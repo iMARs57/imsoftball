@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @namecard.name %>
+</p>
+
+<p>
+  <strong>Tel:</strong>
+  <%= @namecard.tel %>
+</p>
+
+<p>
+  <strong>Address:</strong>
+  <%= @namecard.address %>
+</p>
+
+<p>
+  <strong>Company:</strong>
+  <%= @namecard.company %>
+</p>
+
+<%= link_to 'Edit', edit_namecard_path(@namecard) %> |
+<%= link_to 'Back', namecards_path %>

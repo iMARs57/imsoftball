@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Namecards</h1>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Tel</th>
+      <th>Address</th>
+      <th>Company</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @namecards.each do |namecard| %>
+      <tr>
+        <td><%= namecard.name %></td>
+        <td><%= namecard.tel %></td>
+        <td><%= namecard.address %></td>
+        <td><%= namecard.company %></td>
+        <td><%= link_to 'Show', namecard, class:'btn btn-success' %></td>
+        <td><%= link_to 'Edit', edit_namecard_path(namecard) %></td>
+        <td><%= link_to 'Destroy', namecard, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Namecard', new_namecard_path %>
+<%= paginate @namecards  %>

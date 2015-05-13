@@ -1,0 +1,214 @@
+
+<!-- Navigation -->
+    <nav id="navbar" class="navbar navbar-custom navbar-fixed-top menu" role="navigation">
+        <div class="container menu">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <!--<i class="fa fa-bars"></i>-->
+                    <%= fa_icon "bars" %>
+                </button>
+                <a class="navbar-brand page-scroll" href="#all-top" style="color:#F1772E;">
+                    <!--<i class="fa fa-play-circle"></i> -->
+                    <%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#download" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#contact" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
+                    </li>
+                </ul>
+                <script type="text/javascript">
+                    $(function(){ 
+                        var navMain = $(".navbar-collapse");
+
+                        navMain.on("click", "a", null, function () {
+                        navMain.collapse('hide');
+                    });
+                });
+                </script>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+<!-- Intro Header -->
+    <header class="intro">
+        <div class="height-fill">
+            <div id="slides">
+                <ul class="slides-container">
+                    <li>
+                        <%= image_tag("intro-bg.jpg") %>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-8 col-md-offset-2">
+                                    <a href="#about" class="page-scroll">
+                                    <div id="banner">
+                                        <!-- with "infoman" banner background image -->
+                                    </div>
+                                    </a>
+                                    <!--
+                                    <p class="intro-text">A free, responsive, one page Bootstrap theme.<br>Created by Start Bootstrap.</p>
+                                    <a href="#about" class="btn btn-circle page-scroll">
+                                        <i class="fa fa-angle-double-down animated"></i>
+                                    </a>
+                                    -->
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <%= image_tag("slider1.jpg", width: "1024", height: "685", alt: "2015NICUP_SecondPlace") %>
+                        <div class="container">
+                            <!-- word or something floating upon full scrren image can be added here !!! -->
+                        </div>
+                    </li>
+                    <li>
+                        <%= image_tag("slider2.jpg", width: "1024", height: "685", alt: "2015League_Champion") %>
+                        <div class="container">
+                            <!-- word or something floating upon full scrren image can be added here !!! -->
+                        </div>
+                    </li>
+                    <li>
+                        <%= image_tag("slider3.jpeg", width: "1024", height: "685", alt: "2015I_BMT_CUP_ThirdPlace") %>
+                        <div class="container">
+                            <!-- word or something floating upon full scrren image can be added here !!! -->
+                        </div>
+                    </li>
+                </ul>
+
+                <nav class="slides-navigation">
+                    <a href="#" class="next"><%= fa_icon "chevron-right 2x" %></a>
+                    <a href="#" class="prev"><%= fa_icon "chevron-left 2x" %></a>
+                </nav>            
+            </div>
+        </div>
+    </header>
+    <script>
+        $(window).on('load resize', function(){
+            var win = $(this); //this = window
+            if (win.width() < 768) { 
+                var windowHeight = win.height();
+                var navHeight = $("#navbar").outerHeight();
+                var calculatedHeight = windowHeight - navHeight;
+                var heightFill = $('.height-fill')
+                $(heightFill).height(calculatedHeight);
+                $(heightFill).width(win.width());
+                console.log("Blocked NavBar Case");
+            }
+            else { 
+                var windowHeight = win.height();
+                var heightFill = $('.height-fill')
+                $(heightFill).height(windowHeight);
+                $(heightFill).width(win.width());
+                console.log("Transparent NavBar Case");
+            }
+            // superslides
+            var $slides = $('#slides');
+            
+            Hammer($slides[0]).on("swipeleft", function(e) {
+                $slides.data('superslides').animate('next');
+            });
+
+            Hammer($slides[0]).on("swiperight", function(e) {
+                $slides.data('superslides').animate('prev');
+            });
+
+            $('#slides').superslides({
+                inherit_height_from: '.height-fill',
+                hashchange: false,
+                play: 7000 // 7s per slide
+            });
+            /*
+            $('#slides').on('mouseenter', function() {
+                $(this).superslides('stop');
+                //console.log('Stopped')
+            });
+            $('#slides').on('mouseleave', function() {
+                $(this).superslides('start');
+                //console.log('Started')
+            });
+            */
+        });    
+  </script>
+<!-- About Section -->
+    <section id="news" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                    <%= fa_icon "newspaper-o 3x" ,id:"icon_news"%>
+                    <h2>最新消息</h2>
+                </div>
+                <p>Grayscale is a free Bootstrap 3 theme created by Start Bootstrap. It can be yours right now, simply download the template on <a href="http://startbootstrap.com/template-overviews/grayscale/">the preview page</a>. The theme is open source, and you can use it for any purpose, personal or commercial.</p>
+                <p>This theme features stock photos by <a href="http://gratisography.com/">Gratisography</a> along with a custom Google Maps skin courtesy of <a href="http://snazzymaps.com/">Snazzy Maps</a>.</p>
+                <p>Grayscale includes full HTML, CSS, and custom JavaScript files along with LESS files for easy customization.</p>
+            </div>
+        </div>
+    </section>
+<!-- Download Section -->
+    <section id="download" class="content-section text-center">
+        <div class="download-section">
+            <div class="container">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <h2>Download Grayscale</h2>
+                    <p>You can download Grayscale for free on the preview page at Start Bootstrap.</p>
+                    <a href="http://startbootstrap.com/template-overviews/grayscale/" class="btn btn-default btn-lg">Visit Download Page</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Contact Start Bootstrap</h2>
+                <p>Feel free to email us to provide some feedback on our templates, give us suggestions for new templates and themes, or to just say hello!</p>
+                <p><a href="mailto:feedback@startbootstrap.com">feedback@startbootstrap.com</a>
+                </p>
+                <ul class="list-inline banner-social-buttons">
+                    <li>
+                        <a href="https://twitter.com/SBootstrap" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                    </li>
+                    <li>
+                        <a href="https://plus.google.com/+Startbootstrap/posts" class="btn btn-default btn-lg"><i class="fa fa-google-plus fa-fw"></i> <span class="network-name">Google+</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+<!-- Map Section -->
+    <div id="map"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>Copyright &copy; Your Website 2014</p>
+        </div>
+    </footer>

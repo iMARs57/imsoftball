@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html id="all-top">
 <head>
-  <title>Imsoftball</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NTUIM Softball</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" %>
+  <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Montserrat:400,700" %>
   <%= csrf_meta_tags %>
 </head>
-<body>
-
-<%= yield %>
-
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+	<%= yield %>
 </body>
 </html>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 1) do
+ActiveRecord::Schema.define(version: 20150506075123) do
 
   create_table "battings", id: false, force: :cascade do |t|
     t.text    "game_id",   null: false
@@ -81,6 +81,15 @@ ActiveRecord::Schema.define(version: 1) do
   add_index "games", ["cup_id"], name: "gamecup_id"
   add_index "games", ["game_id"], name: "game_id_1"
   add_index "games", ["game_id"], name: "sqlite_autoindex_games_1", unique: true
+
+  create_table "namecards", force: :cascade do |t|
+    t.string   "name"
+    t.string   "tel"
+    t.string   "address"
+    t.string   "company"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "pitchings", id: false, force: :cascade do |t|
     t.text    "game_id",   null: false

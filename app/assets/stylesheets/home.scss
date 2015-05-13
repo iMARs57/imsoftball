@@ -1,0 +1,47 @@
+// Place all the styles related to the home controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+img.menu_icon{
+	
+	float:left;
+	margin:-5px 10px 0 10px;
+}
+
+nav.menu{
+	
+	min-height:45px;
+}
+
+div.menu{
+	
+	margin-top:-5px;
+
+}
+#banner{
+
+  	margin: 30% auto 0 auto;
+  	background-image: image-url("banner.png");
+  	background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    padding-top: 37.30%; /* (img-height / img-width * width) */
+                		 /* (141 / 378 * 100) */
+
+}
+
+@media(max-width:768px) {
+	.intro{
+		margin-top:52px;
+	}
+}
+
+a.page-scroll{
+
+	font-weight: bold;
+}
+
+#icon_news{
+	
+	margin:0 auto 10px auto;
+}
