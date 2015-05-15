@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150506075123) do
+ActiveRecord::Schema.define(version: 20150515021414) do
 
   create_table "battings", id: false, force: :cascade do |t|
     t.text    "game_id",   null: false
@@ -82,6 +82,14 @@ ActiveRecord::Schema.define(version: 20150506075123) do
   add_index "games", ["game_id"], name: "game_id_1"
   add_index "games", ["game_id"], name: "sqlite_autoindex_games_1", unique: true
 
+  create_table "information", force: :cascade do |t|
+    t.date     "date"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
   create_table "namecards", force: :cascade do |t|
     t.string   "name"
     t.string   "tel"
@@ -138,5 +146,24 @@ ActiveRecord::Schema.define(version: 20150506075123) do
 
   add_index "teams", ["team_id"], name: "sqlite_autoindex_teams_1", unique: true
   add_index "teams", ["team_id"], name: "team_id"
+
+  create_table "users", force: :cascade do |t|
+    t.string   "email",                  default: "", null: false
+    t.string   "encrypted_password",     default: "", null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "username"
+  end
+
+  add_index "users", ["email"], name: "index_users_on_email", unique: true
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
 end

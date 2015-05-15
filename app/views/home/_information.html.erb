@@ -1,0 +1,18 @@
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>日期</th>
+                <th>Event</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @informations.each do |information| %>
+                <tr>
+                    <td><%= information.date %></td>
+                    <td><%= information.description %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

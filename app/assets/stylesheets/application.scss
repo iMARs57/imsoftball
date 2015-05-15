@@ -14,6 +14,10 @@
  *= require_self
  *= require font-awesome
  *= require "grayscale/grayscale.scss"
+ # SASS
+ *= require devise_bootstrap_views
+ # LESS
+ *= require devise_bootstrap_views_less
 
  */
 @import "bootstrap-sprockets";
