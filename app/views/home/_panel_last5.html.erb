@@ -1,0 +1,47 @@
+<thead>
+    <tr>
+        <th>場次</th>
+        <th>盃賽</th>
+        <th>客隊</th>
+        <th>主隊</th>
+        <th>比數</th>
+        <th>勝負</th>
+    </tr>
+</thead>
+<tbody>
+    <% panel_last5.each do |game| %>
+    <tr>	
+        <td><%= game.game_id %></td>
+        <td><%= game.cup_name %></td>
+    	<td><%= game.teamAway_name %></td>
+    	<td><%= game.teamHome_name %></td>
+    	<td><%= game.away_score.to_s + " : " + game.home_score.to_s %></td>
+    	
+    	<%  if(game.teamAway_name == "台大資管" ||
+    		  (game.teamAway_name == "資管A" && game.teamHome_name != "資管B") ||
+    		  (game.teamAway_name == "資管B" && game.teamHome_name != "資管A"))
+    	%>
+    		<% if(game.away_score > game.home_score) %>
+    			<td style="color:red; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "勝" %></td>
+    		<% elsif(game.away_score < game.home_score) %>
+    			<td style="color:green; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "敗" %></td>
+    		<% else %>
+    			<td style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "和" %></td>
+    		<% end %>
+    	<%  elsif(game.teamHome_name == "台大資管" ||
+    			 (game.teamHome_name == "資管A" && game.teamAway_name != "資管B") ||
+    			 (game.teamHome_name == "資管B" && game.teamAway_name != "資管A"))
+    	%>
+    		<% if(game.home_score > game.away_score) %>
+    			<td style="color:red; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "勝" %></td>
+    		<% elsif(game.home_score < game.away_score) %>
+    			<td style="color:green; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "敗" %></td>
+    		<% else %>
+    			<td style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "和" %></td>
+    		<% end %>
+    	<% else %>
+    		<td style="color:#999; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;"><%= "無關勝敗" %></td>
+    	<%  end %>	
+    </tr>
+    <% end %>
+</tbody>

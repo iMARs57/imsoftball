@@ -14,31 +14,31 @@
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav ul_menu">
                     <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
                     <li class="hidden">
                         <a href="#page-top"></a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
+                        <a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#download" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
+                        <a class="page-scroll menuLink" href="#download" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#contact" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+                        <a class="page-scroll menuLink" href="#contact" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
+                        <a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
+                        <a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
+                        <a class="page-scroll menuLink" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
+                        <a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
                     </li>
                 </ul>
                 <script type="text/javascript">
@@ -61,15 +61,15 @@
             <div id="slides">
                 <ul class="slides-container">
                     <li>
-                        <%= image_tag("intro-bg.jpg") %>
+                        <%= image_tag("softCover.png") %>
+                        <!--<a href="#news" class="page-scroll">-->
+                        <div id="banner">
+                            <!-- with "infoman" banner background image -->
+                        </div>
+                        <!--</a>-->
                         <div class="container">
                             <div class="row">
                                 <div class="col-md-8 col-md-offset-2">
-                                    <a href="#news" class="page-scroll">
-                                    <div id="banner">
-                                        <!-- with "infoman" banner background image -->
-                                    </div>
-                                    </a>
                                     <div class="alert alert-dismissable alert-warning">
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                                         <h4>Notice!</h4>
@@ -120,25 +120,29 @@
     <script>
         $(window).on('load resize', function(){
             var win = $(this); //this = window
+            var windowHeight = win.height();
+            var navHeight = $("#navbar").outerHeight();
             if (win.width() < 768) { 
-                var windowHeight = win.height();
-                var navHeight = $("#navbar").outerHeight();
                 var calculatedHeight = windowHeight - navHeight;
                 var heightFill = $('.height-fill')
-                $(heightFill).height(calculatedHeight);
+                $(heightFill).height(calculatedHeight+5);
                 $(heightFill).width(win.width());
                 console.log("Blocked NavBar Case");
             }
             else { 
-                var windowHeight = win.height();
                 var heightFill = $('.height-fill')
-                $(heightFill).height(windowHeight);
+                $(heightFill).height(windowHeight+5);
                 $(heightFill).width(win.width());
                 console.log("Transparent NavBar Case");
             }
+
+            console.log("winH:" + windowHeight);
+            console.log("navH:" + navHeight);
+
             // superslides
             var $slides = $('#slides');
             
+            // mobile devices swipe shift
             Hammer($slides[0]).on("swipeleft", function(e) {
                 $slides.data('superslides').animate('next');
             });
@@ -146,33 +150,55 @@
             Hammer($slides[0]).on("swiperight", function(e) {
                 $slides.data('superslides').animate('prev');
             });
-
+            
+            // superslides activate
             $('#slides').superslides({
                 inherit_height_from: '.height-fill',
                 hashchange: false,
                 play: 7000 // 7s per slide
             });
-            /*
+            
+            // superslides play setting
+            var hoverTimer = 0;
             $('#slides').on('mouseenter', function() {
                 $(this).superslides('stop');
-                //console.log('Stopped')
+                clearTimeout(hoverTimer);
+                //console.log(hoverTimer);
             });
+            
             $('#slides').on('mouseleave', function() {
-                $(this).superslides('start');
-                //console.log('Started')
+                hoverTimer = setTimeout(function(){
+                    $slides.superslides('start');
+                    //console.log(hoverTimer);
+                }, 7000);
             });
-            */
-        });    
-  </script>
+
+            // set up banner size (as sliders')
+            var containerHeight = $('#slides').height();
+            var containerWidth = $('#slides').width();
+            $('#banner').outerHeight(containerHeight);
+            $('#banner').outerWidth(containerWidth);
+
+            var menuHeight = $('div.menu').height();
+            //console.log('containerHeight:' + menuHeight);
+            $('#news').css('min-height', (windowHeight - menuHeight));
+            //console.log(windowHeight + " - " + menuHeight + " = " + $('#news').height());
+            $('#news').css('margin-top',-menuHeight);
+            $('#news').css('padding-top',menuHeight);
+            $('#news').css('padding-bottom',menuHeight);
+
+        });
+
+    </script>
 <!-- About Section -->
-    <section id="news" class="container content-section text-center">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
+    <section id="news" class="container text-center">
+        <div class="row" id="news_row">
+            <div class="col-sm-5" id="div_news">
                 <div>
                     <%= fa_icon "newspaper-o 3x" ,id:"icon_news"%>
                     <h2>最新消息</h2>
                 </div>
-                <div class="table-responsive">
+                <div class="table-responsive panel panel-default">
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -189,6 +215,166 @@
                     <%= paginate @informations, :remote => true %>
                 </div>
             </div>
+            <div class="col-sm-7">
+                <div>    
+                    <%= fa_icon "trophy 3x" ,id:"icon_news"%>
+                    <h2>Info Board</h2>
+                </div>
+                <div class="tabbable" id="tabs_standings">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#panel_last5" data-toggle="tab">近期戰況</a>
+                        </li>
+                        <li>
+                            <a href="#panel_standings" data-toggle="tab">年度戰績</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="panel_last5">
+                            <ul class="nav nav-tabs">
+                                <li class="active">
+                                    <a href="#panel_allGames" data-toggle="tab">所有賽事</a>
+                                </li>
+                                <li>
+                                    <a href="#panel_formalGames" data-toggle="tab">正式賽</a>
+                                </li>
+                                <li>
+                                    <a href="#panel_officialGames" data-toggle="tab">官方賽</a>
+                                </li>
+                                <li>
+                                    <a href="#panel_leagueGames" data-toggle="tab">聯盟賽</a>
+                                </li>
+                                <li>
+                                    <a href="#panel_friendlyGames" data-toggle="tab">友誼賽</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="panel_allGames">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_last5", :locals => {:panel_last5 => @panel_allGames} %>
+                                    </table>        
+                                </div>
+                                <div class="tab-pane" id="panel_formalGames">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_last5", :locals => {:panel_last5 => @panel_formalGames} %>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_officialGames">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_last5", :locals => {:panel_last5 => @panel_officialGames} %>
+                                    </table>
+                                    <p align:center style="font-size:16px">官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃</p>
+                                </div>
+                                <div class="tab-pane" id="panel_leagueGames">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_last5", :locals => {:panel_last5 => @panel_leagueGames} %>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_friendlyGames">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_last5", :locals => {:panel_last5 => @panel_friendlyGames} %>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="panel_standings">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>出賽</th>
+                                        <th>勝</th>
+                                        <th>敗</th>
+                                        <th>和</th>
+                                        <th>勝率</th>
+                                        <th>近10場</th>
+                                        <th>主場</th>
+                                        <th>客場</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><%= @panel_standings_GP %></td>
+                                        <td><%= @panel_standings_W %></td>
+                                        <td><%= @panel_standings_L %></td>
+                                        <td><%= @panel_standings_D %></td>
+                                        <td><%= (@panel_standings_W.to_f / @panel_standings_GP.to_f).round(3) %></td>
+                                        <td><%= @panel_standings_last10_W.to_s + "-" + @panel_standings_last10_L.to_s + "-" + @panel_standings_last10_D.to_s %></td>
+                                        <td><%= @panel_standings_home_W.to_s + "-" + @panel_standings_home_L.to_s + "-" + @panel_standings_home_D.to_s %></td>
+                                        <td><%= @panel_standings_away_W.to_s + "-" + @panel_standings_away_L.to_s + "-" + @panel_standings_away_D.to_s %></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>團隊打擊率</th>
+                                        <th>團隊守備率</th>
+                                        <th>團隊防禦率(五局/七局)</th>
+                                        <th>全壘打</th>
+                                        <th>失誤</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><%= (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f).round(3) %></td>
+                                        <td><%= ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f).round(3) %></td>
+                                        <td><%= @panel_standings_AvgERA5.to_s + " / " + @panel_standings_AvgERA7.to_s %></td>
+                                        <td><%= @panel_standings_forAvgBat.allHR %></td>
+                                        <td><%= @panel_standings_forAvgDef.allE %></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="margin:0 5%">
+                                <p style="text-align:left;font-size:14px">
+                                    註. 此區僅統計&quot;台大資管&quot;、&quot;資管A&quot;、&quot;資管B&quot;(不包含紅白賽)於<%= @academicYear %>學年度(<%= @academicYear %>年9月~<%= (@academicYear.to_i+1) %>年8月)的出賽紀錄,並未包含所有已登錄之賽事
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tabbable" id="tabs_top5">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#panel_battingTop5" data-toggle="tab">打擊排行</a>
+                    </li>
+                    <li>
+                        <a href="#panel_pitchingTop5" data-toggle="tab">投手排行</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="panel_battingTop5">
+                        <p>
+                            打擊排行
+                        </p>
+                    </div>
+                    <div class="tab-pane" id="panel_pitchingTop5">
+                        <p>
+                            投手排行
+                        </p>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <script type="text/javascript">
+
+                $(function(){
+
+                    // We want kaminari's github theme, but not its color...
+                    $('.pagination a').addClass('btn btn-default').css('color','#FFFFFF').css("border", "#F1772E");
+                    $('span.disabled').addClass('btn btn-default').css('color','#CCCCCC').css("border", "#F1772E");
+                    $('.pagination a').attr('role','button');
+
+                });
+
+                // We want kaminari's github theme, but not its color...(for ajax part)
+                $(document).ajaxComplete(function(){
+                    $('.pagination a').addClass('btn btn-default').css('color','#FFFFFF').css("border", "#F1772E");
+                    $('span.disabled').addClass('btn btn-default').css('color','#CCCCCC').css("border", "#F1772E");
+                    $('.pagination a').attr('role','button');
+                });
+                
+
+            </script>
         </div>
     </section>
 <!-- Download Section -->
@@ -232,6 +418,6 @@
     <!-- Footer -->
     <footer>
         <div class="container text-center">
-            <p>Copyright &copy; Your Website 2014</p>
+            <p>Copyright &copy; NTUIM Softball <%= Time.now.year %></p>
         </div>
     </footer>

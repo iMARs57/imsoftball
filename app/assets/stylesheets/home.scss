@@ -15,19 +15,58 @@ nav.menu{
 
 div.menu{
 	
-	margin-top:-5px;
+	/*margin-top:-5px;*/
 
 }
 #banner{
-
-  	margin: 30% auto 0 auto;
+	
+  	margin-left: auto;
+  	margin-right: auto;
   	background-image: image-url("banner.png");
-  	background-size: 100% auto;
+  	background-size: 70% auto;
     background-repeat: no-repeat;
-    background-position: 50% 50%;
-    padding-top: 37.30%; /* (img-height / img-width * width) */
-                		 /* (141 / 378 * 100) */
+    background-position: center center;
 
+}
+
+#news{
+	
+	width:100vw;
+	position: relative;
+}
+
+#news:after{
+	content : "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: image-url("bat.jpg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: auto 100%;
+    width: 100%;
+    height: 100%;
+    opacity : 0.5;
+    z-index: -1;
+}
+
+#news_row{
+	
+	padding: 10% 5%;
+	margin: 0 0;
+}
+
+div.panel{
+	background:rgba(255,255,255,0.3);
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: #F1772E;
+}
+
+.table thead tr th {
+   text-align: center;   
 }
 
 @media(max-width:768px) {
@@ -41,7 +80,77 @@ a.page-scroll{
 	font-weight: bold;
 }
 
+a.menuLink{
+	
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+ul.ul_menu > li.active > a{
+	
+	text-shadow: none;
+}
+
 #icon_news{
 	
 	margin:0 auto 10px auto;
+}
+
+#panel_last5, #panel_standings{
+
+	margin-top:5px;
+}
+
+#div_news{
+	
+	margin-bottom:20px;
+}
+
+div.tabbable > ul > li > a{
+	
+	color: #FFFFFF;
+
+}
+
+div.tabbable > ul > li > a:hover, div.tabbable > ul > li > a:focus{
+	
+	color: red;
+	background-color: rgba(255,255,255,0.5);
+}
+
+div.tabbable > ul > li.active > a{
+	
+	color: #F1772E;
+	background-color: #FFFFFF;
+
+}
+
+div.tabbable > ul > li.active > a:hover, div.tabbable > ul > li.active > a:focus{
+	
+	color: #F1772E;
+	background-color: #FFFFFF;
+}
+
+/*--------------------------------------*/
+
+div.tab-pane > ul > li > a{
+	
+	color: #FFFFFF;
+}
+
+div.tab-pane > ul > li > a:hover, div.tab-pane > ul > li > a:focus{
+	
+	color: #FFFFFF;
+	background-color: rgba(0,0,255,0.5);
+}
+
+div.tab-pane > ul > li.active > a{
+	
+	color: #FFFFFF;
+	background-color: blue;
+}
+
+div.tab-pane > ul > li.active > a:hover, div.tab-pane > ul > li.active > a:focus{
+	
+	color: #FFFFFF;
+	background-color: blue;
 }
