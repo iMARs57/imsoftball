@@ -44,17 +44,22 @@ class HomeController < ApplicationController
   		#end
       
       # 執行秀出已授權可看的畫面內容
+
       if(Time.now.year < 2011)
         if Time.now.month >= 9
           @academicYear = '0' + (Time.now.year - 1911).to_s
+          @thisyear = Time.now.year
         else
           @academicYear = '0' + (Time.now.year - 1912).to_s
+          @thisyear = Time.now.year - 1
         end
       else
         if Time.now.month >= 9
           @academicYear = (Time.now.year - 1911).to_s
+          @thisyear = Time.now.year
         else
           @academicYear = (Time.now.year - 1912).to_s
+          @thisyear = Time.now.year - 1
         end
       end
 
@@ -251,7 +256,7 @@ class HomeController < ApplicationController
       @panel_standings_AvgERA5 = (15 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f).round(2)
       @panel_standings_AvgERA7 = (21 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f).round(2)
 
-
+      
 
                                 
                                                          
