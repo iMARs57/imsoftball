@@ -237,14 +237,14 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="panel_last5">
-                            <ul class="nav nav-tabs">
+                            <ul class="nav nav-tabs nav-justified">
                                 <li class="active">
                                     <a href="#panel_allGames" data-toggle="tab">所有賽事</a>
                                 </li>
                                 <li>
                                     <a href="#panel_formalGames" data-toggle="tab">正式賽</a>
                                 </li>
-                                <li>
+                                <li class="withToolTip" data-toggle="tooltip" title="官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃">
                                     <a href="#panel_officialGames" data-toggle="tab">官方賽</a>
                                 </li>
                                 <li>
@@ -269,7 +269,7 @@
                                     <table class="table table-hover">
                                         <%= render :partial => "panel_last5", :locals => {:panel_last5 => @panel_officialGames} %>
                                     </table>
-                                    <p align:center style="font-size:16px">官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃</p>
+                                    <!--<p align:center style="font-size:16px">官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃</p>-->
                                 </div>
                                 <div class="tab-pane" id="panel_leagueGames">
                                     <table class="table table-hover">
@@ -339,89 +339,95 @@
                     </div>
                 </div>
                 <div class="tabbable" id="tabs_top5">
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a href="#panel_battingTop5" data-toggle="tab">打擊排行</a>
-                    </li>
-                    <li>
-                        <a href="#panel_pitchingTop5" data-toggle="tab">投手排行</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="panel_battingTop5">
-                        
-                        <ul class="nav nav-tabs">
-                            <script type="text/javascript">
-                                $(function(){
-                                    // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
-                                    $('#panel_battingTop5 > ul > li').tooltip({
-                                        // 為了不換行的設定
-                                        template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;"></div></div>'
-                                    });  
-                                });
-                                
-                            </script>
-                            <li class="active" data-toggle="tooltip" title="打擊率">
-                                <a href="#panel_AVG" data-toggle="tab">AVG</a>
-                            </li>
-                            <li data-toggle="tooltip" title="打擊率(補足打席)">
-                                <a href="#panel_AVGS" data-toggle="tab">AVG(S)</a>
-                            </li>
-                            <li data-toggle="tooltip" title="安打">
-                                <a href="#panel_H" data-toggle="tab">H</a>
-                            </li>
-                            <li data-toggle="tooltip" title="全壘打">
-                                <a href="#panel_HR" data-toggle="tab">HR</a>
-                            </li>
-                            <li data-toggle="tooltip" title="打點">
-                                <a href="#panel_RBI" data-toggle="tab">RBI</a>
-                            </li>
-                            <li data-toggle="tooltip" title="得分">
-                                <a href="#panel_R" data-toggle="tab">R</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="panel_AVG">
-                                <table class="table table-hover">
-                                    <%#= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_leagueGames} %>
-                                </table>        
-                            </div>
-                            <div class="tab-pane" id="panel_AVGS">
-                                <table class="table table-hover">
-                                    
-                                </table>
-                            </div>
-                            <div class="tab-pane" id="panel_H">
-                                <table class="table table-hover">
-                                    
-                                </table>
-                                <p align:center style="font-size:16px">官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃</p>
-                            </div>
-                            <div class="tab-pane" id="panel_HR">
-                                <table class="table table-hover">
-                                    
-                                </table>
-                            </div>
-                            <div class="tab-pane" id="panel_RBI">
-                                <table class="table table-hover">
-                                    
-                                </table>
-                            </div>
-                            <div class="tab-pane" id="panel_R">
-                                <table class="table table-hover">
-                                    
-                                </table>
-                            </div>
-                        </div>                        
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#panel_battingTop5" data-toggle="tab">打擊排行</a>
+                        </li>
+                        <li>
+                            <a href="#panel_pitchingTop5" data-toggle="tab">投手排行</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="panel_battingTop5">
+                            <ul class="nav nav-tabs nav-justified">
+                                <script type="text/javascript">
+                                    $(function(){
+                                        // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
+                                        $('#panel_battingTop5 > ul > li').tooltip({
+                                            // 為了不換行的設定
+                                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;"></div></div>',
+                                            container: 'body'
+                                        }); 
 
-                    </div>
-                    <div class="tab-pane" id="panel_pitchingTop5">
-                        <p>
-                            投手排行
-                        </p>
+                                        $('.withToolTip').tooltip({
+                                            // 為了不換行的設定
+                                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;max-width: 350px;"></div></div>',
+                                            container: 'body',
+                                        }); 
+                                    });
+                                </script>
+                                <li class="active" data-toggle="tooltip" title="打擊率">
+                                    <a href="#panel_AVG" data-toggle="tab">AVG</a>
+                                </li>
+                                <li data-toggle="tooltip" title="打擊率(補足打席)">
+                                    <a href="#panel_AVGS" data-toggle="tab">AVG(S)</a>
+                                </li>
+                                <li data-toggle="tooltip" title="安打">
+                                    <a href="#panel_H" data-toggle="tab">H</a>
+                                </li>
+                                <li data-toggle="tooltip" title="全壘打">
+                                    <a href="#panel_HR" data-toggle="tab">HR</a>
+                                </li>
+                                <li data-toggle="tooltip" title="打點">
+                                    <a href="#panel_RBI" data-toggle="tab">RBI</a>
+                                </li>
+                                <li data-toggle="tooltip" title="得分">
+                                    <a href="#panel_R" data-toggle="tab">R</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="panel_AVG">
+                                    <table class="table table-hover">
+                                        <%= @gameNumber %>
+                                        <%#= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_leagueGames} %>
+                                    </table>        
+                                </div>
+                                <div class="tab-pane" id="panel_AVGS">
+                                    <table class="table table-hover">
+                                    
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_H">
+                                    <table class="table table-hover">
+                                    
+                                    </table>
+                                    <p align:center style="font-size:16px">官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃</p>
+                                </div>
+                                <div class="tab-pane" id="panel_HR">
+                                    <table class="table table-hover">
+                                    
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_RBI">
+                                    <table class="table table-hover">
+                                    
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_R">
+                                    <table class="table table-hover">
+                                    
+                                    </table>
+                                </div>
+                            </div>                        
+
+                        </div>
+                        <div class="tab-pane" id="panel_pitchingTop5">
+                            <p>
+                                投手排行
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
             <script type="text/javascript">
 

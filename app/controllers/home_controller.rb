@@ -257,6 +257,17 @@ class HomeController < ApplicationController
       @panel_standings_AvgERA7 = (21 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f).round(2)
 
       
+      # Top 5 panel
+
+      @activePLAYER = 150
+      @gameNumber = Game.where('cups.year = ' + @thisyear.to_s).joins('INNER JOIN cups ON cups.cup_id = games.cup_id').count()
+      
+
+
+
+
+
+      #@panel_top5_AVG = 
 
                                 
                                                          

@@ -31,7 +31,7 @@ div.menu{
 
 #news{
 	
-	width:100vw;
+	width:100%;
 	position: relative;
 }
 
@@ -73,6 +73,34 @@ div.panel{
 	.intro{
 		margin-top:52px;
 	}
+
+	.nav-justified > li {
+    	display: table-cell !important;
+  	}
+  	
+  	#tabs_standings *, #tabs_top5 *{
+
+		overflow-x: auto;
+		overflow-y:hidden;
+	}
+
+	/*
+	#panel_battingTop5 > ul {
+
+		overflow-x: auto;
+  		overflow-y: hidden;
+  		display: -webkit-box;
+  		display: -moz-box;
+
+	}
+
+	#panel_battingTop5 > ul > li {
+
+		display: table-cell !important;
+		float: none;
+	}
+	*/
+
 }
 
 a.page-scroll{
@@ -95,7 +123,7 @@ ul.ul_menu > li.active > a{
 	margin:0 auto 10px auto;
 }
 
-#panel_last5, #panel_standings{
+#panel_last5, #panel_standings, #panel_battingTop5, #panel_pitchingTop5{
 
 	margin-top:5px;
 }
@@ -153,4 +181,15 @@ div.tab-pane > ul > li.active > a:hover, div.tab-pane > ul > li.active > a:focus
 	
 	color: #FFFFFF;
 	background-color: blue;
+}
+
+#tabs_standings *, #tabs_top5 *{
+	
+	vertical-align:middle;
+
+}
+
+#tabs_standings * td, #tabs_standings * a, #tabs_top5 * td, #tabs_top5 * a{
+
+	white-space: nowrap;
 }
