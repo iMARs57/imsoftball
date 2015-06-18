@@ -23,16 +23,16 @@
                         <a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
                     </li>
                     <li>
-                        <a class="page-scroll menuLink" href="#download" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#contact" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+                        <a class="page-scroll menuLink" href="#about" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
                     </li>
                     <li>
                         <a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
                     </li>
                     <li>
                         <a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
                     </li>
                     <li>
                         <a class="page-scroll menuLink" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
@@ -44,11 +44,17 @@
                 <script type="text/javascript">
                     $(function(){ 
                         var navMain = $(".navbar-collapse");
+                        var navHeader = $(".navbar-header");
 
                         navMain.on("click", "a", null, function () {
-                        navMain.collapse('hide');
+                            navMain.collapse('hide');
+                        });
+
+                        navHeader.on("click", "a", null, function () {
+                            navMain.collapse('hide');
+                        });
+
                     });
-                });
                 </script>
             </div>
             <!-- /.navbar-collapse -->
@@ -61,55 +67,32 @@
             <div id="slides">
                 <ul class="slides-container">
                     <li>
-                        <%= image_tag("softCover.png") %>
+                        <div class="poster">
+                            <%= image_tag("blackandorange_wide.png") %>
+                        </div>
                         <!--<a href="#news" class="page-scroll">-->
-                        <div id="banner">
-                            <!-- with "infoman" banner background image -->
-                        </div>
-                        <!--</a>-->
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md-8 col-md-offset-2">
-                                    <div class="alert alert-dismissable alert-warning">
-                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                        <h4>Notice!</h4>
-                                        <p class="notice"><%= notice %></p>
-                                    </div>
-                                    <div class="alert alert-dismissable alert-danger">
-                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                        <h4>Alert!</h4>
-                                        <p class="alert"><%= alert %></p>
-                                    </div>
-                                    <!--
-                                    <p class="intro-text">A free, responsive, one page Bootstrap theme.<br>Created by Start Bootstrap.</p>
-                                    <a href="#about" class="btn btn-circle page-scroll">
-                                        <i class="fa fa-angle-double-down animated"></i>
-                                    </a>
-                                    -->
-                                </div>
-                            </div>
-                        </div>
+                        <!--<div id="banner"></div>-->
                     </li>
                     <li>
-                        <%= image_tag("slider1.jpg", width: "1024", height: "685", alt: "2015NTUPremier16_Champion") %>
+                        <%= image_tag("slider/slider1.jpg", width: "1024", height: "685", alt: "2015NTUPremier16_Champion") %>
                         <div class="container">
                             <!-- word or something floating upon full scrren image can be added here !!! -->
                         </div>
                     </li>
                     <li>
-                        <%= image_tag("slider2.jpg", width: "1024", height: "685", alt: "2015NICUP_SecondPlace") %>
+                        <%= image_tag("slider/slider2.jpg", width: "1024", height: "685", alt: "2015NICUP_SecondPlace") %>
                         <div class="container">
                             <!-- word or something floating upon full scrren image can be added here !!! -->
                         </div>
                     </li>
                     <li>
-                        <%= image_tag("slider3.jpg", width: "1024", height: "685", alt: "2015League_Champion") %>
+                        <%= image_tag("slider/slider3.jpg", width: "1024", height: "685", alt: "2015League_Champion") %>
                         <div class="container">
                             <!-- word or something floating upon full scrren image can be added here !!! -->
                         </div>
                     </li>
                     <li>
-                        <%= image_tag("slider4.jpg", width: "1024", height: "685", alt: "2015I_BMT_CUP_ThirdPlace") %>
+                        <%= image_tag("slider/slider4.jpg", width: "1024", height: "685", alt: "2015I_BMT_CUP_ThirdPlace") %>
                         <div class="container">
                             <!-- word or something floating upon full scrren image can be added here !!! -->
                         </div>
@@ -124,26 +107,40 @@
         </div>
     </header>
     <script>
+        // for responsive design
         $(window).on('load resize', function(){
             var win = $(this); //this = window
-            var windowHeight = win.height();
+            var windowHeight = win.outerHeight();
             var navHeight = $("#navbar").outerHeight();
+            var menuHeight = $('div.menu').height();
+
             if (win.width() < 768) { 
                 var calculatedHeight = windowHeight - navHeight;
-                var heightFill = $('.height-fill')
-                $(heightFill).height(calculatedHeight+5);
+                var heightFill = $('.height-fill');
+                $(heightFill).height(calculatedHeight);
                 $(heightFill).width(win.width());
-                console.log("Blocked NavBar Case");
+                //console.log("Blocked NavBar Case");
+                if($('#ul_about').hasClass("nav-stacked")){
+                    $('#ul_about').removeClass("nav-stacked");
+                }
+                if(win.width() < 600){
+                    $('#ul_about').css('display','block');
+                }
+                else{
+                    $('#ul_about').css('display','inline-block');
+                }
+                $('body').css('padding-top',navHeight);
             }
             else { 
-                var heightFill = $('.height-fill')
-                $(heightFill).height(windowHeight+5);
+                var heightFill = $('.height-fill');
+                $(heightFill).height(windowHeight);
                 $(heightFill).width(win.width());
-                console.log("Transparent NavBar Case");
+                //console.log("Transparent NavBar Case");
+                if(!$('#ul_about').hasClass("nav-stacked")){
+                    $('#ul_about').addClass("nav-stacked");
+                }
+                $('body').css('padding-top',0);
             }
-
-            console.log("winH:" + windowHeight);
-            console.log("navH:" + navHeight);
 
             // superslides
             var $slides = $('#slides');
@@ -182,17 +179,68 @@
             // set up banner size (as sliders')
             var containerHeight = $('#slides').height();
             var containerWidth = $('#slides').width();
-            $('#banner').outerHeight(containerHeight);
-            $('#banner').outerWidth(containerWidth);
+            $('#poster').outerHeight(containerHeight);
+            $('#poster').outerWidth(containerWidth);
 
-            var menuHeight = $('div.menu').height();
-            //console.log('containerHeight:' + menuHeight);
-            $('#news').css('min-height', (windowHeight - menuHeight));
-            //console.log(windowHeight + " - " + menuHeight + " = " + $('#news').height());
-            $('#news').css('margin-top',-menuHeight);
-            $('#news').css('padding-top',menuHeight);
-            $('#news').css('padding-bottom',menuHeight);
+            // overwrite page-scroll的定義, 考慮navbar後重新計算scroll的offset
+            $('[data-spy="scroll"]').each(function () {
+                var $spy = $(this).scrollspy('refresh')
+            })
 
+            $('a.page-scroll').bind('click', function(event) {
+                var $anchor = $(this);
+                $('html, body').stop().animate({
+                    scrollTop: $($anchor.attr('href')).offset().top - (menuHeight - 1)
+                }, 1500, 'easeInOutExpo');
+                event.preventDefault();
+            });
+
+            // scrollspy修改offset只能動到click事件,scroll到各個section以切換active li事件部分得自己寫...
+            $(window).scroll(function() {
+                
+                var cur_pos = $(window).scrollTop();
+                var sections = $('section');
+                var navbar = $('#navbar')
+
+                sections.each(function(){
+                    
+                    //console.log($(this).attr('id').toString());
+                    var top = $(this).offset().top - menuHeight;
+                    var bottom = top + $(this).outerHeight();
+
+                    if(cur_pos >= top && cur_pos <= bottom){
+                        navbar.find('li').removeClass('active');
+                        navbar.find('a[href="#'+$(this).attr('id')+'"]').parent('li').addClass('active');
+                    }
+                });
+
+                if(cur_pos < $('#news').offset().top - menuHeight){
+                    var nav_lis = navbar.find('li');
+                    nav_lis.each(function(){
+                        if($(this).hasClass('active')){
+                            $(this).removeClass('active');
+                        } 
+                    });
+                }
+            });
+
+            // top 5 portrait size
+            $('img.top5_portrait').height(windowHeight*0.10);
+
+            // for 16 : 9 map size :)
+            $('#panel_map').height($('#practice').width() * 0.45);
+            $('#panel_map').width($('#practice').width() * 0.8);
+
+            $('.map_description').css('padding-left',$('#practice').width()*0.1);
+            $('.map_description').css('max-width',$('#practice').width()*0.9);
+            
+            // load的時候地圖也會跑掉，所以要resize一次
+            var m = $('#map').data('tinyMap');
+            // 1.觸發 map resize 事件
+            google.maps.event.trigger(m.map, 'resize');
+            // 2.移動地圖中心
+            m.map.panTo(new google.maps.LatLng('25.017344', '121.539746'));
+            
         });
 
     </script>
@@ -303,7 +351,7 @@
                                         <td><%= @panel_standings_W %></td>
                                         <td><%= @panel_standings_L %></td>
                                         <td><%= @panel_standings_D %></td>
-                                        <td><%= (@panel_standings_W.to_f / @panel_standings_GP.to_f).round(3) %></td>
+                                        <td><%= '%.3f' % (@panel_standings_W.to_f / @panel_standings_GP.to_f) %></td>
                                         <td><%= @panel_standings_last10_W.to_s + "-" + @panel_standings_last10_L.to_s + "-" + @panel_standings_last10_D.to_s %></td>
                                         <td><%= @panel_standings_home_W.to_s + "-" + @panel_standings_home_L.to_s + "-" + @panel_standings_home_D.to_s %></td>
                                         <td><%= @panel_standings_away_W.to_s + "-" + @panel_standings_away_L.to_s + "-" + @panel_standings_away_D.to_s %></td>
@@ -322,8 +370,8 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><%= (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f).round(3) %></td>
-                                        <td><%= ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f).round(3) %></td>
+                                        <td><%= '%.3f' % (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f) %></td>
+                                        <td><%= '%.3f' % ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f) %></td>
                                         <td><%= @panel_standings_AvgERA5.to_s + " / " + @panel_standings_AvgERA7.to_s %></td>
                                         <td><%= @panel_standings_forAvgBat.allHR %></td>
                                         <td><%= @panel_standings_forAvgDef.allE %></td>
@@ -355,7 +403,7 @@
                                         // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
                                         $('#panel_battingTop5 > ul > li').tooltip({
                                             // 為了不換行的設定
-                                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;"></div></div>',
+                                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;max-width: 350px;"></div></div>',
                                             container: 'body'
                                         }); 
 
@@ -363,13 +411,20 @@
                                             // 為了不換行的設定
                                             template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;max-width: 350px;"></div></div>',
                                             container: 'body',
-                                        }); 
+                                        });
+                                        $('.withTieName').tooltip({
+                                            // 為了不換行的設定
+                                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="max-width: 350px;"></div></div>',
+                                            container: 'body',
+                                            html: true,
+                                            placement: 'bottom',
+                                        });
                                     });
                                 </script>
                                 <li class="active" data-toggle="tooltip" title="打擊率">
                                     <a href="#panel_AVG" data-toggle="tab">AVG</a>
                                 </li>
-                                <li data-toggle="tooltip" title="打擊率(補足打席)">
+                                <li data-toggle="tooltip" title="補足打席後打擊率(修正打擊率/原打擊率)">
                                     <a href="#panel_AVGS" data-toggle="tab">AVG(S)</a>
                                 </li>
                                 <li data-toggle="tooltip" title="安打">
@@ -388,43 +443,92 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="panel_AVG">
                                     <table class="table table-hover">
-                                        <%= @gameNumber %>
-                                        <%#= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_leagueGames} %>
-                                    </table>        
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_AVG, :format => '%.3f'} %>
+                                    </table>       
                                 </div>
                                 <div class="tab-pane" id="panel_AVGS">
                                     <table class="table table-hover">
-                                    
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_AVGS, :format => '%s'} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_H">
                                     <table class="table table-hover">
-                                    
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_H, :format => '%d'} %>
                                     </table>
-                                    <p align:center style="font-size:16px">官方賽為：大資盃 北資盃 台大盃 新生盃 資管盃 管院盃</p>
                                 </div>
                                 <div class="tab-pane" id="panel_HR">
                                     <table class="table table-hover">
-                                    
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_HR, :format => '%d'} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_RBI">
                                     <table class="table table-hover">
-                                    
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_RBI, :format => '%d'} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_R">
                                     <table class="table table-hover">
-                                    
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_R, :format => '%d'} %>
                                     </table>
                                 </div>
                             </div>                        
 
                         </div>
                         <div class="tab-pane" id="panel_pitchingTop5">
-                            <p>
-                                投手排行
-                            </p>
+                            <ul class="nav nav-tabs nav-justified">
+                                <script type="text/javascript">
+                                    $(function(){
+                                        // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
+                                        $('#panel_pitchingTop5 > ul > li').tooltip({
+                                            // 為了不換行的設定
+                                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;max-width: 350px;"></div></div>',
+                                            container: 'body'
+                                        });
+                                    });
+                                </script>
+                                <li class="active" data-toggle="tooltip" title="勝場">
+                                    <a href="#panel_W" data-toggle="tab">W</a>
+                                </li>
+                                <li data-toggle="tooltip" title="三振">
+                                    <a href="#panel_SO" data-toggle="tab">SO</a>
+                                </li>
+                                <li data-toggle="tooltip" title="五局防禦率＝自責分 x 5 / 投球局數">
+                                    <a href="#panel_ERA5" data-toggle="tab">ERA5</a>
+                                </li>
+                                <li data-toggle="tooltip" title="七局防禦率＝自責分 x 7 / 投球局數">
+                                    <a href="#panel_ERA7" data-toggle="tab">ERA7</a>
+                                </li>
+                                <li data-toggle="tooltip" title="每局被上壘率 = (安打 + 四壞) / 投球局數">
+                                    <a href="#panel_WHIP" data-toggle="tab">WHIP</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="panel_W">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_W, :format => '%d'} %>
+                                    </table>        
+                                </div>
+                                <div class="tab-pane" id="panel_SO">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_SO, :format => '%d'} %>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_ERA5">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_ERA5, :format => '%.2f'} %>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_ERA7">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_ERA7, :format => '%.2f'} %>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="panel_WHIP">
+                                    <table class="table table-hover">
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_WHIP, :format => '%.2f'} %>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -452,46 +556,443 @@
         </div>
     </section>
 <!-- Download Section -->
-    <section id="download" class="content-section text-center">
-        <div class="download-section">
-            <div class="container">
-                <div class="col-lg-8 col-lg-offset-2">
-                    <h2>Download Grayscale</h2>
-                    <p>You can download Grayscale for free on the preview page at Start Bootstrap.</p>
-                    <a href="http://startbootstrap.com/template-overviews/grayscale/" class="btn btn-default btn-lg">Visit Download Page</a>
+    <section id="about" class="container text-center">
+        <div class="row" id="about_row">
+            <div>
+                <%= fa_icon "pencil-square-o 3x" ,id:"icon_news"%>
+                <h2>關於系壘</h2>
+            </div>
+            <hr class="soften" />
+            <div role="tabpanel" id="tabpanel_about">
+                <!-- Nav tabs -->
+                <div class="col-sm-3 center-block">
+                    <ul id="ul_about" class="nav nav-pills nav-stacked" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#practice" aria-controls="practice" role="tab" data-toggle="tab">
+                                <%= fa_icon "clock-o" ,class:"fa-fw"%> 例行練球時間
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#infoSource" aria-controls="infoSource" role="tab" data-toggle="tab">
+                                <%= fa_icon "info-circle" ,class:"fa-fw"%> 最新消息來源
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#forFresh" aria-controls="forFresh" role="tab" data-toggle="tab">
+                                <%= fa_icon "film" ,class:"fa-fw"%> 迎新宣傳資訊
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#reference" aria-controls="reference" role="tab" data-toggle="tab">
+                                <%= fa_icon "file-text-o" ,class:"fa-fw"%> 參考資料
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tab panes -->
+                <div class="col-sm-9">
+                    <div class="tab-content" id="about_content">
+                        <div role="tabpanel" class="tab-pane active" id="practice">
+                            <p>通常是每週六下午,但依幹部公告而定。(練球的前一天請務必睡眠充足)</p>
+                            <%= fa_icon "map-marker 2x", id:"fa_map" %><h3 style="margin-bottom:20px;">練球地點</h3>
+                            <ul id="list" class="nav nav-pills">
+                                <!-- 建立地址清單 -->
+                                <li><a href="#">台大棒球場</a></li>
+                                <li><a href="#">景美福和河濱公園(萬隆堤外)</a></li>
+                                <li><a href="#">道南河濱公園(萬壽橋下)</a></li>
+                                <li><a href="#">大新莊棒壘球打擊場輔大館</a></li>
+                                <li><a href="#">中正橋下</a></li>
+                                <li><a href="#">中正河濱公園(近馬場町)</a></li>
+                                <li><a href="#">迎風河濱公園(民權大橋下)</a></li>
+                            </ul>
+                            <div class="panel panel-default" id="panel_map">
+                                <div id="map" class="overlay"></div>
+                            </div>
+                            <p class="map_description">
+                                為了避免影響瀏覽體驗，地圖縮放功能已鎖定，欲啟動縮放功能，請於地圖上方點擊以開啟。
+                            </p>                            
+
+                            <script type="text/javascript">
+                                
+                                var map = $('#map');
+                                // tabs 切換
+                                $(document).on('load click', '#ul_about > li > a', function () {
+                                    var obj    = $(this),
+                                    tabs   = $('#ul_about'),
+                                    li     = tabs.find('li'),
+                                    parent = obj.closest('li'),
+                                    panel  = $('#about_content'),
+                                    target = obj.attr('href'),
+                                    m      = map.data('tinyMap');
+
+                                    li.removeClass('active');
+                                    parent.addClass('active');
+
+                                    panel.find('.tab-pane').removeClass('active');
+                                    $(target).addClass('active');
+            
+                                    // 要解決主要是執行以下兩個動作：
+                                    // 1.觸發 map resize 事件
+                                    google.maps.event.trigger(m.map, 'resize');
+                                    // 2.移動地圖中心
+                                    m.map.panTo(new google.maps.LatLng('25.017344', '121.539746'));
+                                });
+
+                                map.tinyMap({
+                                    'center': [25.017344, 121.539746],
+                                    'zoom': 14,
+                                    'marker': [
+                                        /* 給予每個標記唯一的 id 值 */
+                                        {'addr': [25.020776, 121.535188], 'text': '台大棒球場', 'id': '台大棒球場'},
+                                        {'addr': [25.001429, 121.534752], 'text': '景美福和河濱公園(萬隆堤外)', 'id': '景美福和河濱公園(萬隆堤外)'},
+                                        {'addr': [24.993784, 121.573263], 'text': '道南河濱公園(萬壽橋下)', 'id': '道南河濱公園(萬壽橋下)'},
+                                        {'addr': '242新北市新莊區中正路621號', 'text': '大新莊棒壘球打擊場輔大館', 'id': '大新莊棒壘球打擊場輔大館'},
+                                        {'addr': [25.019232, 121.510909], 'text': '中正橋下', 'id': '中正橋下'},
+                                        {'addr': [25.023230, 121.511986], 'text': '中正河濱公園(近馬場町)', 'id': '中正河濱公園(近馬場町)'},
+                                        {'addr': [25.073019, 121.569117], 'text': '迎風河濱公園(民權大橋下)', 'id': '迎風河濱公園(民權大橋下)'}
+                                    ]
+                                });
+
+                                $('#list').on('click', 'a', function () {
+                                    var obj = $(this),        
+                                    id = obj.text(),
+                                    m = {},
+                                    marker = {},
+                                    markers = [],
+                                    i = 0;       
+
+                                    // 取得 tinyMap 實例
+                                    m = map.data('tinyMap');
+                                    // 取得所有標記
+                                    markers = m._markers;
+
+                                    for (i; i < markers.length; i += 1) {
+                                        marker = markers[i];
+                                        // 關閉所有 infoWindow
+                                        marker.infoWindow.close();
+                                        console.dir(typeof marker.infoWindow.close);
+                                        // 若標記 id 符合則開啟 infoWindow
+                                        if (id === marker.id) {            
+                                            marker.infoWindow.open(m.map, marker);
+                                            google.maps.event.trigger(m.map, 'resize');
+                                            // 移動地圖
+                                            m.map.panTo(marker.position);            
+                                        }
+                                    }
+
+                                    // prevent from jumping to the top after clicking
+                                    return false;
+
+                                });
+
+                                $('.overlay').click(function() {
+                                    $('.overlay div').css("pointer-events", "auto");
+                                });
+
+                            </script>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="infoSource">
+                            <p class="about_title">1. Facebook</p>
+                            <p class="about_text">請聯絡隊上幹部以取得更多資訊</p>
+                            <p class="about_title">2. 電子佈告欄系統(BBS)</p>
+                            <p class="about_text">台大資管鳴蟬小站（<a href="telnet://tolo.twbbs.org">telnet://tolo.twbbs.org</a>）<br/>&rArr; IMSoftball看板</p>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="forFresh">
+                            <ul>
+                                <li>
+                                    <p>
+                                        2013年　<a href="https://www.youtube.com/watch?v=yEygnWUMaHg&amp;feature=youtu.be" target="_blank">台大資管壘球隊(2013)</a>　<a href="ppt/IMSoftballTeam2013.pptx">投影片</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2011年　<a href="http://www.slideshare.net/eriokira42/ss-8835525" target="_blank">投影片PPT版本</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2010年　<a href="http://www.youtube.com/watch?v=vCiJyp1k8i0&amp;feature=grec_index" target="_blank">台大資管壘球隊(2010)</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2009年　<a href="http://www.im.ntu.edu.tw/~softball/video/IMSoftballTeam2009.wmv" target="_blank">台大資管壘球隊(2009)</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2008年　<a href="http://www.im.ntu.edu.tw/~bbs/IMSoftballTeam2008.wmv" target="_blank">台大資管壘球隊(2008)</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2007年　<a href="http://www.im.ntu.edu.tw/~bbs/IMSoftballTeam2007.wmv" target="_blank">台大資管壘球隊(2007)</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2007年　<a href="http://www.im.ntu.edu.tw/~softball/data/IMSoftballTeam2007.ppt" target="_blank">投影片PPT版本</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2006年　<a href="http://www.im.ntu.edu.tw/~softball/video/IMSoftballTeam2006.wmv" target="_blank">台大資管壘球隊(2006)</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2005年　<a href="http://www.im.ntu.edu.tw/~softball/video/IMSoftballTeam2005v2.wmv" target="_blank">台大資管壘球隊(2005)</a>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        2004年　<a href="http://www.im.ntu.edu.tw/~softball/data/IMSoftballTeam2004.ppt" target="_blank">投影片PPT版本</a>　<a href="http://www.im.ntu.edu.tw/~softball/data/IMSoftballTeam2004.pdf" target="_blank">投影片PDF版本</a>
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="reference">
+                            <ul>
+                                <li>
+                                    <p><a href="http://www.im.ntu.edu.tw/~softball/money.xls" target="_blank">至2006.09.30隊費收入總覽</a></p>
+                                </li>
+                                <li>
+                                    <p><a href="http://www.im.ntu.edu.tw/~softball/report/20040926.htm" target="_blank">2004.09.26資管小報之稿件</a></p>
+                                </li>
+                                <li>
+                                    <p><a href="http://www.im.ntu.edu.tw/~softball/report/2004management.htm" target="_blank">2004台大管院盃奪冠紀實</a></p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="container content-section text-center">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
-                <h2>Contact Start Bootstrap</h2>
-                <p>Feel free to email us to provide some feedback on our templates, give us suggestions for new templates and themes, or to just say hello!</p>
-                <p><a href="mailto:feedback@startbootstrap.com">feedback@startbootstrap.com</a>
-                </p>
-                <ul class="list-inline banner-social-buttons">
-                    <li>
-                        <a href="https://twitter.com/SBootstrap" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
-                    </li>
-                    <li>
-                        <a href="https://plus.google.com/+Startbootstrap/posts" class="btn btn-default btn-lg"><i class="fa fa-google-plus fa-fw"></i> <span class="network-name">Google+</span></a>
-                    </li>
-                </ul>
+    <section id="albums" class="container text-center">
+        <div class="row" id="albums_row">
+            <div>
+                <%= fa_icon "book 3x" ,id:"icon_albums"%>
+                <h2>球隊相簿</h2>
+            </div>
+            <hr class="soften" />
+            <!-- 
+                已template化，相簿直接新增至陣列中即可 :)
+                規則：
+                    第一欄為同一日期下的相簿個數k
+                    第二欄及第(2*K)欄為連結網址
+                    第三欄及第(2*K+1)欄為連結的文字內容
+                請參考原有之範例
+            -->
+            <% @album_list = [[1,'2006.07.22','http://photo.xuite.net/huangshuchuen/1797935','書芳園隊聚'],
+                              [1,'2006.11.04','http://www.wretch.cc/album/album.php?id=Allen1109&book=1','中正橋練球'],
+                              [1,'2006.12.17','http://www.pixnet.net/album/huangshuchuen/1287344','中正橋練球'],
+                              [1,'2006.12.20','http://www.pixnet.net/album/huangshuchuen/1295713','奈良一本鍋隊聚'],
+                              [1,'2007.06.27','http://photo.xuite.net/huangshuchuen/1828998','景美鬥牛士隊聚'],
+                              [1,'2008.04.25','http://picasaweb.google.com/Kiwikao1218/08','2008政大北資盃'],
+                              [1,'2008.12.20','https://picasaweb.google.com/109363871807970263772/08_IM_GAMEWinter','2008系級盃'],
+                              [1,'2009.03.22','https://picasaweb.google.com/windwalker.Chang/20090322','2009台大盃初賽 v.s. 蟀哥霉女'],
+                              [1,'2009.05.08','https://picasaweb.google.com/109363871807970263772/09','2009北資盃'],
+                              [2,'2009.06.27','https://picasaweb.google.com/109363871807970263772/SUVPtI','皓翔引退賽1',
+                                              'https://picasaweb.google.com/windwalker.Chang/20090927','相簿2'],
+                              [1,'2009.10.30','https://picasaweb.google.com/windwalker.Chang/20091031','台灣大賽'],
+                              [2,'2009.11.29','https://picasaweb.google.com/109363871807970263772/0904','2009系級盃1',
+                                              'https://picasaweb.google.com/windwalker.Chang/20091129','相簿2'],
+                              [1,'2010.01.18','https://picasaweb.google.com/109363871807970263772/10','小盃賽'],
+                              [1,'2010.01.25','https://picasaweb.google.com/109363871807970263772/10_02','2010交大大資盃'],
+                              [1,'2010.03.18','https://picasaweb.google.com/109363871807970263772/20100319_VS_','2010台大盃初賽 v.s. 科法所'],
+                              [3,'2010.04.02','https://picasaweb.google.com/109363871807970263772/20100402_VS','2010台大盃初賽 v.s. 牙醫',
+                                              'http://photo.xuite.net/huangshuchuen/1828998','相簿2',
+                                              'https://picasaweb.google.com/hsiaom/20100402','相簿3'],
+                              [3,'2010.05.01','https://picasaweb.google.com/hsiaom/20100501#','2010文化資管盃',
+                                              'http://www.wretch.cc/album/album.php?id=reggle09&book=231&page=2','官方1',
+                                              'http://www.wretch.cc/album/album.php?id=reggle09&book=232&page=3','官方2'],
+                              [1,'2010.09.25','https://picasaweb.google.com/hsiaom/20100925OB#','IM20 & OB之資管紅白賽'],
+                              [2,'2010.11.20','https://picasaweb.google.com/hsiaom/20101120#','台灣大賽',
+                                              'https://picasaweb.google.com/109363871807970263772/10_02','相簿2'],
+                              [2,'2010.12.18','https://picasaweb.google.com/109363871807970263772/20101218_','2010系級盃1',
+                                              'https://picasaweb.google.com/davidlilywang/2010','相簿2'],
+                              [1,'2011.02.25','https://picasaweb.google.com/109363871807970263772/20110226','2011管院盃'],
+                              [2,'2011.03.21','https://picasaweb.google.com/109363871807970263772/20110321_VS#','2011台大盃初賽 v.s. 深宮怨婦',
+                                              'https://picasaweb.google.com/109363871807970263772/10_02','相簿2'],
+                              [1,'2011.05.21','https://picasaweb.google.com/109363871807970263772/20110521_','2011中正資管盃']
+                             ] 
+            %>
+            <% @album_list.each do |album| %>
+                <% if @album_list.index(album) % 2 == 0 %><!-- odd item -->
+                    <div class="col-sm-4 col-sm-offset-2" style="height:60px;">
+                        <table class="table">
+                            <tr>
+                                <td class="text-right text_date" style="width:50%;border-top: none !important;"><%= album[1] %></td>
+                                <td class="text-left text_item" style="width:50%;border-top: none !important;">
+                                    <% for i in 1..album[0] do %>
+                                        <% if i == album[0] %>
+                                            <%= link_to album[2*i+1], album[2*i], target: "_blank" %>&emsp;
+                                        <% else %>
+                                            <%= link_to album[2*i+1], album[2*i], target: "_blank" %>
+                                        <% end %>
+                                    <% end %>
+                                </td>
+                            </tr>
+                        </table> 
+                    </div>
+                <% else %><!-- even item -->
+                    <div class="col-sm-4" style="height:60px;">
+                        <table class="table">
+                            <tr>
+                                <td class="text-right text_date" style="width:50%;border-top: none !important;"><%= album[1] %></td>
+                                <td class="text-left text_item" style="width:50%;border-top: none !important;">
+                                    <% for i in 1..album[0] do %>
+                                        <% if i == album[0] %>
+                                            <%= link_to album[2*i+1], album[2*i], target: "_blank" %>&emsp;
+                                        <% else %>
+                                            <%= link_to album[2*i+1], album[2*i], target: "_blank" %>
+                                        <% end %>
+                                    <% end %>
+                                </td>
+                            </tr>
+                        </table> 
+                    </div>
+                    <div class="col-sm-2"></div>
+                <% end %>
+            <% end %>
+        </div>
+    </section>
+    <section id="photos" class="container text-center">
+        <div class="row" id="photos_row">
+            <div>
+                <%= fa_icon "photo 3x" ,id:"icon_photos"%>
+                <h2>照片集</h2>
+            </div>
+            <hr class="soften" />
+            <script type="text/javascript">
+                // All images need to be loaded for this plugin to work so
+                // we end up waiting for the whole window to load in this example
+                $(window).load(function () {
+                    $(document).ready(function(){
+                        collage();
+                        $('.Collage').collageCaption();
+                    });
+                });
+            
+            
+                // Here we apply the actual CollagePlus plugin
+                function collage() {
+                    $('.Collage').removeWhitespace().collagePlus(
+                        {
+                            'fadeSpeed'     : 2000,
+                            'targetHeight'  : 200,
+                            'effect'        : 'effect-2',
+                            'direction'     : 'vertical',
+                            'allowPartialLastRow':false
+                        }
+                    );
+                };
+            
+                // This is just for the case that the browser window is resized
+                var resizeTimer = null;
+                $(window).bind('resize', function() {
+                    // hide all the images until we resize them
+                    $('.Collage .Image_Wrapper').css("opacity", 0);
+                    // set a timer to re-apply the plugin
+                    if (resizeTimer) clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(collage, 200);
+                });
+
+                // Colorbox
+                $(document).ready(function(){
+
+                    $(".photo_group").each(function() {
+                        
+                        var imgsrc = $(this).find('img').attr('src');
+                        var text = $(this).find('img').attr('alt');
+                        //console.log(imgsrc);
+                        $(this).attr('href',imgsrc);
+                        $(this).attr('title',text);
+                    });
+
+                    $(".photo_group").colorbox({
+                        rel:'photo_group',
+                        maxWidth: "90%",
+                        maxHeight: "90%",
+                    });
+
+                    $(window).on('load resize', function(){
+
+                        $('.youtube').colorbox({
+                            iframe:true,
+                            innerWidth: $(window).width() * 0.64,
+                            innerHeight:$(window).width() * 0.36,
+                            rel:'photo_group'
+                        });
+                    });
+                });
+
+
+            </script>
+            <!-- 
+                已template化，照片直接新增至陣列中即可 :)
+                規則：
+                    第一欄為照片的說明文字
+                    第二欄為照片檔名
+                    所有照片皆放在photos資料夾底下
+                請參考原有之範例
+            -->
+            <%
+                @photo_list = [['2005大資盃1','p_0001_05cs1.jpg'],
+                               ['2005大資盃2','p_0002_05cs2.jpg'],
+                               ['2005大資盃3','p_0003_05cs3.jpg'],
+                               ['2005資管盃','p_0004_05im.jpg'],
+                               ['2008北資盃','p_0005_08ni.jpg'],
+                               ['2009台灣大賽＠五股球場','p_0006_09ts.jpg'],
+                               ['2009北資盃複賽＠內湖美堤河濱公園','p_0007_09ni.JPG'],
+                               ['2009皓翔隱退賽＠萬隆堤外','p_0008_09windwalker.JPG'],
+                               ['2010大資盃1＠新竹交大','p_0009_10cs1.jpg'],
+                               ['2010大資盃2＠新竹交大','p_0010_10cs2.jpg'],
+                               ['2010管院盃＠萬隆堤外','p_0011_10mgt.jpg'],
+                               ['2011資管盃＠嘉義中正大學','p_0012_11im.JPG'],
+                               ['2011上學期期初隊聚1＠景美必勝客','p_0013_11eat1.JPG'],
+                               ['2011上學期期初隊聚2＠景美必勝客','p_0014_11eat2.JPG'],
+                               ['2011新生盃v.s.台大森林','p_0015_11fresh.JPG'],
+                               ['2011OB對抗賽1＠中正橋','p_0016_11ob1.JPG'],
+                               ['2011OB對抗賽2＠中正橋','p_0017_11ob2.JPG'],
+                               ['2011OB對抗賽3＠中正橋','p_0018_11ob3.png'],
+                               ['2012畢業典禮 隊員合照','p_0019_12grad.png'],
+                               ['2012下學期期末隊聚＠西門鍋爸','p_0020_12eat.png'],
+                               ['2012系級盃','p_0021_12IMGame.png'],
+                               ['2012台大盃十六強邀請賽＠台大棒壘場','p_0022_12NTU_Top16.jpg'],
+                               ['2013寒訓-移地訓練＠花蓮1','p_0023_13SpringTraining1.jpg'],
+                               ['2013寒訓-移地訓練＠花蓮2 ＠七星潭','p_0024_13SpringTraining2.jpg'],
+                               ['2013寒訓-移地訓練＠花蓮3 ＠國福球場','p_0025_13SpringTraining3.jpg'],
+                               ['2013下學期期末隊聚1＠鹿鳴宴','p_0026_13eat1.jpg'],
+                               ['2013下學期期末隊聚2＠鹿鳴宴','p_0027_13eat2.jpg'],
+                               ['第二屆台大慢壘聯盟開幕戰1＠萬隆堤外','p_0028_13League2_0915_1.jpg'],
+                               ['第二屆台大慢壘聯盟開幕戰2＠萬隆堤外','p_0029_13League2_0915_2.jpg'],
+                               ['2013台大盃十二強邀請賽＠台大棒壘場','p_0030_13NTU_Top12.jpg'],
+                              ]
+            %>
+            <div class="Collage effect-parent">
+                <% @photo_list.each do |photo| %>
+                    <div class="Image_Wrapper" data-caption=<%= photo[0] %> > 
+                        <a class="photo_group"><%= image_tag("photos/#{photo[1]}", alt: photo[0] ) %></a>
+                    </div>
+                <% end %>
+                <!-- Youtube影片請另外放在此區 範例如下-->
+                <div class="Image_Wrapper" data-caption="台大資管壘球隊2010宣傳影片" > 
+                    <a class='youtube' href="https://www.youtube.com/embed/vCiJyp1k8i0?autoplay=0&fmt=35">
+                        <img alt="台大資管壘球隊2010宣傳影片" src="http://i.ytimg.com/vi/vCiJyp1k8i0/0.jpg" />
+                    </a>
+                </div>
             </div>
         </div>
     </section>
-<!-- Map Section -->
-    <div id="map"></div>
-
     <!-- Footer -->
     <footer>
         <div class="container text-center">
-            <p>Copyright &copy; NTUIM Softball <%= Time.now.year %></p>
+            <p>Copyright &copy; <%= Time.now.year %> NTUIM Softball Team</p>
+            <p style="font-size:14px;">關於本網站任何資訊的修改事宜，請將相關資料整理後於消息來源處po文告知</p>
         </div>
     </footer>

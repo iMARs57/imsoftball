@@ -1,10 +1,70 @@
 <tbody>
-	<tr>
-		<% panel_top5.each do |game| %>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+	<% orderNow = 0 %>
+	<% rankNow = 1 %>
+	<% tieList = [] %>
+	<% tieName = '' %>
+	<% totalItem = panel_top5.length %>
+	<% counter = 0 %>
+	<% while totalItem != 0 %>
+		<% rankNow = panel_top5[orderNow].Rank %>
+		<% for i in 0..(totalItem-1) %>
+			<% tieList.push(panel_top5[orderNow+i]) %>
+			<% break if i+1 > (totalItem-1) || (panel_top5[orderNow+i+1].Rank.to_i != rankNow) %>
 		<% end %>
-	</tr>
+		<% if tieList.length > 1 %>
+			<tr>
+				<td><%= rankNow.to_s + '.' %></td>
+				<td ><%= image_tag("portrait/tie.jpg", class:"top5_portrait" ,alt: "Tie") %></td>
+				<% tieList.each do |tie| %>
+					<% if tie.firstName != nil && tie.lastName != nil %>
+						<% if tie.firstName.to_s.length == 2 %>
+            				<% tieName = tieName + tie.lastName.to_s + ' ' + tie.firstName.to_s[0] + ' ' + tie.firstName.to_s[1] + '<br/>' %>
+            			<% else %>
+            				<% tieName = tieName + tie.lastName.to_s + ' ' + tie.firstName.to_s[0] + '<br/>' %>
+            			<% end %>
+            		<% else %>
+            			<% tieName = tieName + tie.ID.to_s + '<br/>' %>
+            		<% end %>
+				<% end %>
+				<td class="withTieName" title="<%= tieName %>">Tie With <%= tieList.length %></td>
+				<td><%= format % (panel_top5[orderNow].Data) %></td>
+			</tr>			
+			<% totalItem = totalItem - tieList.length %>
+			<% orderNow = orderNow + tieList.length %>	
+		<% else %>
+			<tr>
+				<td><%= rankNow.to_s + '.' %></td>
+				<% if !Imsoftball::Application.assets.find_asset("portrait/#{panel_top5[orderNow].ID}.jpg").nil? %>
+					<td><%= image_tag("portrait/#{panel_top5[orderNow].ID}.jpg", class:"top5_portrait" , alt: "#{panel_top5[orderNow].ID}") %></td>
+				<% else %>
+					<td><%= image_tag("portrait/no_portrait.jpg", class:"top5_portrait" , alt: "#{panel_top5[orderNow].ID}") %></td>
+				<% end %>
+				<% if panel_top5[orderNow].firstName != nil && panel_top5[orderNow].lastName != nil %>
+					<% if panel_top5[orderNow].firstName.to_s.length == 2 %>
+            			<td><%= panel_top5[orderNow].lastName.to_s + ' ' + panel_top5[orderNow].firstName.to_s[0] + ' ' + panel_top5[orderNow].firstName.to_s[1] %></td>
+        			<% else %>
+            			<td><%= panel_top5[orderNow].lastName.to_s + ' ' + panel_top5[orderNow].firstName.to_s[0] %></td>
+        			<% end %>
+        		<% else %>
+        			<td><%= panel_top5[orderNow].ID %></td>
+        		<% end %>
+				<td><%= format % (panel_top5[orderNow].Data) %></td>
+			</tr>
+			<% totalItem = totalItem - 1 %>
+			<% orderNow = orderNow + 1 %>
+		<% end %>
+		<% counter = counter + 1 %>			
+		<% tieList.clear %>
+		<% tieName = '' %>
+	<% end %>
+	<% if counter < 5 %>
+		<% for leftover in 1..(5 - counter) %>
+			<tr>
+				<td></td>
+				<td colspan="2">從 缺</td>
+				<td>---</td>
+			</tr>
+		<% end %>	
+	<% end %>
+
 </tbody>

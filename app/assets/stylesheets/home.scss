@@ -2,6 +2,16 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+body{
+
+	overflow-x: hidden;
+}
+
+body, #navbar{
+
+	min-width:300px;
+}
+
 img.menu_icon{
 	
 	float:left;
@@ -33,6 +43,8 @@ div.menu{
 	
 	width:100%;
 	position: relative;
+	padding-top: 50px;
+	padding-bottom: 50px;
 }
 
 #news:after{
@@ -44,18 +56,13 @@ div.menu{
     background-image: image-url("bat.jpg");
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: auto 100%;
+    background-size: cover;
     width: 100%;
     height: 100%;
     opacity : 0.5;
     z-index: -1;
 }
 
-#news_row{
-	
-	padding: 10% 5%;
-	margin: 0 0;
-}
 
 div.panel{
 	background:rgba(255,255,255,0.3);
@@ -70,9 +77,11 @@ div.panel{
 }
 
 @media(max-width:768px) {
+	/*
 	.intro{
 		margin-top:52px;
 	}
+	*/
 
 	.nav-justified > li {
     	display: table-cell !important;
@@ -84,22 +93,32 @@ div.panel{
 		overflow-y:hidden;
 	}
 
-	/*
-	#panel_battingTop5 > ul {
-
+	#ul_about, #list{
+	
+		//margin-left:auto;
+		//margin-right:auto;
 		overflow-x: auto;
   		overflow-y: hidden;
   		display: -webkit-box;
   		display: -moz-box;
+  		//display: inline-block;
 
 	}
 
-	#panel_battingTop5 > ul > li {
-
+	#ul_about > li, #list > li {
+		
 		display: table-cell !important;
-		float: none;
+		overflow-x:auto;
+		overflow-y:hidden;
+		float:none;
 	}
-	*/
+
+	#practice, #infoSource, #forFresh, #reference{
+	
+		margin-top:50px;
+		margin-left:20px;
+		margin-right:20px;
+	}
 
 }
 
@@ -118,7 +137,7 @@ ul.ul_menu > li.active > a{
 	text-shadow: none;
 }
 
-#icon_news{
+#icon_news, #icon_albums, #icon_photos{
 	
 	margin:0 auto 10px auto;
 }
@@ -189,7 +208,211 @@ div.tab-pane > ul > li.active > a:hover, div.tab-pane > ul > li.active > a:focus
 
 }
 
-#tabs_standings * td, #tabs_standings * a, #tabs_top5 * td, #tabs_top5 * a{
+#tabs_standings * td, #tabs_standings * a, #tabs_top5 * td, #tabs_top5 * a, #ul_about * a, #list * a{
 
 	white-space: nowrap;
+	text-align: center;
+}
+
+.fa-fw {width: 1em;}
+
+#ul_about > li > a{
+	
+	font-size: 16px;
+	color: white;
+}
+
+#practice, #infoSource, #forFresh, #reference{
+	
+	text-align:left;
+}
+
+#practice > p, #infoSource > p, #forFresh > p, #reference > p{
+	
+	font-size: 18px;
+}
+
+#fa_map{
+	
+	float:left;
+	margin-right:10px;
+}
+
+hr.soften {
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,.8), rgba(255,255,255,0));
+  background-image:    -moz-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,.8), rgba(255,255,255,0));
+  background-image:     -ms-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,.8), rgba(255,255,255,0));
+  background-image:      -o-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,.8), rgba(255,255,255,0));
+  border: 0;
+  margin-bottom: 50px;
+}
+
+#tabpanel_about{
+	
+	margin-top:50px;
+}
+
+#about{
+	
+	width:100%;
+	position: relative;
+	background-image: image-url("about.jpg");
+	background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+
+#about_row, #news_row, #albums_row, #photos_row{  
+	
+	padding: 10% 5%;
+	margin: 0 0;
+}
+
+#map{
+	
+	width:100%;
+	height:100%;
+	color: black;
+}
+
+.overlay div{
+	
+	pointer-events: none;
+}
+
+.map_description{
+	
+	font-size:12px!important;
+	margin-top:20px;
+}
+
+#panel_map{
+	margin: 0 auto;
+}
+
+#list{
+	
+	margin-bottom: 10px;
+}
+
+#list > li > a{
+	
+	color: #CCCCCC;
+	font-size:15px;
+}
+
+#list > li > a:hover, #list > li > a:focus{
+	
+	color: #FFFFFF;
+}
+
+p.about_title{
+	
+	color:#FF3385;
+	font-weight:bolder;
+}
+
+p.about_text{
+	
+	padding-left:1em;
+}
+
+#forFresh > ul > li > p, #reference > ul > li > p{
+	
+	margin-bottom:10px;
+}
+
+#about * p > a:hover {
+	
+	color: red;
+}
+
+#albums{
+	
+	width:100%;
+	position: relative;
+	background-image: image-url("softball_background.jpg");
+	background-repeat: no-repeat;
+	background-position: center center;
+    background-size: cover;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+td.text_date{
+	
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+td.text_item{
+	
+	text-shadow: 1px 1px #FFFFFF;
+}
+
+#photos{
+	
+	width:100%;
+	position: relative;
+	
+	/*background-color: #000000;*/
+	
+	background-image: image-url("background2.jpg");
+	background-repeat: no-repeat;
+	background-position: center center;
+    background-size: cover;
+    
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+// Collage Plus
+
+.Collage{
+
+    /*This is where you set the padding you want between the images*/
+    padding:10px;
+
+}
+.Collage img{
+    margin:0;
+    padding:0;
+    display:inline-block;
+    vertical-align:bottom;
+    opacity:1;
+
+    /*This is where you set the border you want for the image*/
+    border:6px solid #FFF;
+}
+
+
+/* In this example, this is the main item being resized */
+.Image_Wrapper{
+    /* to get the fade in effect, set opacity to 0 on the first element within the gallery area */
+    opacity:0;
+    -moz-box-shadow:0px 2px 4px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow:0px 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow:0px 2px 4px rgba(0, 0, 0, 0.1);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.Caption{
+    font-size:14px;
+    font-weight:normal;
+    font-family:arial;
+}
+.Caption_Content{
+    /* padding:10px; */
+    color:#FFF;
+    padding:20px;
+}
+
+.top5_description{
+	
+	font-size:14px;
 }
