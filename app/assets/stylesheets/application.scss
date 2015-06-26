@@ -16,11 +16,7 @@
  *= require "grayscale/grayscale.scss"
  *= require "CollagePlus/transitions.css"
  *= require "Colorbox/colorbox.css"
- # SASS
- *= require devise_bootstrap_views
- # LESS
- *= require devise_bootstrap_views_less
-
+ 
  */
 @import "bootstrap-sprockets";
 @import "bootstrap";
