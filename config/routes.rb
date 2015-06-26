@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   
   
-  devise_for :users
+  #devise_for :users
   root :to => "home#determine"
 
   resources :namecards
@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   # root 'welcome#index'
 
   # classic route
-  # match ':controller(/:action(/:id(.:format)))', :via => :all
+  match ':controller(/:action(/:id(.:format)))', :via => :all
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

@@ -58,8 +58,8 @@ gem 'kaminari'
 gem 'bootstrap-kaminari-views'
 
 # Use devise
-gem 'devise'
-gem 'devise-bootstrap-views'
+#gem 'devise'
+#gem 'devise-bootstrap-views'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
 
-	before_action :authenticate_user!, :only => :determine
+	#before_action :authenticate_user!, :only => :determine
 	require "ipaddr"
 	
 	def remote_ip
@@ -43,7 +43,7 @@ class HomeController < ApplicationController
       #  return
   	  #end
       
-      @message = IPAddr.new(request.remote_ip)
+      @message = remote_ip
 
       # 執行秀出已授權可看的畫面內容
 
