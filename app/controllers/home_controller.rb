@@ -1,6 +1,5 @@
 class HomeController < ApplicationController
 
-	#before_action :authenticate_user!, :only => :determine
 	require "ipaddr"
 	
 	def remote_ip
@@ -9,12 +8,17 @@ class HomeController < ApplicationController
     if remIP === locIp
       # Hard coded remote address for test
       #IPAddr.new("123.45.67.89")
-      IPAddr.new("140.112.12.34")
+      return IPAddr.new("140.112.12.34")
     else
-      remIP
+      if remIP.ipv4?
+        return 'true'
+      else
+        return 'false'
+      end
     end
   end
 
+=begin
 	def determine
 		
 		if user_signed_in?
@@ -34,7 +38,7 @@ class HomeController < ApplicationController
   		end
 
 	end
-
+=end
 
 	def index
 		# 若此session無 已授權 標示，導回首頁
@@ -42,7 +46,6 @@ class HomeController < ApplicationController
       #  redirect_to "home/determine"
       #  return
   	  #end
-      
       @message = remote_ip
 
       # 執行秀出已授權可看的畫面內容
@@ -70,102 +73,102 @@ class HomeController < ApplicationController
       # SQL for Info Board
       @panel_allGames = Game.select('games.*,
                                      cups.cup_name,
-                                     teamAway.team_name AS "teamAway_name",
-                                     teamHome.team_name AS "teamHome_name"')
+                                     teamAway.team_name AS teamAway_name,
+                                     teamHome.team_name AS teamHome_name')
                             .joins('INNER JOIN cups ON cups.cup_id = games.cup_id')
                             .joins('INNER JOIN teams AS teamAway ON games.away_team_id = teamAway.team_id')
                             .joins('INNER JOIN teams AS teamHome ON games.home_team_id = teamHome.team_id')
                             .order('game_id DESC').take(5)
       @panel_formalGames = Game.select('games.*,
                                         cups.cup_name,
-                                        teamAway.team_name AS "teamAway_name",
-                                        teamHome.team_name AS "teamHome_name"')
-                               .where('cups.formal = \'1\'')
+                                        teamAway.team_name AS teamAway_name,
+                                        teamHome.team_name AS teamHome_name')
+                               .where('cups.formal = "1"')
                                .joins('INNER JOIN cups ON cups.cup_id = games.cup_id')
                                .joins('INNER JOIN teams AS teamAway ON games.away_team_id = teamAway.team_id')
                                .joins('INNER JOIN teams AS teamHome ON games.home_team_id = teamHome.team_id')
                                .order('game_id DESC').take(5)
       @panel_officialGames = Game.select('games.*,
                                           cups.cup_name,
-                                          teamAway.team_name AS "teamAway_name",
-                                          teamHome.team_name AS "teamHome_name"')
-                                 .where('cups.official = \'1\'')
+                                          teamAway.team_name AS teamAway_name,
+                                          teamHome.team_name AS teamHome_name')
+                                 .where('cups.official = "1"')
                                  .joins('INNER JOIN cups ON cups.cup_id = games.cup_id')
                                  .joins('INNER JOIN teams AS teamAway ON games.away_team_id = teamAway.team_id')
                                  .joins('INNER JOIN teams AS teamHome ON games.home_team_id = teamHome.team_id')
                                  .order('game_id DESC').take(5)
       @panel_leagueGames = Game.select('games.*,
                                         cups.cup_name,
-                                        teamAway.team_name AS "teamAway_name",
-                                        teamHome.team_name AS "teamHome_name"')
-                               .where('cups.cup_name = \'台大聯盟\'')
+                                        teamAway.team_name AS teamAway_name,
+                                        teamHome.team_name AS teamHome_name')
+                               .where('cups.cup_name = "台大聯盟"')
                                .joins('INNER JOIN cups ON cups.cup_id = games.cup_id')
                                .joins('INNER JOIN teams AS teamAway ON games.away_team_id = teamAway.team_id')
                                .joins('INNER JOIN teams AS teamHome ON games.home_team_id = teamHome.team_id')
                                .order('game_id DESC').take(5)
       @panel_friendlyGames = Game.select('games.*,
                                           cups.cup_name,
-                                          teamAway.team_name AS "teamAway_name",
-                                          teamHome.team_name AS "teamHome_name"')
-                                 .where('cups.formal = \'0\' AND cups.official = \'0\'')
+                                          teamAway.team_name AS teamAway_name,
+                                          teamHome.team_name AS teamHome_name')
+                                 .where('cups.formal = "0" AND cups.official = "0"')
                                  .joins('INNER JOIN cups ON cups.cup_id = games.cup_id')
                                  .joins('INNER JOIN teams AS teamAway ON games.away_team_id = teamAway.team_id')
                                  .joins('INNER JOIN teams AS teamHome ON games.home_team_id = teamHome.team_id')
                                  .order('game_id DESC').take(5)
-      @panel_standings_GP = Game.where('games.game_id LIKE \'' + @academicYear + '__\' 
-                                   AND (games.home_team_id = \'IM\' OR 
-                                        games.away_team_id = \'IM\' OR
-                                       (games.home_team_id = \'IM-A\' AND games.away_team_id <> \'IM-B\') OR
-                                       (games.home_team_id = \'IM-B\' AND games.away_team_id <> \'IM-A\') OR
-                                       (games.away_team_id = \'IM-A\' AND games.home_team_id <> \'IM-B\') OR
-                                       (games.away_team_id = \'IM-B\' AND games.home_team_id <> \'IM-A\'))')
+      @panel_standings_GP = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+                                   AND (games.home_team_id = "IM" OR 
+                                        games.away_team_id = "IM" OR
+                                       (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+                                       (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+                                       (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+                                       (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))')
                                 .count('games.game_id')
-      @panel_standings_W = Game.where('games.game_id LIKE \'' + @academicYear + '__\' 
-                                   AND (games.home_team_id = \'IM\' OR games.away_team_id = \'IM\' OR
-                                       (games.home_team_id = \'IM-A\' AND games.away_team_id <> \'IM-B\') OR
-                                       (games.home_team_id = \'IM-B\' AND games.away_team_id <> \'IM-A\') OR
-                                       (games.away_team_id = \'IM-A\' AND games.home_team_id <> \'IM-B\') OR
-                                       (games.away_team_id = \'IM-B\' AND games.home_team_id <> \'IM-A\'))
-                                   AND ((games.home_score > games.away_score AND games.home_team_id = \'IM\') OR 
-                                        (games.home_score < games.away_score AND games.away_team_id = \'IM\') OR
-                                        (games.home_score > games.away_score AND games.home_team_id = \'IM-A\') OR
-                                        (games.home_score < games.away_score AND games.away_team_id = \'IM-A\') OR
-                                        (games.home_score > games.away_score AND games.home_team_id = \'IM-B\') OR 
-                                        (games.home_score < games.away_score AND games.away_team_id = \'IM-B\'))')
+      @panel_standings_W = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+                                   AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
+                                       (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+                                       (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+                                       (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+                                       (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
+                                   AND ((games.home_score > games.away_score AND games.home_team_id = "IM") OR 
+                                        (games.home_score < games.away_score AND games.away_team_id = "IM") OR
+                                        (games.home_score > games.away_score AND games.home_team_id = "IM-A") OR
+                                        (games.home_score < games.away_score AND games.away_team_id = "IM-A") OR
+                                        (games.home_score > games.away_score AND games.home_team_id = "IM-B") OR 
+                                        (games.home_score < games.away_score AND games.away_team_id = "IM-B"))')
                                .count('games.game_id')
-      @panel_standings_L = Game.where('games.game_id LIKE \'' + @academicYear + '__\' 
-                                   AND (games.home_team_id = \'IM\' OR games.away_team_id = \'IM\' OR
-                                       (games.home_team_id = \'IM-A\' AND games.away_team_id <> \'IM-B\') OR
-                                       (games.home_team_id = \'IM-B\' AND games.away_team_id <> \'IM-A\') OR
-                                       (games.away_team_id = \'IM-A\' AND games.home_team_id <> \'IM-B\') OR
-                                       (games.away_team_id = \'IM-B\' AND games.home_team_id <> \'IM-A\'))
-                                   AND ((games.home_score < games.away_score AND games.home_team_id = \'IM\') OR 
-                                        (games.home_score > games.away_score AND games.away_team_id = \'IM\') OR
-                                        (games.home_score < games.away_score AND games.home_team_id = \'IM-A\') OR
-                                        (games.home_score > games.away_score AND games.away_team_id = \'IM-A\') OR
-                                        (games.home_score < games.away_score AND games.home_team_id = \'IM-B\') OR 
-                                        (games.home_score > games.away_score AND games.away_team_id = \'IM-B\'))')
+      @panel_standings_L = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+                                   AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
+                                       (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+                                       (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+                                       (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+                                       (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
+                                   AND ((games.home_score < games.away_score AND games.home_team_id = "IM") OR 
+                                        (games.home_score > games.away_score AND games.away_team_id = "IM") OR
+                                        (games.home_score < games.away_score AND games.home_team_id = "IM-A") OR
+                                        (games.home_score > games.away_score AND games.away_team_id = "IM-A") OR
+                                        (games.home_score < games.away_score AND games.home_team_id = "IM-B") OR 
+                                        (games.home_score > games.away_score AND games.away_team_id = "IM-B"))')
                                .count('games.game_id')
-      @panel_standings_D = Game.where('games.game_id LIKE \'' + @academicYear + '__\' 
-                                   AND (games.home_team_id = \'IM\' OR games.away_team_id = \'IM\' OR
-                                       (games.home_team_id = \'IM-A\' AND games.away_team_id <> \'IM-B\') OR
-                                       (games.home_team_id = \'IM-B\' AND games.away_team_id <> \'IM-A\') OR
-                                       (games.away_team_id = \'IM-A\' AND games.home_team_id <> \'IM-B\') OR
-                                       (games.away_team_id = \'IM-B\' AND games.home_team_id <> \'IM-A\'))
-                                   AND ((games.home_score = games.away_score AND games.home_team_id = \'IM\') OR 
-                                        (games.home_score = games.away_score AND games.away_team_id = \'IM\') OR
-                                        (games.home_score = games.away_score AND games.home_team_id = \'IM-A\') OR
-                                        (games.home_score = games.away_score AND games.away_team_id = \'IM-A\') OR
-                                        (games.home_score = games.away_score AND games.home_team_id = \'IM-B\') OR 
-                                        (games.home_score = games.away_score AND games.away_team_id = \'IM-B\'))')
+      @panel_standings_D = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+                                   AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
+                                       (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+                                       (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+                                       (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+                                       (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
+                                   AND ((games.home_score = games.away_score AND games.home_team_id = "IM") OR 
+                                        (games.home_score = games.away_score AND games.away_team_id = "IM") OR
+                                        (games.home_score = games.away_score AND games.home_team_id = "IM-A") OR
+                                        (games.home_score = games.away_score AND games.away_team_id = "IM-A") OR
+                                        (games.home_score = games.away_score AND games.home_team_id = "IM-B") OR 
+                                        (games.home_score = games.away_score AND games.away_team_id = "IM-B"))')
                                .count('games.game_id')
-      @panel_standings_WLD = Game.where('games.game_id LIKE \'' + @academicYear + '__\' 
-                                    AND (games.home_team_id = \'IM\' OR 
-                                         games.away_team_id = \'IM\' OR
-                                        (games.home_team_id = \'IM-A\' AND games.away_team_id <> \'IM-B\') OR
-                                        (games.home_team_id = \'IM-B\' AND games.away_team_id <> \'IM-A\') OR
-                                        (games.away_team_id = \'IM-A\' AND games.home_team_id <> \'IM-B\') OR
-                                        (games.away_team_id = \'IM-B\' AND games.home_team_id <> \'IM-A\'))')
+      @panel_standings_WLD = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+                                    AND (games.home_team_id = "IM" OR 
+                                         games.away_team_id = "IM" OR
+                                        (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+                                        (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+                                        (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+                                        (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))')
       @counter = 0;
       @panel_standings_last10_W = 0
       @panel_standings_last10_L = 0
@@ -216,45 +219,45 @@ class HomeController < ApplicationController
         @counter = @counter + 1;
       end
 
-      @panel_standings_forAvgBat = Game.find_by_sql('SELECT SUM(b."AB") AS "allAB", SUM(b."H") AS "allH", SUM(b."HR") AS "allHR"
+      @panel_standings_forAvgBat = Game.find_by_sql('SELECT SUM(b.AB) AS allAB, SUM(b.H) AS allH, SUM(b.HR) AS allHR
                                                      FROM games AS g, battings AS b
-                                                     WHERE g.game_id LIKE \'' + @academicYear + '__\'
-                                                     AND (g.home_team_id = \'IM\' OR 
-                                                          g.away_team_id = \'IM\' OR
-                                                         (g.home_team_id = \'IM-A\' AND g.away_team_id <> \'IM-B\') OR
-                                                         (g.home_team_id = \'IM-B\' AND g.away_team_id <> \'IM-A\') OR
-                                                         (g.away_team_id = \'IM-A\' AND g.home_team_id <> \'IM-B\') OR
-                                                         (g.away_team_id = \'IM-B\' AND g.home_team_id <> \'IM-A\'))
+                                                     WHERE g.game_id LIKE "' + @academicYear + '__"
+                                                     AND (g.home_team_id = "IM" OR 
+                                                          g.away_team_id = "IM" OR
+                                                         (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
+                                                         (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
+                                                         (g.away_team_id = "IM-A" AND g.home_team_id <> "IM-B") OR
+                                                         (g.away_team_id = "IM-B" AND g.home_team_id <> "IM-A"))
                                                      AND g.game_id = b.game_id
-                                                     AND (b.team_id = \'IM\' OR
-                                                          b.team_id = \'IM-A\' OR
-                                                          b.team_id = \'IM-B\')')[0]
-      @panel_standings_forAvgDef = Game.find_by_sql('SELECT SUM(f."PO") AS "allPO", SUM(f."A") AS "allA", SUM(f."E") AS "allE"
+                                                     AND (b.team_id = "IM" OR
+                                                          b.team_id = "IM-A" OR
+                                                          b.team_id = "IM-B")')[0]
+      @panel_standings_forAvgDef = Game.find_by_sql('SELECT SUM(f.PO) AS allPO, SUM(f.A) AS allA, SUM(f.E) AS allE
                                                      FROM games AS g, fieldings AS f
-                                                     WHERE g.game_id LIKE \'' + @academicYear + '__\'
-                                                     AND (g.home_team_id = \'IM\' OR 
-                                                          g.away_team_id = \'IM\' OR
-                                                         (g.home_team_id = \'IM-A\' AND g.away_team_id <> \'IM-B\') OR
-                                                         (g.home_team_id = \'IM-B\' AND g.away_team_id <> \'IM-A\') OR
-                                                         (g.away_team_id = \'IM-A\' AND g.home_team_id <> \'IM-B\') OR
-                                                         (g.away_team_id = \'IM-B\' AND g.home_team_id <> \'IM-A\'))
+                                                     WHERE g.game_id LIKE "' + @academicYear + '__"
+                                                     AND (g.home_team_id = "IM" OR 
+                                                          g.away_team_id = "IM" OR
+                                                         (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
+                                                         (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
+                                                         (g.away_team_id = "IM-A" AND g.home_team_id <> "IM-B") OR
+                                                         (g.away_team_id = "IM-B" AND g.home_team_id <> "IM-A"))
                                                      AND g.game_id = f.game_id
-                                                     AND (f.team_id = \'IM\' OR
-                                                          f.team_id = \'IM-A\' OR
-                                                          f.team_id = \'IM-B\')')[0]
-      @panel_standings_forAvgERA = Game.find_by_sql('SELECT SUM(p."IPouts") AS "allIPouts", SUM(p."ER") AS "allER"
+                                                     AND (f.team_id = "IM" OR
+                                                          f.team_id = "IM-A" OR
+                                                          f.team_id = "IM-B")')[0]
+      @panel_standings_forAvgERA = Game.find_by_sql('SELECT SUM(p.IPouts) AS allIPouts, SUM(p.ER) AS allER
                                                      FROM games AS g, pitchings AS p
-                                                     WHERE g.game_id LIKE \'' + @academicYear + '__\'
-                                                     AND (g.home_team_id = \'IM\' OR 
-                                                          g.away_team_id = \'IM\' OR
-                                                         (g.home_team_id = \'IM-A\' AND g.away_team_id <> \'IM-B\') OR
-                                                         (g.home_team_id = \'IM-B\' AND g.away_team_id <> \'IM-A\') OR
-                                                         (g.away_team_id = \'IM-A\' AND g.home_team_id <> \'IM-B\') OR
-                                                         (g.away_team_id = \'IM-B\' AND g.home_team_id <> \'IM-A\'))
+                                                     WHERE g.game_id LIKE "' + @academicYear + '__"
+                                                     AND (g.home_team_id = "IM" OR 
+                                                          g.away_team_id = "IM" OR
+                                                         (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
+                                                         (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
+                                                         (g.away_team_id = "IM-A" AND g.home_team_id <> "IM-B") OR
+                                                         (g.away_team_id = "IM-B" AND g.home_team_id <> "IM-A"))
                                                      AND g.game_id = p.game_id
-                                                     AND (p.team_id = \'IM\' OR
-                                                          p.team_id = \'IM-A\' OR
-                                                          p.team_id = \'IM-B\')')[0]
+                                                     AND (p.team_id = "IM" OR
+                                                          p.team_id = "IM-A" OR
+                                                          p.team_id = "IM-B")')[0]
       @panel_standings_AvgERA5 = '%.2f' % (15 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
       @panel_standings_AvgERA7 = '%.2f' % (21 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
 
@@ -272,7 +275,6 @@ class HomeController < ApplicationController
                       FROM pitchings AS PIT, games AS G, cups AS C 
                       WHERE PIT.game_id = G.game_id and G.cup_id = C.cup_id and C.year = " + @thisyear.to_s + " )";
 
-=begin
       @panel_top5_AVG = Batting.find_by_sql('WITH Top5AVG(Batter,fName,lName,AVG,ABs,Hits,RBIs) 
                                                       AS (SELECT BAT.player_id AS "Batter",
                                                                  PLY.player_fname AS "fName",
@@ -660,8 +662,7 @@ class HomeController < ApplicationController
                                                                QueryWHIP.WHIPs
                                                       ORDER BY whipRank ASC
                                                          LIMIT 5)
-                                                   ORDER BY Rank ASC')
-=end                               
+                                                   ORDER BY Rank ASC')                               
                                                          
 	end
 
