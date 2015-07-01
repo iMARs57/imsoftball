@@ -40,7 +40,17 @@
                     <li>
                         <a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
                     </li>
+                    <% if logged_in? %>
+                        <li title="目前以<%=@current_user.name%>登入">
+                            <%= link_to "登出", logout_path, method: "delete", id: "btn_login", class: "menuLink", onMouseOver: "this.innerHTML = 'Log Out'", onMouseOut: "this.innerHTML = '登出'" %>
+                        </li>
+                    <% else %>
+                        <li>
+                            <li><%= link_to "登入", login_path, id: "btn_login", class: "menuLink", onMouseOver: "this.innerHTML = 'Log In'", onMouseOut: "this.innerHTML = '登入'" %></li>
+                        </li>
+                    <% end %>
                 </ul>
+
                 <script type="text/javascript">
                     $(function(){ 
                         var navMain = $(".navbar-collapse");
@@ -54,6 +64,17 @@
                             navMain.collapse('hide');
                         });
 
+                    });
+
+                    $(function(){
+                        $('#btn_login').parent().attr('data-toggle','tooltip');
+                        // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
+                        $('#btn_login').parent().tooltip({
+                            // 為了不換行的設定
+                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;max-width: 350px;"></div></div>',
+                            container: 'body',
+                            placement: 'bottom'
+                        });
                     });
                 </script>
             </div>

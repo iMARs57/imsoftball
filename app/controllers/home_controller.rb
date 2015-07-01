@@ -1,20 +1,17 @@
 class HomeController < ApplicationController
 
 	require "ipaddr"
+
 	
 	def remote_ip
     locIp = IPAddr.new("127.0.0.1")
     remIP = IPAddr.new(request.remote_ip)
-    if remIP === locIp
+    if remIP === locIp || remIP === IPAddr.new("::1")
       # Hard coded remote address for test
       #IPAddr.new("123.45.67.89")
       return IPAddr.new("140.112.12.34")
     else
-      if remIP.ipv4?
-        return 'true'
-      else
-        return 'false'
-      end
+      return remIP
     end
   end
 
@@ -40,16 +37,11 @@ class HomeController < ApplicationController
 	end
 =end
 
-	def index
-		# 若此session無 已授權 標示，導回首頁
-  		#if session[:username] == nil
-      #  redirect_to "home/determine"
-      #  return
-  	  #end
-      @message = remote_ip
-
+  def index  
+    
+    ntuIP = IPAddr.new("140.112.0.0/16")
+    if (ntuIP === remote_ip) || logged_in?  
       # 執行秀出已授權可看的畫面內容
-
       if(Time.now.year < 2011)
         if Time.now.month >= 9
           @academicYear = '0' + (Time.now.year - 1911).to_s
@@ -663,7 +655,11 @@ class HomeController < ApplicationController
                                                       ORDER BY whipRank ASC
                                                          LIMIT 5)
                                                    ORDER BY Rank ASC')                               
-                                                         
-	end
+    else
+      #沒台大IP又沒登入
+      redirect_to :action => 'new', :controller => 'sessions'
+    end                                                     
+	
+  end
 
 end

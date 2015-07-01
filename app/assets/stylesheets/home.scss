@@ -76,6 +76,18 @@ div.panel{
    text-align: center;   
 }
 
+#tabs_top5 {
+	
+	width: 80%;
+	margin: 50px auto 0px auto;
+}
+
+#panel_battingTop5 > ul, #panel_pitchingTop5 > ul{
+	
+	overflow-x: auto;
+	overflow-y:hidden;
+}
+
 @media(max-width:768px) {
 	/*
 	.intro{

@@ -1,10 +1,13 @@
 Rails.application.routes.draw do
-  
-  
-  #devise_for :users
+
+  get    'login'   => 'sessions#new'
+  post   'login'   => 'sessions#create'
+  delete 'logout'  => 'sessions#destroy'
+
+  get 'home/index'
   root :to => "home#index"
 
-  resources :namecards
+  #resources :namecards
   #resources :home
   
   # The priority is based upon order of creation: first created -> highest priority.

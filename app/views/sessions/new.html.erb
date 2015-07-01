@@ -1,0 +1,86 @@
+<!-- Navigation -->
+<nav id="navbar" class="navbar navbar-custom menu" role="navigation">
+  <div class="container menu">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+        <!--<i class="fa fa-bars"></i>-->
+        <%= fa_icon "bars" %>
+      </button>
+      <a class="navbar-brand page-scroll disabled" href="#all-top" style="color:#F1772E;">
+        <!--<i class="fa fa-play-circle"></i> -->
+        <%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
+      </a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+      <ul class="nav navbar-nav ul_menu">
+        <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+        <li class="hidden">
+          <a href="#page-top"></a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#about" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
+        </li>
+        <li class="disabled">
+          <a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
+        </li>
+      </ul>
+      <script type="text/javascript">
+      $(function(){ 
+        var navMain = $(".navbar-collapse");
+        var navHeader = $(".navbar-header");
+
+        navMain.on("click", "a", null, function () {
+          navMain.collapse('hide');
+        });
+
+        navHeader.on("click", "a", null, function () {
+          navMain.collapse('hide');
+        });
+
+      });
+      </script>
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container -->
+</nav>
+<div class="login">
+  <h1 class="text-center">登入</h1>
+  <%= flash_messages %>
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <%= form_for(:session, url: login_path) do |f| %>
+
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control' %>
+
+      <%= f.label :password %>
+      <%= f.password_field :password, class: 'form-control' %>
+      
+      <%= f.label :remember_me, class: "checkbox inline" do %>
+        <%= f.check_box :remember_me %>
+        <span>Remember me on this computer</span>
+      <% end %>
+
+      <%= f.submit "Log in", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+</div>
