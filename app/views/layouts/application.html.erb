@@ -4,17 +4,129 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NTUIM Softball</title>
+  <title>NTUIM SOFTBALL | 國立臺灣大學資訊管理學系壘球隊</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%#= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" %>
-  <%#= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Montserrat:400,700" %>
+  <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" %>
+  <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Montserrat:400,700" %>
   <% %w(16 32 96).each do |s| %>
     <%= favicon_link_tag "icon/favicon-#{s}x#{s}.png", rel: 'icon', type: 'image/png', sizes: "#{s}x#{s}" %>
   <% end %>
   <%= csrf_meta_tags %>
 </head>
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-  <%= yield %>
+  <!-- Navigation -->
+  <nav id="navbar" class="navbar navbar-custom navbar-fixed-top menu" role="navigation">
+    <div class="container menu">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+          <!--<i class="fa fa-bars"></i>-->
+          <%= fa_icon "bars" %>
+        </button>
+        <a class="navbar-brand page-scroll" href="#all-top" style="color:#F1772E;">
+          <!--<i class="fa fa-play-circle"></i> -->
+          <%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
+        </a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+        <ul class="nav navbar-nav ul_menu">
+          <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+          <li class="hidden">
+            <a href="#page-top"></a>
+          </li>
+          <li>
+            <a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
+          </li>
+          <li>
+            <a class="page-scroll menuLink" href="#about" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
+          </li>
+          <li>
+            <a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
+          </li>
+          <li>
+            <a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
+          </li>
+          <!--<li>-->
+          <!--
+            <a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+          -->
+          <% if logged_in? %>
+          <li>
+            <%= link_to "球員名單", {controller: 'home', action: 'roster'}, :class => 'page-scroll menuLink', :id => 'a_Roster', :onMouseOver => "this.innerHTML = 'Roster'", :onMouseOut => "this.innerHTML = '球員名單'", :remote => true %>
+          </li>
+          <% else %>
+          <li>
+            <%= link_to "球員名單", {controller: 'home', action: 'roster'}, :class => 'page-scroll menuLink', :id => 'a_Roster', :onMouseOver => "this.innerHTML = 'Roster'", :onMouseOut => "this.innerHTML = '球員名單'" %>
+          </li>
+          <% end %>
+          <script type="text/javascript">
+          $('#a_Roster').on('ajax:success', function(evt, data) {
+                                var target = $('#content'); // Find where is the destination
+                                $(target).html(data);
+                              });
+          </script>
+          <!--</li>-->
+          <li>
+            <a class="page-scroll menuLink" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
+          </li>
+          <li>
+            <a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
+          </li>
+          <% if logged_in? %>
+          <li title="目前以帳號 <%=@current_user.name%> 登入">
+            <%= link_to "登出", logout_path, method: "delete", id: "btn_login", class: "page-scroll menuLink" %>
+          </li>
+          <% else %>
+          <li>
+            <li><%= link_to "登入", login_path, id: "btn_login", class: "page-scroll menuLink" %></li>
+          </li>
+          <% end %>
+        </ul>
+
+        <script type="text/javascript">
+        $(function(){ 
+          var navMain = $(".navbar-collapse");
+          var navHeader = $(".navbar-header");
+
+          navMain.on("click", "a", null, function () {
+            navMain.collapse('hide');
+          });
+
+          navHeader.on("click", "a", null, function () {
+            navMain.collapse('hide');
+          });
+
+        });
+
+        $(function(){
+          var li_login = $('#btn_login').parent();
+          li_login.attr('data-toggle','tooltip');
+          // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
+          li_login.tooltip({
+            // 為了不換行的設定
+            template: 
+            '<div class="tooltip" role="tooltip"><div class="tooltip-arrow" style="border-bottom-color:#00f;"></div><div class="tooltip-inner" style="white-space:nowrap;max-width:350px;background-color:#00f;"></div></div>',
+            container: 'body',
+            placement: 'bottom'
+          });
+        });
+        </script>
+      </div>
+      <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+  </nav>
+  <div id="main_content">
+    <%= yield %>
+  </div>
+  <!-- Footer -->
+  <footer>
+    <div class="container text-center">
+      <p>Copyright &copy; 2015 NTUIM Softball Team</p>
+      <p style="font-size:14px;">關於本網站任何資訊的修改事宜，請將相關資料整理後於消息來源處po文告知</p>
+    </div>
+  </footer>
 </body>
 </html>

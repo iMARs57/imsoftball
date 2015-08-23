@@ -2,7 +2,6 @@ class HomeController < ApplicationController
 
 	require "ipaddr"
 
-	
 	def remote_ip
     locIp = IPAddr.new("127.0.0.1")
     remIP = IPAddr.new(request.remote_ip)
@@ -14,28 +13,6 @@ class HomeController < ApplicationController
       return remIP
     end
   end
-
-=begin
-	def determine
-		
-		if user_signed_in?
-			session[:username] = "anonymous"
-			redirect_to :action => "index"
-			return
-		end
-		# 未授權過的session，則檢查來query本頁面的 IP 為何
-  		# 看此 IP 是否為允許範圍內
-  		ntuIP = IPAddr.new("140.112.0.0/16")
-      if (ntuIP === remote_ip)
-  			#在此 session 標上已授權記號
-    		session[:username] = "anonymous"
-    		redirect_to :action => "index"
-    	else
-    		redirect_to "users/sign_in"
-  		end
-
-	end
-=end
 
   def index  
     
@@ -61,7 +38,7 @@ class HomeController < ApplicationController
       end
 
       # News' kaminari setup
-      @informations = Information.order('date DESC').page(params[:page]).per(8)
+      @informations = Information.order('date DESC').page(params[:page]).per(10)
       # SQL for Info Board
       @panel_allGames = Game.select('games.*,
                                      cups.cup_name,
@@ -660,6 +637,14 @@ class HomeController < ApplicationController
       redirect_to :action => 'new', :controller => 'sessions'
     end                                                     
 	
+  end
+
+  def roster
+    if logged_in?
+      render :partial => 'roster', :content_type => 'text/html'
+    else
+      redirect_to :action => 'new', :controller => 'sessions'
+    end
   end
 
 end

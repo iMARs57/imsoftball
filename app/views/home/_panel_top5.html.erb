@@ -14,7 +14,7 @@
 		<% if tieList.length > 1 %>
 			<tr>
 				<td><%= rankNow.to_s + '.' %></td>
-				<td ><%= image_tag("portrait/tie.jpg", class:"top5_portrait" ,alt: "Tie") %></td>
+				<td class="top5photo"><%= image_tag("portrait/tie.jpg", class:"top5_portrait" ,alt: "Tie") %></td>
 				<% tieList.each do |tie| %>
 					<% if tie.firstName != nil && tie.lastName != nil %>
 						<% if tie.firstName.to_s.length == 2 %>
@@ -35,7 +35,7 @@
 			<tr>
 				<td><%= rankNow.to_s + '.' %></td>
 				<% if !Imsoftball::Application.assets.find_asset("portrait/#{panel_top5[orderNow].ID}.jpg").nil? %>
-					<td><%= image_tag("portrait/#{panel_top5[orderNow].ID}.jpg", class:"top5_portrait" , alt: "#{panel_top5[orderNow].ID}") %></td>
+					<td class="top5photo"><%= image_tag("portrait/#{panel_top5[orderNow].ID}.jpg", class:"top5_portrait" , alt: "#{panel_top5[orderNow].ID}") %></td>
 				<% else %>
 					<td><%= image_tag("portrait/no_portrait.jpg", class:"top5_portrait" , alt: "#{panel_top5[orderNow].ID}") %></td>
 				<% end %>

@@ -1,88 +1,5 @@
-<!-- Navigation -->
-    <nav id="navbar" class="navbar navbar-custom navbar-fixed-top menu" role="navigation">
-        <div class="container menu">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-                    <!--<i class="fa fa-bars"></i>-->
-                    <%= fa_icon "bars" %>
-                </button>
-                <a class="navbar-brand page-scroll" href="#all-top" style="color:#F1772E;">
-                    <!--<i class="fa fa-play-circle"></i> -->
-                    <%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
-                </a>
-            </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-                <ul class="nav navbar-nav ul_menu">
-                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
-                    <li class="hidden">
-                        <a href="#page-top"></a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#about" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
-                    </li>
-                    <% if logged_in? %>
-                        <li title="目前以<%=@current_user.name%>登入">
-                            <%= link_to "登出", logout_path, method: "delete", id: "btn_login", class: "menuLink", onMouseOver: "this.innerHTML = 'Log Out'", onMouseOut: "this.innerHTML = '登出'" %>
-                        </li>
-                    <% else %>
-                        <li>
-                            <li><%= link_to "登入", login_path, id: "btn_login", class: "menuLink", onMouseOver: "this.innerHTML = 'Log In'", onMouseOut: "this.innerHTML = '登入'" %></li>
-                        </li>
-                    <% end %>
-                </ul>
-
-                <script type="text/javascript">
-                    $(function(){ 
-                        var navMain = $(".navbar-collapse");
-                        var navHeader = $(".navbar-header");
-
-                        navMain.on("click", "a", null, function () {
-                            navMain.collapse('hide');
-                        });
-
-                        navHeader.on("click", "a", null, function () {
-                            navMain.collapse('hide');
-                        });
-
-                    });
-
-                    $(function(){
-                        $('#btn_login').parent().attr('data-toggle','tooltip');
-                        // bootstrap的tooltip和tab會衝突，所以把tooltip設在li上
-                        $('#btn_login').parent().tooltip({
-                            // 為了不換行的設定
-                            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="white-space:nowrap;max-width: 350px;"></div></div>',
-                            container: 'body',
-                            placement: 'bottom'
-                        });
-                    });
-                </script>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
-    </nav>
 <!-- Intro Header -->
+<div id="content">
     <header class="intro">
         <div class="height-fill">
             <div id="slides">
@@ -91,8 +8,11 @@
                         <div class="poster">
                             <%= image_tag("blackandorange_wide.png") %>
                         </div>
-                        <!--<a href="#news" class="page-scroll">-->
-                        <!--<div id="banner"></div>-->
+                        <!--
+                        <div id="title_container" class="container">
+                            國立臺灣大學資訊管理學系棒壘球隊
+                        </div>
+                        -->
                     </li>
                     <li>
                         <%= image_tag("slider/slider1.jpg", width: "1024", height: "685", alt: "2015NTUPremier16_Champion") %>
@@ -162,6 +82,8 @@
                 }
                 $('body').css('padding-top',0);
             }
+
+            $('#title_container').css('padding-top',$('.height-fill').height()*0.85);
 
             // superslides
             var $slides = $('#slides');
@@ -255,13 +177,16 @@
             $('.map_description').css('padding-left',$('#practice').width()*0.1);
             $('.map_description').css('max-width',$('#practice').width()*0.9);
             
+        });
+
+        $(window).on('resize', function(){
+
             // load的時候地圖也會跑掉，所以要resize一次
             var m = $('#map').data('tinyMap');
             // 1.觸發 map resize 事件
             google.maps.event.trigger(m.map, 'resize');
             // 2.移動地圖中心
             m.map.panTo(new google.maps.LatLng('25.017344', '121.539746'));
-            
         });
 
     </script>
@@ -712,6 +637,17 @@
                                     $('.overlay div').css("pointer-events", "auto");
                                 });
 
+                                $(window).load(function() {
+
+                                    var m = $('#map').data('tinyMap');
+                                    // 1.觸發 map resize 事件
+                                    google.maps.event.trigger(m.map, 'resize');
+                                    // 2.移動地圖中心
+                                    m.map.panTo(new google.maps.LatLng('25.017344', '121.539746'));
+                                    //console.log('Map Loaded!!!');
+
+                                });
+
                             </script>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="infoSource">
@@ -1011,10 +947,4 @@
             </div>
         </div>
     </section>
-    <!-- Footer -->
-    <footer>
-        <div class="container text-center">
-            <p>Copyright &copy; <%= Time.now.year %> NTUIM Softball Team</p>
-            <p style="font-size:14px;">關於本網站任何資訊的修改事宜，請將相關資料整理後於消息來源處po文告知</p>
-        </div>
-    </footer>
+</div>

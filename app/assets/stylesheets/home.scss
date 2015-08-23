@@ -28,6 +28,16 @@ div.menu{
 	/*margin-top:-5px;*/
 
 }
+
+#title_container{
+	
+	font-size: 45px;
+	color: white;
+	text-shadow: -1px 0 #F1772E, 0 2px #F1772E, 2px 0 #F1772E, 0 -1px #F1772E;
+	white-space: nowrap;
+	text-align: center;
+}
+
 #banner{
 	
   	margin-left: auto;
@@ -36,6 +46,12 @@ div.menu{
   	background-size: 70% auto;
     background-repeat: no-repeat;
     background-position: center center;
+
+}
+
+.fa-chevron-left:hover, .fa-chevron-right:hover{
+	
+	color: rgba(255,255,255,0.6);
 
 }
 
@@ -86,6 +102,14 @@ div.panel{
 	
 	overflow-x: auto;
 	overflow-y:hidden;
+}
+
+@media(min-width:768px){
+	
+	.navbar-brand{
+	
+		margin-left: -20px !important;
+	}
 }
 
 @media(max-width:768px) {
@@ -355,6 +379,11 @@ p.about_text{
     padding-bottom: 50px;
 }
 
+#albums * a:hover{
+	
+	color: red;
+}
+
 td.text_date{
 	
 	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
@@ -427,4 +456,10 @@ td.text_item{
 .top5_description{
 	
 	font-size:14px;
+}
+
+.top5photo{
+	
+	width: 25%;
+
 }

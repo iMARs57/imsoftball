@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
       params[:session][:remember_me] == '1' ? remember(user) : forget(user)
       redirect_to root_url
     else
-      flash.now[:error] = 'Invalid email/password combination' # Not quite right!
+      flash.now[:error] = '帳號或密碼錯誤！請重新輸入。'
 	  render 'new'
     end
 	
