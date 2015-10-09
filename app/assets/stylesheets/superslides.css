@@ -32,11 +32,11 @@
 }
 .slides-navigation a.prev {
   left: 10px;
-  color:rgba(255,255,255,0.8);
+  color:rgba(255,255,255,0.5);
 }
 .slides-navigation a.next {
   right: 10px;
-  color:rgba(255,255,255,0.8);
+  color:rgba(255,255,255,0.5);
 }
 
 .slides-pagination {

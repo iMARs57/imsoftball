@@ -4,11 +4,16 @@
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
 
+@font-face {
+  font-family: KaiGenGothicTW-Medium;
+  src: url("../KaiGenGothicTW/KaiGenGothicTW-Medium.ttf");
+}
+
 body {
     width: 100%;
     height: 100%;
-    font-family: NotoSansCJKtc-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: url("../NotoSansCJKtc/NotoSansCJKtc-Medium.otf");
+    font-family: KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
+    src: url("../KaiGenGothicTW/KaiGenGothicTW-Medium.ttf");
     color: #fff;
     background-color: #000000;
 }
@@ -26,8 +31,8 @@ h5,
 h6 {
     margin: 0 0 35px;
     text-transform: uppercase;
-    font-family: Montserrat , NotoSansCJKtc-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: url("../NotoSansCJKtc/NotoSansCJKtc-Medium.otf");
+    font-family: Montserrat , KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
+    src: url("../KaiGenGothicTW/KaiGenGothicTW-Medium.ttf");
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -67,8 +72,8 @@ a:focus {
     margin-bottom: 0;
     border-bottom: 1px solid rgba(255,255,255,.3);
     text-transform: uppercase;
-    font-family: Montserrat, NotoSansCJKtc-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: url("../NotoSansCJKtc/NotoSansCJKtc-Medium.otf");
+    font-family: Montserrat, KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
+    src: url("../KaiGenGothicTW/KaiGenGothicTW-Medium.ttf");
     background-color: #000;
 }
 
@@ -307,8 +312,8 @@ a:focus {
 .btn {
     border-radius: 0;
     text-transform: uppercase;
-    font-family: Montserrat, NotoSansCJKtc-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: url("../NotoSansCJKtc/NotoSansCJKtc-Medium.otf");
+    font-family: Montserrat, KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
+    src: url("../KaiGenGothicTW/KaiGenGothicTW-Medium.ttf");
     font-weight: 400;
     -webkit-transition: all .3s ease-in-out;
     -moz-transition: all .3s ease-in-out;

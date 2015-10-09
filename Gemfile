@@ -13,16 +13,16 @@ gem 'sqlite3'
 gem 'sass-rails', '~> 5.0'
 
 # use less
-gem 'less-rails', '~> 2.7.0'
+#gem 'less-rails', '~> 2.7.0'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
-gem 'therubyracer', platforms: :ruby
+#gem 'therubyracer', platforms: :ruby
 
-# Use jquery as the JavaScript library
+# Use jquery as the JavaScript libraFry
 gem 'jquery-rails'
 
 # Use Jquery easing plugin
@@ -57,6 +57,8 @@ gem 'bootstrap-kaminari-views'
 # Use devise
 #gem 'devise'
 #gem 'devise-bootstrap-views'
+
+gem 'tzinfo-data'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

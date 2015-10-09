@@ -15,6 +15,4 @@
 //= require jquery.animate-enhanced
 //= require bootstrap-sprockets
 //= require jquery_ujs
-//= require turbolinks
-//= require_tree ./CollagePlus
-//= require_tree .
+//= require_tree ./common

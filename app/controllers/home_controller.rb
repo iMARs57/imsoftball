@@ -3,22 +3,47 @@ class HomeController < ApplicationController
 	require "ipaddr"
 
 	def remote_ip
-    locIp = IPAddr.new("127.0.0.1")
-    remIP = IPAddr.new(request.remote_ip)
-    if remIP === locIp || remIP === IPAddr.new("::1")
-      # Hard coded remote address for test
-      #IPAddr.new("123.45.67.89")
-      return IPAddr.new("140.112.12.34")
-    else
-      return remIP
-    end
-  end
+		locIp = IPAddr.new("127.0.0.1")
+		remIP = IPAddr.new(request.remote_ip)
+		if remIP === locIp || remIP === IPAddr.new("::1")
+			# Hard coded remote address for test
+			#IPAddr.new("123.45.67.89")
+			return IPAddr.new("140.112.12.34")
+		else
+			return remIP
+		end
+	end
+	
+	def memberQuery(age)
+		@query = Member.select('members.*')
+                       .where('members.IM_age = ' + age.to_s)
+                       .order('number')
+		return @query
+	end
+	
+	def memberQuery_active(age)
+		@query = Member.select('members.*')
+                       .where('members.IM_age = ' + age.to_s)
+					   .where('members.active = 1')
+                       .order('number')
+		return @query
+	end
+	
+	def memberQuery_leadership(age, type)
+		@query = Member.select('members.*')
+                       .where('members.IM_age = ' + age.to_s)
+					   .where('members.leadership = ' + type.to_s)
+                       .order('number')
+		return @query
+	end
+	
 
   def index  
     
-    ntuIP = IPAddr.new("140.112.0.0/16")
-    if (ntuIP === remote_ip) || logged_in?  
-      # 執行秀出已授權可看的畫面內容
+	ntuIP = IPAddr.new("140.112.0.0/16")
+    if (ntuIP === remote_ip) || logged_in?
+	
+	  # 執行秀出已授權可看的畫面內容
       if(Time.now.year < 2011)
         if Time.now.month >= 9
           @academicYear = '0' + (Time.now.year - 1911).to_s
@@ -36,7 +61,7 @@ class HomeController < ApplicationController
           @thisyear = Time.now.year - 1
         end
       end
-
+	  
       # News' kaminari setup
       @informations = Information.order('date DESC').page(params[:page]).per(10)
       # SQL for Info Board
@@ -227,8 +252,8 @@ class HomeController < ApplicationController
                                                      AND (p.team_id = "IM" OR
                                                           p.team_id = "IM-A" OR
                                                           p.team_id = "IM-B")')[0]
-      @panel_standings_AvgERA5 = '%.2f' % (15 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
-      @panel_standings_AvgERA7 = '%.2f' % (21 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
+      @panel_standings_AvgERA5 = '%.2f' % (15.0 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
+      @panel_standings_AvgERA7 = '%.2f' % (21.0 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
 
       
       # Top 5 panel
@@ -631,17 +656,38 @@ class HomeController < ApplicationController
                                                                QueryWHIP.WHIPs
                                                       ORDER BY whipRank ASC
                                                          LIMIT 5)
-                                                   ORDER BY Rank ASC')                               
-    else
+                                                   ORDER BY Rank ASC')
+      @Max_age = Member.maximum("IM_age")
+	  @memberQuery = Array.new(@Max_age)
+	  @activelist = Array.new(@Max_age){0}
+	  @captainlist = Array.new(@Max_age){0}
+	  @deputylist = Array.new(@Max_age){0}
+	  @GAlist = Array.new(@Max_age){0}
+	  @counter_captain = 0
+	  @counter_deputy = 0
+	  @counter_GA = 0
+	  for i in 0..(@Max_age-1) do
+		@memberQuery[i] = memberQuery(i+1)
+		@activelist[i] = memberQuery_active(i+1).length
+		@captainlist[i] = memberQuery_leadership(i+1,1).length
+		@counter_captain = @counter_captain + @captainlist[i]
+		@deputylist[i] = memberQuery_leadership(i+1,2).length
+		@counter_deputy = @counter_deputy + @deputylist[i]
+		@GAlist[i] = memberQuery_leadership(i+1,3).length
+		@counter_GA = @counter_GA + @GAlist[i]
+	  end
+	  
+	  
+	else
       #沒台大IP又沒登入
       redirect_to :action => 'new', :controller => 'sessions'
     end                                                     
 	
   end
 
-  def roster
+  def show
     if logged_in?
-      render :partial => 'roster', :content_type => 'text/html'
+
     else
       redirect_to :action => 'new', :controller => 'sessions'
     end

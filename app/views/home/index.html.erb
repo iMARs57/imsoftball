@@ -47,150 +47,13 @@
             </div>
         </div>
     </header>
-    <script>
-        // for responsive design
-        $(window).on('load resize', function(){
-            var win = $(this); //this = window
-            var windowHeight = win.outerHeight();
-            var navHeight = $("#navbar").outerHeight();
-            var menuHeight = $('div.menu').height();
-
-            if (win.width() < 768) { 
-                var calculatedHeight = windowHeight - navHeight;
-                var heightFill = $('.height-fill');
-                $(heightFill).height(calculatedHeight);
-                $(heightFill).width(win.width());
-                //console.log("Blocked NavBar Case");
-                if($('#ul_about').hasClass("nav-stacked")){
-                    $('#ul_about').removeClass("nav-stacked");
-                }
-                if(win.width() < 600){
-                    $('#ul_about').css('display','block');
-                }
-                else{
-                    $('#ul_about').css('display','inline-block');
-                }
-                $('body').css('padding-top',navHeight);
-            }
-            else { 
-                var heightFill = $('.height-fill');
-                $(heightFill).height(windowHeight);
-                $(heightFill).width(win.width());
-                //console.log("Transparent NavBar Case");
-                if(!$('#ul_about').hasClass("nav-stacked")){
-                    $('#ul_about').addClass("nav-stacked");
-                }
-                $('body').css('padding-top',0);
-            }
-
-            $('#title_container').css('padding-top',$('.height-fill').height()*0.85);
-
-            // superslides
-            var $slides = $('#slides');
-            
-            // mobile devices swipe shift
-            Hammer($slides[0]).on("swipeleft", function(e) {
-                $slides.data('superslides').animate('next');
-            });
-
-            Hammer($slides[0]).on("swiperight", function(e) {
-                $slides.data('superslides').animate('prev');
-            });
-            
-            // superslides activate
-            $('#slides').superslides({
-                inherit_height_from: '.height-fill',
-                hashchange: false,
-                play: 7000 // 7s per slide
-            });
-            
-            // superslides play setting
-            var hoverTimer = 0;
-            $('#slides').on('mouseenter', function() {
-                $(this).superslides('stop');
-                clearTimeout(hoverTimer);
-                //console.log(hoverTimer);
-            });
-            
-            $('#slides').on('mouseleave', function() {
-                hoverTimer = setTimeout(function(){
-                    $slides.superslides('start');
-                    //console.log(hoverTimer);
-                }, 7000);
-            });
-
-            // set up banner size (as sliders')
-            var containerHeight = $('#slides').height();
-            var containerWidth = $('#slides').width();
-            $('#poster').outerHeight(containerHeight);
-            $('#poster').outerWidth(containerWidth);
-
-            // overwrite page-scroll的定義, 考慮navbar後重新計算scroll的offset
-            $('[data-spy="scroll"]').each(function () {
-                var $spy = $(this).scrollspy('refresh')
-            })
-
-            $('a.page-scroll').bind('click', function(event) {
-                var $anchor = $(this);
-                $('html, body').stop().animate({
-                    scrollTop: $($anchor.attr('href')).offset().top - (menuHeight - 1)
-                }, 1500, 'easeInOutExpo');
-                event.preventDefault();
-            });
-
-            // scrollspy修改offset只能動到click事件,scroll到各個section以切換active li事件部分得自己寫...
-            $(window).scroll(function() {
-                
-                var cur_pos = $(window).scrollTop();
-                var sections = $('section');
-                var navbar = $('#navbar')
-
-                sections.each(function(){
-                    
-                    //console.log($(this).attr('id').toString());
-                    var top = $(this).offset().top - menuHeight;
-                    var bottom = top + $(this).outerHeight();
-
-                    if(cur_pos >= top && cur_pos <= bottom){
-                        navbar.find('li').removeClass('active');
-                        navbar.find('a[href="#'+$(this).attr('id')+'"]').parent('li').addClass('active');
-                    }
-                });
-
-                if(cur_pos < $('#news').offset().top - menuHeight){
-                    var nav_lis = navbar.find('li');
-                    nav_lis.each(function(){
-                        if($(this).hasClass('active')){
-                            $(this).removeClass('active');
-                        } 
-                    });
-                }
-            });
-
-            // top 5 portrait size
-            $('img.top5_portrait').height(windowHeight*0.10);
-
-            // for 16 : 9 map size :)
-            $('#panel_map').height($('#practice').width() * 0.45);
-            $('#panel_map').width($('#practice').width() * 0.8);
-
-            $('.map_description').css('padding-left',$('#practice').width()*0.1);
-            $('.map_description').css('max-width',$('#practice').width()*0.9);
-            
-        });
-
-        $(window).on('resize', function(){
-
-            // load的時候地圖也會跑掉，所以要resize一次
-            var m = $('#map').data('tinyMap');
-            // 1.觸發 map resize 事件
-            google.maps.event.trigger(m.map, 'resize');
-            // 2.移動地圖中心
-            m.map.panTo(new google.maps.LatLng('25.017344', '121.539746'));
-        });
-
+    <%= javascript_include_tag 'home' %>
+	<script>
+		
+		
+		
     </script>
-<!-- About Section -->
+<!-- News Section -->
     <section id="news" class="container text-center">
         <div class="row" id="news_row">
             <div class="col-sm-5" id="div_news">
@@ -231,7 +94,7 @@
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane active" id="panel_last5">
+                        <div class="tab-pane active blueTab" id="panel_last5">
                             <ul class="nav nav-tabs nav-justified">
                                 <li class="active">
                                     <a href="#panel_allGames" data-toggle="tab">所有賽事</a>
@@ -294,12 +157,16 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><%= @panel_standings_GP %></td>
+										<td><%= @panel_standings_GP %></td>
                                         <td><%= @panel_standings_W %></td>
                                         <td><%= @panel_standings_L %></td>
                                         <td><%= @panel_standings_D %></td>
-                                        <td><%= '%.3f' % (@panel_standings_W.to_f / @panel_standings_GP.to_f) %></td>
-                                        <td><%= @panel_standings_last10_W.to_s + "-" + @panel_standings_last10_L.to_s + "-" + @panel_standings_last10_D.to_s %></td>
+                                        <% if @panel_standings_GP == 0 %>
+											<td>-.---</td>
+										<% else %>
+											<td><%= '%.3f' % (@panel_standings_W.to_f / @panel_standings_GP.to_f) %></td>
+										<% end %>
+										<td><%= @panel_standings_last10_W.to_s + "-" + @panel_standings_last10_L.to_s + "-" + @panel_standings_last10_D.to_s %></td>
                                         <td><%= @panel_standings_home_W.to_s + "-" + @panel_standings_home_L.to_s + "-" + @panel_standings_home_D.to_s %></td>
                                         <td><%= @panel_standings_away_W.to_s + "-" + @panel_standings_away_L.to_s + "-" + @panel_standings_away_D.to_s %></td>
                                     </tr>
@@ -317,11 +184,23 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><%= '%.3f' % (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f) %></td>
-                                        <td><%= '%.3f' % ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f) %></td>
-                                        <td><%= @panel_standings_AvgERA5.to_s + " / " + @panel_standings_AvgERA7.to_s %></td>
-                                        <td><%= @panel_standings_forAvgBat.allHR %></td>
-                                        <td><%= @panel_standings_forAvgDef.allE %></td>
+										<% if @panel_standings_GP == 0 %>
+											<td>-.---</td>
+										<% else %>
+											<td><%= '%.3f' % (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f) %></td>	
+										<% end %>
+										<% if @panel_standings_GP == 0 %>
+											<td>-.---</td>
+										<% else %>	
+											<td><%= '%.3f' % ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f) %></td>
+										<% end %>
+										<% if @panel_standings_GP == 0 %>
+											<td>-.-- / -.--</td>
+										<% else %>
+											<td><%= @panel_standings_AvgERA5.to_s + " / " + @panel_standings_AvgERA7.to_s %></td>
+                                        <% end %>
+										<td><%= @panel_standings_GP == 0? 0 : @panel_standings_forAvgBat.allHR %></td>
+                                        <td><%= @panel_standings_GP == 0? 0 : @panel_standings_forAvgDef.allE %></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -343,7 +222,7 @@
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane active" id="panel_battingTop5">
+                        <div class="tab-pane active blueTab" id="panel_battingTop5">
                             <ul class="nav nav-tabs nav-justified">
                                 <script type="text/javascript">
                                     $(function(){
@@ -421,7 +300,7 @@
                             </div>                        
 
                         </div>
-                        <div class="tab-pane" id="panel_pitchingTop5">
+                        <div class="tab-pane blueTab" id="panel_pitchingTop5">
                             <ul class="nav nav-tabs nav-justified">
                                 <script type="text/javascript">
                                     $(function(){
@@ -502,7 +381,7 @@
             </script>
         </div>
     </section>
-<!-- Download Section -->
+<!-- About Section -->
     <section id="about" class="container text-center">
         <div class="row" id="about_row">
             <div>
@@ -548,7 +427,7 @@
                                 <li><a href="#">台大棒球場</a></li>
                                 <li><a href="#">景美福和河濱公園(萬隆堤外)</a></li>
                                 <li><a href="#">道南河濱公園(萬壽橋下)</a></li>
-                                <li><a href="#">大新莊棒壘球打擊場輔大館</a></li>
+                                <li><a href="#">大新莊棒壘球打擊場</a></li>
                                 <li><a href="#">中正橋下</a></li>
                                 <li><a href="#">中正河濱公園(近馬場町)</a></li>
                                 <li><a href="#">迎風河濱公園(民權大橋下)</a></li>
@@ -594,7 +473,7 @@
                                         {'addr': [25.020776, 121.535188], 'text': '台大棒球場', 'id': '台大棒球場'},
                                         {'addr': [25.001429, 121.534752], 'text': '景美福和河濱公園(萬隆堤外)', 'id': '景美福和河濱公園(萬隆堤外)'},
                                         {'addr': [24.993784, 121.573263], 'text': '道南河濱公園(萬壽橋下)', 'id': '道南河濱公園(萬壽橋下)'},
-                                        {'addr': '242新北市新莊區中正路621號', 'text': '大新莊棒壘球打擊場輔大館', 'id': '大新莊棒壘球打擊場輔大館'},
+                                        {'addr': [25.034850, 121.436636], 'text': '大新莊棒壘球打擊場', 'id': '大新莊棒壘球打擊場'},
                                         {'addr': [25.019232, 121.510909], 'text': '中正橋下', 'id': '中正橋下'},
                                         {'addr': [25.023230, 121.511986], 'text': '中正河濱公園(近馬場町)', 'id': '中正河濱公園(近馬場町)'},
                                         {'addr': [25.073019, 121.569117], 'text': '迎風河濱公園(民權大橋下)', 'id': '迎風河濱公園(民權大橋下)'}
@@ -728,8 +607,219 @@
             </div>
         </div>
     </section>
-
-    <!-- Contact Section -->
+<% if logged_in? %>
+<!-- Roster Section -->
+	<section id="roster" class="container text-center">
+		<div class="row" id="roster_row">
+			<div>
+	            <%= fa_icon "sitemap 3x" ,id:"icon_roster"%>
+	            <h2>球員名單</h2>
+	        </div>
+	        <hr class="soften" />
+			<div class="col-sm-11 col-sm-offset-1" style="text-shadow: 2px 2px rgb(255,102,0);">
+				<%= fa_icon "bolt 2x" ,id:"fa_active"%><h3 class="text-left">現役球員</h3>
+			</div>
+			<div class="col-sm-2 col-sm-offset-2 roster_title">
+				<h3 class="text-left">隊長</h3>
+			</div>
+			<% if @counter_captain != 0 %>
+				<% for i in 1..@Max_age do %>	
+					<% if @captainlist[i-1]!= 0 %>
+						<div class="col-sm-1">
+							<table class="table table-condensed">
+								<tr>
+									<td class="text-left" style=" border-top: none !important;">
+										<p class="roster_age">IM<%= i < 10? "0"+i.to_s : i %></p>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-sm-7">
+							<table class="table table-condensed">
+								<tr>
+									<td style="padding-left:5%; border-top: none !important;">
+										<ul class="list-inline text-left">
+											<% @memberQuery[i-1].each do |member| %>
+												<% if member.leadership == 1 %>
+													<li><span class="roster_number">#<%= (member.number == nil)? '??' : '%02d' % (member.number) %></span><span class="roster_name">　<%= link_to member.name, Member.find(member.id) %></span></li>
+												<% end %>
+											<% end %>
+										</ul>
+									</td>
+								</tr>
+							</table>
+						</div>
+					<% end %>
+				<% end %>
+			<% else %>
+				<div class="col-sm-4 col-sm-offset-4">
+					<table class="table table-condensed">
+						<tr>
+							<td style="padding-left:5%; border-top: none !important;">
+								<ul class="list-inline text-left">
+									<li><span class="roster_number" style="visibility: hidden;">#00</span><span class="roster_name">　從　缺</span></li>
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</div>
+			<% end %>
+			<div class="col-sm-2 col-sm-offset-2 roster_title">
+				<h3 class="text-left">副隊長</h3>
+			</div>
+			<% if @counter_deputy != 0 %>
+				<% for i in 1..@Max_age do %>
+					<% if @deputylist[i-1]!= 0 %>
+						<div class="col-sm-1">
+							<table class="table table-condensed">
+								<tr>
+									<td class="text-left" style=" border-top: none !important;">
+										<p class="roster_age">IM<%= i < 10? "0"+i.to_s : i %></p>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-sm-7">
+							<table class="table table-condensed">
+								<tr>
+									<td style="padding-left:5%; border-top: none !important;">
+										<ul class="list-inline text-left">
+											<% @memberQuery[i-1].each do |member| %>
+												<% if member.leadership == 2 %>
+													<li><span class="roster_number">#<%= (member.number == nil)? '??' : '%02d' % (member.number) %></span><span class="roster_name">　<%= link_to member.name, Member.find(member.id) %></span></li>
+												<% end %>
+											<% end %>
+										</ul>
+									</td>
+								</tr>
+							</table>
+						</div>
+					<% end %>
+				<% end %>
+			<% else %>
+				<div class="col-sm-4 col-sm-offset-4">
+					<table class="table table-condensed">
+						<tr>
+							<td style="padding-left:5%; border-top: none !important;">
+								<ul class="list-inline text-left">
+									<li><span class="roster_number" style="visibility: hidden;">#00</span><span class="roster_name">　從　缺</span></li>
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</div>
+			<% end %>
+			<div class="col-sm-2 col-sm-offset-2 roster_title">
+				<h3 class="text-left">總務</h3>
+			</div>
+			<% if @counter_GA != 0 %>
+				<% for i in 1..@Max_age do %>
+					<% if @GAlist[i-1]!= 0 %>
+						<div class="col-sm-1">
+							<table class="table table-condensed">
+								<tr>
+									<td class="text-left" style=" border-top: none !important;">
+										<p class="roster_age">IM<%= i < 10? "0"+i.to_s : i %></p>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-sm-7">
+							<table class="table table-condensed">
+								<tr>
+									<td style="padding-left:5%; border-top: none !important;">
+										<ul class="list-inline text-left">
+											<% @memberQuery[i-1].each do |member| %>
+												<% if member.leadership == 3 %>
+													<li><span class="roster_number">#<%= (member.number == nil)? '??' : '%02d' % (member.number) %></span><span class="roster_name">　<%= link_to member.name, Member.find(member.id) %></span></li>
+												<% end %>
+											<% end %>
+										</ul>
+									</td>
+								</tr>
+							</table>
+						</div>
+					<% end %>
+				<% end %>
+			<% else %>
+				<div class="col-sm-7 col-sm-offset-1">
+					<table class="table table-condensed">
+						<tr>
+							<td style="padding-left:5%; border-top: none !important;">
+								<ul class="list-inline text-left">
+									<li><span class="roster_number" style="visibility: hidden;">#00</span><span class="roster_name">　從　缺</span></li>
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</div>
+			<% end %>
+			<div class="col-sm-10 col-sm-offset-2 roster_title">
+				<h3 class="text-left">球員</h3>
+			</div>
+			<% for i in 1..@Max_age do %>
+				<% if @activelist[i-1]!= 0 %>
+					<div class="col-sm-1 col-sm-offset-4">
+						<table class="table table-condensed">
+							<tr>
+								<td class="text-left" style=" border-top: none !important;">
+									<p class="roster_age">IM<%= i < 10? "0"+i.to_s : i %></p>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="col-sm-7">
+						<table class="table table-condensed">
+							<tr>
+								<td style="padding-left:5%; border-top: none !important;">
+									<ul class="list-inline text-left">
+										<% @memberQuery[i-1].each do |member| %>
+											<% if member.active == true && member.leadership == nil %>
+												<li><span class="roster_number">#<%= (member.number == nil)? '??' : '%02d' % (member.number) %></span><span class="roster_name">　<%= link_to member.name, Member.find(member.id) %></span></li>
+											<% end %>
+										<% end %>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</div>
+				<% end %>
+			<% end %>
+			<div class="col-sm-11 col-sm-offset-1" style="text-shadow: 2px 2px rgb(255,102,0);">
+				<%= fa_icon "graduation-cap 2x" ,id:"fa_nonactive"%><h3 class="text-left">退役球員</h3>
+			</div>
+			<% for i in 1..@Max_age do %>
+				<% if @memberQuery[i-1].length != 0 && @memberQuery[i-1].length > @activelist[i-1] %>
+					<div class="col-sm-1 col-sm-offset-2">
+						<table class="table table-condensed">
+							<tr>
+								<td class="text-left" style=" border-top: none !important;">
+									<p class="roster_age">IM<%= i < 10? "0"+i.to_s : i %></p>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="col-sm-9">
+						<table class="table table-condensed">
+							<tr>
+								<td style="padding-left:5%; border-top: none !important;">
+									<ul class="list-inline text-left">
+										<% @memberQuery[i-1].each do |member| %>
+											<% if member.active == false %>
+												<li><span class="roster_number">#<%= (member.number == nil)? '??' : '%02d' % (member.number) %></span><span class="roster_name">　<%= link_to member.name, Member.find(member.id) %></span></li>
+											<% end %>
+										<% end %>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</div>
+				<% end %>
+			<% end %>
+		</div>
+	</section>
+<% end %>
+<!-- Albums Section -->
     <section id="albums" class="container text-center">
         <div class="row" id="albums_row">
             <div>
@@ -819,6 +909,7 @@
             <% end %>
         </div>
     </section>
+<!-- Photos Section -->
     <section id="photos" class="container text-center">
         <div class="row" id="photos_row">
             <div>

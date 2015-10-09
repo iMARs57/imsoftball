@@ -9,7 +9,7 @@ body{
 
 body, #navbar{
 
-	min-width:300px;
+	min-width:320px;
 }
 
 img.menu_icon{
@@ -51,7 +51,7 @@ div.menu{
 
 .fa-chevron-left:hover, .fa-chevron-right:hover{
 	
-	color: rgba(255,255,255,0.6);
+	color: rgba(255,255,255,0.8);
 
 }
 
@@ -112,12 +112,17 @@ div.panel{
 	}
 }
 
-@media(max-width:768px) {
+@media(max-width:767px) {
 	/*
 	.intro{
 		margin-top:52px;
 	}
 	*/
+	
+	body{
+		
+		font-size:1.2em !important;
+	}
 
 	.nav-justified > li {
     	display: table-cell !important;
@@ -173,7 +178,7 @@ ul.ul_menu > li.active > a{
 	text-shadow: none;
 }
 
-#icon_news, #icon_albums, #icon_photos{
+#icon_news, #icon_albums, #icon_photos, #icon_roster{
 	
 	margin:0 auto 10px auto;
 }
@@ -215,24 +220,24 @@ div.tabbable > ul > li.active > a:hover, div.tabbable > ul > li.active > a:focus
 
 /*--------------------------------------*/
 
-div.tab-pane > ul > li > a{
+div.blueTab > ul > li > a{
 	
 	color: #FFFFFF;
 }
 
-div.tab-pane > ul > li > a:hover, div.tab-pane > ul > li > a:focus{
+div.blueTab > ul > li > a:hover, div.blueTab > ul > li > a:focus{
 	
 	color: #FFFFFF;
 	background-color: rgba(0,0,255,0.5);
 }
 
-div.tab-pane > ul > li.active > a{
+div.blueTab > ul > li.active > a{
 	
 	color: #FFFFFF;
 	background-color: blue;
 }
 
-div.tab-pane > ul > li.active > a:hover, div.tab-pane > ul > li.active > a:focus{
+div.blueTab > ul > li.active > a:hover, div.blueTab > ul > li.active > a:focus{
 	
 	color: #FFFFFF;
 	background-color: blue;
@@ -258,6 +263,13 @@ div.tab-pane > ul > li.active > a:hover, div.tab-pane > ul > li.active > a:focus
 	color: white;
 }
 
+#ul_about > li > a:hover{
+	
+	font-size: 16px;
+	color: white;
+	background-color: rgb(168,166,164);
+}
+
 #practice, #infoSource, #forFresh, #reference{
 	
 	text-align:left;
@@ -268,7 +280,7 @@ div.tab-pane > ul > li.active > a:hover, div.tab-pane > ul > li.active > a:focus
 	font-size: 18px;
 }
 
-#fa_map{
+#fa_map, #fa_active, #fa_nonactive{
 	
 	float:left;
 	margin-right:10px;
@@ -302,9 +314,9 @@ hr.soften {
 }
 
 
-#about_row, #news_row, #albums_row, #photos_row{  
+#about_row, #news_row, #albums_row, #photos_row, #roster_row{  
 	
-	padding: 10% 5%;
+	padding: 5% 5%;
 	margin: 0 0;
 }
 
@@ -343,7 +355,8 @@ hr.soften {
 
 #list > li > a:hover, #list > li > a:focus{
 	
-	color: #FFFFFF;
+	background: #4169E1;
+	color: white;
 }
 
 p.about_title{
@@ -462,4 +475,51 @@ td.text_item{
 	
 	width: 25%;
 
+}
+
+#roster{
+	
+	width:100%;
+	position: relative;
+	background-image: image-url("ntu_w.jpg");
+	//background-color: #4b3f72;
+	background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.roster_title{
+	
+	color: rgb(153,0,153);
+	text-shadow: 1px 1px #FFFFFF;
+	
+}
+
+.roster_age{
+	
+	color:rgb(0,179,0);
+	font-size:1.2em;
+	margin:0 0 0px;
+	font-weight: bold;
+	text-shadow: 1px 1px rgb(50,50,50);
+}
+
+.roster_number{
+	
+	color:rgb(255,102,0);
+	font-size:1.2em;
+	margin:0 0 0px;
+	font-weight: bold;
+	text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+.roster_name, .roster_name > a{
+	
+	color:rgb(0,12,186);
+	font-size:1.1em;
+	margin:0 0 0px;
+	font-weight: bold;
+	text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }

@@ -5,8 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NTUIM SOFTBALL | 國立臺灣大學資訊管理學系壘球隊</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
   <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" %>
   <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Montserrat:400,700" %>
   <% %w(16 32 96).each do |s| %>
@@ -16,17 +16,27 @@
 </head>
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
   <!-- Navigation -->
-  <nav id="navbar" class="navbar navbar-custom navbar-fixed-top menu" role="navigation">
-    <div class="container menu">
+  <% if action_name == "index" && controller_name == "home" %>
+	<nav id="navbar" class="navbar navbar-custom navbar-fixed-top menu" role="navigation">
+  <% else %>
+	<nav id="navbar" class="navbar navbar-custom navbar-fixed-top menu top-nav-collapse" role="navigation">
+  <% end %>
+	<div class="container menu">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
           <!--<i class="fa fa-bars"></i>-->
           <%= fa_icon "bars" %>
         </button>
-        <a class="navbar-brand page-scroll" href="#all-top" style="color:#F1772E;">
-          <!--<i class="fa fa-play-circle"></i> -->
-          <%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
-        </a>
+		<% if action_name == "index" && controller_name == "home" %>
+			<a class="navbar-brand page-scroll" href="#all-top" style="color:#F1772E;">
+				<!--<i class="fa fa-play-circle"></i> -->
+				<%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
+			</a>
+		<% else %>
+			<%= link_to({anchor: "all-top", controller: "home", action: "index"}, class: "navbar-brand page-scroll", style:"color:#F1772E") do %> 
+				<%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
+			<% end %>
+		<% end %>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -37,51 +47,84 @@
             <a href="#page-top"></a>
           </li>
           <li>
-            <a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
-          </li>
+            <% if action_name == "index" && controller_name == "home" %>
+				<a class="page-scroll menuLink" href="#news" id='a_News' onMouseOver="this.innerHTML = 'News'" onMouseOut="this.innerHTML = '最新消息'">最新消息</a>
+			<% else %>
+				<%= link_to "最新消息", {anchor: "news", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_News", onMouseOver: "this.innerHTML = 'News'", onMouseOut: "this.innerHTML = '最新消息'" %>
+			<% end %>
+		  </li>
           <li>
-            <a class="page-scroll menuLink" href="#about" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
-          </li>
-          <li>
-            <a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
-          </li>
-          <li>
-            <a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
-          </li>
-          <!--<li>-->
-          <!--
-            <a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
-          -->
-          <% if logged_in? %>
-          <li>
-            <%= link_to "球員名單", {controller: 'home', action: 'roster'}, :class => 'page-scroll menuLink', :id => 'a_Roster', :onMouseOver => "this.innerHTML = 'Roster'", :onMouseOut => "this.innerHTML = '球員名單'", :remote => true %>
-          </li>
+			<% if action_name == "index" && controller_name == "home" %>
+				<a class="page-scroll menuLink" href="#about" id='a_About' onMouseOver="this.innerHTML = 'About'" onMouseOut="this.innerHTML = '關於系壘'">關於系壘</a>
+			<% else %>
+				<%= link_to "關於系壘", {anchor: "about", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_About", onMouseOver: "this.innerHTML = 'About'", onMouseOut: "this.innerHTML = '關於系壘'" %>
+			<% end %>
+		  </li>
+		  <% if logged_in? %>
+			<li>
+				<% if action_name == "index" && controller_name == "home" %>
+					<a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+				<% else %>
+					<%= link_to "球員名單", {anchor: "roster", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_Roster", onMouseOver: "this.innerHTML = 'Roster'", onMouseOut: "this.innerHTML = '球員名單'" %>
+				<% end %>
+			</li>
           <% else %>
-          <li>
-            <%= link_to "球員名單", {controller: 'home', action: 'roster'}, :class => 'page-scroll menuLink', :id => 'a_Roster', :onMouseOver => "this.innerHTML = 'Roster'", :onMouseOut => "this.innerHTML = '球員名單'" %>
-          </li>
+			<li class="disabled">
+				<% if action_name == "index" && controller_name == "home" %>
+					<a class="page-scroll menuLink" href="#roster" id='a_Roster' onMouseOver="this.innerHTML = 'Roster'" onMouseOut="this.innerHTML = '球員名單'">球員名單</a>
+				<% else %>
+					<%= link_to "球員名單", {anchor: "roster", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_Roster", onMouseOver: "this.innerHTML = 'Roster'", onMouseOut: "this.innerHTML = '球員名單'" %>
+				<% end %>
+			</li>
           <% end %>
-          <script type="text/javascript">
-          $('#a_Roster').on('ajax:success', function(evt, data) {
-                                var target = $('#content'); // Find where is the destination
-                                $(target).html(data);
-                              });
-          </script>
-          <!--</li>-->
           <li>
-            <a class="page-scroll menuLink" href="#record" id='a_Record' onMouseOver="this.innerHTML = 'Record'" onMouseOut="this.innerHTML = '成績紀錄'">成績紀錄</a>
+			<% if action_name == "index" && controller_name == "home" %>
+				<a class="page-scroll menuLink" href="#albums" id='a_Albums' onMouseOver="this.innerHTML = 'Albums'" onMouseOut="this.innerHTML = '球隊相簿'">球隊相簿</a>
+			<% else %>
+				<%= link_to "球隊相簿", {anchor: "albums", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_Albums", onMouseOver: "this.innerHTML = 'Albums'", onMouseOut: "this.innerHTML = '球隊相簿'" %>
+			<% end %>
           </li>
           <li>
-            <a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
-          </li>
+			<% if action_name == "index" && controller_name == "home" %>
+				<a class="page-scroll menuLink" href="#photos" id='a_Photos' onMouseOver="this.innerHTML = 'Photos'" onMouseOut="this.innerHTML = '照片集'">照片集</a>
+			<% else %>
+				<%= link_to "照片集", {anchor: "photos", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_Photos", onMouseOver: "this.innerHTML = 'Photos'", onMouseOut: "this.innerHTML = '照片集'" %>
+			<% end %>
+		  </li>
           <% if logged_in? %>
-          <li title="目前以帳號 <%=@current_user.name%> 登入">
-            <%= link_to "登出", logout_path, method: "delete", id: "btn_login", class: "page-scroll menuLink" %>
-          </li>
+			<li>
+				<%= link_to "成績紀錄", {controller: "records", action: "index"}, class: "page-scroll menuLink", id: "a_Record", onMouseOver: "this.innerHTML = 'Record'", onMouseOut: "this.innerHTML = '成績紀錄'" %>
+			</li>
+		  <% else %>
+			<li class="disabled">
+				<%= link_to "成績紀錄", {controller: "records", action: "index"}, class: "page-scroll menuLink", id: "a_Record", onMouseOver: "this.innerHTML = 'Record'", onMouseOut: "this.innerHTML = '成績紀錄'" %>
+			</li>
+		  <% end %>
+          <% if logged_in? %>
+			<li>
+				<% if action_name == "index" && controller_name == "home" %>
+					<a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
+				<% else %>
+					<%= link_to "紀錄系統", {anchor: "recApp", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_RecApp", onMouseOver: "this.innerHTML = 'Rec-App'", onMouseOut: "this.innerHTML = '紀錄系統'" %>
+				<% end %>
+			</li>
           <% else %>
-          <li>
-            <li><%= link_to "登入", login_path, id: "btn_login", class: "page-scroll menuLink" %></li>
-          </li>
+			<li class="disabled">
+				<% if action_name == "index" && controller_name == "home" %>
+					<a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
+				<% else %>
+					<%= link_to "紀錄系統", {anchor: "recApp", controller: "home", action: "index"}, class: "page-scroll menuLink", id: "a_RecApp", onMouseOver: "this.innerHTML = 'Rec-App'", onMouseOut: "this.innerHTML = '紀錄系統'" %>
+				<% end %>
+			</li>
+		  <% end %>
+		  <% if logged_in? %>
+			<li title="目前以帳號 <%=@current_user.name%> 登入">
+				<%= link_to "登出", logout_path, method: "delete", id: "btn_login", class: "page-scroll menuLink" %>
+			</li>
+          <% else %>
+			<li>
+				<%= link_to "登入", login_path, id: "btn_login", class: "page-scroll menuLink" %>
+			</li>
           <% end %>
         </ul>
 
@@ -97,6 +140,8 @@
           navHeader.on("click", "a", null, function () {
             navMain.collapse('hide');
           });
+		  
+		  //console.log("<%= action_name %>" + " " + "<%= controller_name %>");
 
         });
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150701060600) do
+ActiveRecord::Schema.define(version: 20150912030523) do
 
   create_table "battings", id: false, force: :cascade do |t|
     t.text    "game_id",   null: false
@@ -88,6 +88,25 @@ ActiveRecord::Schema.define(version: 20150701060600) do
     t.boolean  "is_public"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+  end
+
+  create_table "members", force: :cascade do |t|
+    t.string   "member_id"
+    t.integer  "number"
+    t.string   "name"
+    t.date     "birthday"
+    t.string   "birthplaceCH"
+    t.string   "birthplaceEN"
+    t.string   "high_schoolCH"
+    t.string   "high_schoolEN"
+    t.string   "position"
+    t.string   "bats"
+    t.string   "throws"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "IM_age"
+    t.boolean  "active"
+    t.integer  "leadership"
   end
 
   create_table "namecards", force: :cascade do |t|
