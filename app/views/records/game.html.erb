@@ -1,0 +1,295 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="record_index">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="col-sm-9">
+			<h3>球賽查詢</h3>
+			<hr>
+			<% if(params[:game_id] == nil && params[:year] == nil) %>
+				<%= form_tag("game" , method:"get") do %>
+					<!-- 選單選項預設為最新年份 -->
+					<%= select_tag(:year, options_for_select(@year_option,@year_option[@year_option.length-1][1])) %>
+					<%= submit_tag("查詢", name: nil) %>
+				<% end %>	
+			<% elsif(params[:game_id] == nil && params[:year] != nil) %>
+				<!-- 顯示該年所有比賽 -->
+				<h4><%= params[:year] %>年(<%= params[:year].to_i-1911 %>年度)所有賽事</h4>
+				<br/>
+				<div class="table-responsive" id="div_game_oneyear">
+					<table class="table table-striped table-condensed" id="table_game_oneyear">
+						<thead>
+							<tr>
+								<th>編號</th>
+								<th>年度</th>
+								<th>盃賽</th>
+								<th>客隊</th>
+								<th>客隊分數</th>
+								<th>主隊分數</th>
+								<th>主隊</th>
+								<th>時間</th>
+								<th>MVP</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% @game_oneyear.each do |onegame| %>
+								<tr>
+									<td>
+										<%= link_to onegame.game_id, controller: "records", action: "game", game_id: onegame.game_id %>
+									</td>
+									<td><%= onegame.year %></td>
+									<td><%= onegame.cup_name %></td>
+									<td><%= onegame.teamAwayName %></td>
+									<td><%= onegame.away_score %></td>
+									<td><%= onegame.home_score %></td>
+									<td><%= onegame.teamHomeName %></td>
+									<td>
+										<% game_time = Time.strptime(onegame.time,"%m/%d/%Y %H:%M:%S") %>
+										<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
+									</td>
+									<td><%= onegame.mvp %></td>
+								</tr>
+							<% end %>
+						</tbody>
+					</table>
+				
+			<% else %>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="table-responsive" id="div_game_scoreboard">
+							<table class="table table-condensed" id="table_game_scoreboard">
+								<tbody>
+									<tr>
+										<td colspan="6">No. <%= @game_id %></td>
+									</tr>
+									<tr>
+										<td rowspan="7" width="25%">
+											<% if !Imsoftball::Application.assets.find_asset("team_logo/#{@game_onegame.teamAwayName}.png").nil? %>
+												<%= image_tag("team_logo/#{@game_onegame.teamAwayName}.png", width: "150px", height:"150px") %>
+											<% else %>
+												<%= image_tag("team_logo/logo_template.png", width: "150px", height:"150px") %>
+											<% end %>
+											<br/>
+											<br/>
+											<%= @game_onegame.teamAwayName %>
+										</td>
+										<td colspan="4"><%= @game_onegame.year %>年度　<%= @game_onegame.cup_name %></td>
+										<td rowspan="7" width="25%">
+											<% if !Imsoftball::Application.assets.find_asset("team_logo/#{@game_onegame.teamHomeName}.png").nil? %>
+												<%= image_tag("team_logo/#{@game_onegame.teamHomeName}.png", width: "150px", height:"150px") %>
+											<% else %>
+												<%= image_tag("team_logo/logo_template.png", width: "150px", height:"150px") %>
+											<% end %>
+											<br/>
+											<br/>
+											<%= @game_onegame.teamHomeName %>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="4" >
+											<div style="display:inline-block; width:35%; text-align:left;"><%= @game_onegame.teamAwayName %></div>
+											<div style="display:inline-block; width:auto;"><%= @game_onegame.away_score %>：<%= @game_onegame.home_score %></div>
+											<div style="display:inline-block; width:35%; text-align:right;"><%= @game_onegame.teamHomeName %></div>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="4">
+											<% game_time = Time.strptime(@game_onegame.time,"%m/%d/%Y %H:%M:%S") %>
+											<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
+										</td>
+									</tr>
+									<tr>
+										<td style="width:20%; background:black;"></td>
+										<td style="width:10%; background:black;">R</td>
+										<td style="width:10%; background:black;">H</td>
+										<td style="width:10%; background:black;">E</td>
+									</tr>
+									<tr>
+										<td style="background:black;"><%= @game_onegame.teamAwayName %></td>
+										<td style="background:black;"><%= @game_onegame.away_score %></td>
+										<td style="background:black;">1</td>
+										<td style="background:black;">1</td>
+									</tr>
+									<tr>
+										<td style="background:black;"><%= @game_onegame.teamHomeName %></td>
+										<td style="background:black;"><%= @game_onegame.home_score %></td>
+										<td style="background:black;">2</td>
+										<td style="background:black;">2</td>
+									</tr>
+									<tr>
+										<td colspan="4">WLSVMVP</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="panel panel-default" id="panel_game_battingAway">
+							<div class="panel-body">
+								<div class="table-responsive" id="div_game_battingAway">
+									<table class="table table-condensed">
+										<thead>
+											<tr>
+												<th colspan="2">BATTING</th>
+												<th>PA</th>
+												<th>AB</th>
+												<th>H</th>
+												<th>2B</th>
+												<th>3B</th>
+												<th>HR</th>
+												<th>TB</th>
+												<th>RBI</th>
+												<th>R</th>
+												<th>SO</th>
+												<th>BB</th>
+												<th>IBB</th>
+												<th>SF</th>
+												<th>BOE</th>
+												<th>AVG</th>
+											</tr>
+											<tr>
+												<th colspan="2">打擊成績</th>
+												<th>打席</th>
+												<th>打數</th>
+												<th>安打</th>
+												<th>二壘</th>
+												<th>三壘</th>
+												<th>全壘</th>
+												<th>壘打數</th>
+												<th>打點</th>
+												<th>得分</th>
+												<th>三振</th>
+												<th>四壞</th>
+												<th>故意</th>
+												<th>犧牲</th>
+												<th>失誤</th>
+												<th>打擊率</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% if @game_BattingAway.size != 0 %>
+												<% @game_BattingAway.each do |battingAway| %>
+													<tr>
+														<td><%= battingAway.order %></td>
+														<td><%= battingAway.player_id %></td>
+														<td><%= battingAway.PA %></td>
+														<td><%= battingAway.AB %></td>
+														<td><%= battingAway.H %></td>
+														<td><%= battingAway.B2 %></td>
+														<td><%= battingAway.B3 %></td>
+														<td><%= battingAway.HR %></td>
+														<td><%= battingAway.TB %></td>
+														<td><%= battingAway.RBI %></td>
+														<td><%= battingAway.R %></td>
+														<td><%= battingAway.SO %></td>
+														<td><%= battingAway.BB %></td>
+														<td><%= battingAway.IBB %></td>
+														<td><%= battingAway.SF %></td>
+														<td><%= battingAway.E %></td>
+														<td><%= battingAway.AVG %></td>
+													</tr>
+												<% end %>
+											<% else %>
+												<tr>
+													<td colspan="17">未登錄客隊打擊數據<td>
+												</tr>
+											<% end %>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<!--/panel-body-->
+						</div>
+						<!--/panel-->
+					</div>
+					<div class="col-sm-6">
+						<div class="panel panel-default" id="panel_game_battingHome">
+							<div class="panel-body">
+								<div class="table-responsive" id="div_game_battingHome">
+									<table class="table table-condensed">
+										<thead>
+											<tr>
+												<th colspan="2">BATTING</th>
+												<th>PA</th>
+												<th>AB</th>
+												<th>H</th>
+												<th>2B</th>
+												<th>3B</th>
+												<th>HR</th>
+												<th>TB</th>
+												<th>RBI</th>
+												<th>R</th>
+												<th>SO</th>
+												<th>BB</th>
+												<th>IBB</th>
+												<th>SF</th>
+												<th>BOE</th>
+												<th>AVG</th>
+											</tr>
+											<tr>
+												<th colspan="2">打擊成績</th>
+												<th>打席</th>
+												<th>打數</th>
+												<th>安打</th>
+												<th>二壘</th>
+												<th>三壘</th>
+												<th>全壘</th>
+												<th>壘打數</th>
+												<th>打點</th>
+												<th>得分</th>
+												<th>三振</th>
+												<th>四壞</th>
+												<th>故意</th>
+												<th>犧牲</th>
+												<th>失誤</th>
+												<th>打擊率</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% if @game_BattingHome.size != 0 %>
+												<% @game_BattingHome.each do |battingHome| %>
+													<tr>
+														<td><%= battingHome.order %></td>
+														<td><%= battingHome.player_id %></td>
+														<td><%= battingHome.PA %></td>
+														<td><%= battingHome.AB %></td>
+														<td><%= battingHome.H %></td>
+														<td><%= battingHome.B2 %></td>
+														<td><%= battingHome.B3 %></td>
+														<td><%= battingHome.HR %></td>
+														<td><%= battingHome.TB %></td>
+														<td><%= battingHome.RBI %></td>
+														<td><%= battingHome.R %></td>
+														<td><%= battingHome.SO %></td>
+														<td><%= battingHome.BB %></td>
+														<td><%= battingHome.IBB %></td>
+														<td><%= battingHome.SF %></td>
+														<td><%= battingHome.E %></td>
+														<td><%= battingHome.AVG %></td>
+													</tr>
+												<% end %>
+											<% else %>
+												<tr>
+													<td colspan="17">未登錄主隊打擊數據<td>
+												</tr>
+											<% end %>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<!--/panel-body-->
+						</div>
+						<!--/panel-->
+					</div>
+				</div>
+			<% end %>
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

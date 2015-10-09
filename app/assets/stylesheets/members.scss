@@ -1,0 +1,186 @@
+body{
+	
+	min-width: 320px;
+}
+
+#player{
+	
+	background:rgb(212,212,212);
+	
+}
+
+.cover_image{
+	
+	width:100%;
+	min-width:100%;
+	padding:0 0 !important;
+	
+}
+
+#thumbnail{
+
+	max-width:200px;
+	height:auto;
+}
+
+#span_thumbnail{
+	
+	position:absolute;
+	top: -160px;
+	left: 30px;
+}
+
+img.name_logo{
+	
+	margin-bottom: 4px;
+}
+
+div.player_cover{
+	
+	background:gray; 
+	padding:0 0;
+}
+
+div.player_content{
+	
+	background:white;
+	padding-top:10%;
+	padding-bottom:50px;
+	color: black;
+}
+
+#span_title{
+	
+	display:inline-block;
+	background:rgba(0,0,0,0.5);
+	color: white;
+	position:absolute;
+	left:0;
+	bottom: 3%;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-size: 2em;
+}
+
+#title_smaller_screen{
+	
+	text-transform: none;
+	display: none;
+}
+
+#personalTabContent{
+	
+	padding-top: 15px;
+}
+
+#table_info > tbody > tr > th{
+	
+	width: 25%;
+	
+}
+
+#table_acdmcPitching > thead > tr > th, #table_acdmcPitching > tbody > tr > td, #table_acdmcPitching > tfoot > tr > td,
+#table_acdmcBatting > thead > tr > th, #table_acdmcBatting > tbody > tr > td, #table_acdmcBatting > tfoot > tr > td,
+#table_acdmcFielding > thead > tr > th, #table_acdmcFielding > tbody > tr > td, #table_acdmcFielding > tfoot > tr > td,
+#table_careerPitching > thead > tr > th, #table_careerPitching > tbody > tr > td, #table_careerPitching > tfoot > tr > td,
+#table_careerBatting > thead > tr > th, #table_careerBatting > tbody > tr > td, #table_careerBatting > tfoot > tr > td,
+#table_careerFielding > thead > tr > th, #table_careerFielding > tbody > tr > td, #table_careerFielding > tfoot > tr > td{
+	
+	text-align: center;
+	vertical-align: middle;
+}
+
+#table_acdmcPitching > tfoot > tr > td, #table_acdmcBatting > tfoot > tr > td, #table_acdmcFielding > tfoot > tr > td,
+#table_careerPitching > tfoot > tr > td, #table_careerBatting > tfoot > tr > td, #table_careerFielding > tfoot > tr > td{
+	
+	color: white;
+	background-color: purple;
+}
+
+#table_acdmcPitching > thead > tr > th, #table_acdmcBatting > thead > tr > th, #table_acdmcFielding > thead > tr > th,
+#table_careerPitching > thead > tr > th, #table_careerBatting > thead > tr > th, #table_careerFielding > thead > tr > th{
+	
+	color: green;
+}
+
+ul.innerTab > li > a{
+	
+	color: #FFFFFF;
+	background-color: rgba(241,119,46,0.3);
+}
+
+ul.innerTab > li > a:hover, ul.innerTab > li > a:focus{
+	
+	color: #FFFFFF;
+	background-color: rgba(241,119,46,0.7);
+}
+
+ul.innerTab > li.active > a{
+	
+	color: #FFFFFF;
+	background-color: rgb(241,119,46);
+}
+
+ul.innerTab > li.active > a:hover, ul.innerTab > li.active > a:focus{
+	
+	color: #FFFFFF;
+	background-color: rgb(241,119,46);
+}
+
+#photoSlider{
+	
+	//margin: 0 auto;
+}
+
+
+@media(max-width:767px){
+	
+	#span_title{
+		
+		display: none;
+	}
+	
+	#title_smaller_screen{
+	
+		display: block;
+	}
+	
+	#span_thumbnail{
+	
+		position:absolute;
+		top: -140px;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+	}
+}
+
+@media(max-width:600px){
+	
+	#span_thumbnail{
+		
+		top: -120px;
+	}
+}
+
+@media(max-width:500px){
+	
+	#span_thumbnail{
+
+		top: -100px;
+	}
+}
+
+@media(max-width:400px){
+	
+	#span_thumbnail{
+
+		top: -80px;
+	}
+}
+
+@-moz-document url-prefix() {
+	fieldset { display: table-cell; }
+}

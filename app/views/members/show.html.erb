@@ -1,0 +1,1244 @@
+<script>
+	// for responsive design
+    
+	var ReadyandResize = function(){
+		
+		var winWidth = $(window).width();
+		var winHeight = $(window).height();
+
+		$('.player_content').css('min-height',winHeight * 0.7);
+		
+		$('#thumbnail').css('width', winWidth * 0.3);
+		
+		$('#span_title').css('margin-left', 2 * parseInt($('#span_thumbnail').css('left')) + 200 );
+		
+		$('.callbacks_container').height(winHeight * 0.7);
+		
+	};
+	
+	$(document).ready(ReadyandResize);
+	$(window).resize(ReadyandResize);
+	
+	$(window).on('load resize', function(){
+		
+		var navHeight = $("#navbar").outerHeight();
+        $('body').css('padding-top',navHeight);
+		
+		var winWidth = $(window).width();
+		var winHeight = $(window).height();
+		
+		if(winWidth < 768){
+			if(!$('#title_smaller_screen').hasClass('text-center')){
+				$('#title_smaller_screen').addClass('text-center');
+			}
+		}
+		else{
+			if($('#title_smaller_screen').hasClass('text-center')){
+				$('#title_smaller_screen').removeClass('text-center');
+			}
+		}
+    });
+	
+	$(function() {
+		$('#personalTab').tabCollapse();
+		$("#photoSlider").responsiveSlides({
+			timeout: 7000,
+			//maxwidth: 800,
+			auto: false,
+			nav: true,
+			namespace: "callbacks",
+		});
+	});
+	
+	
+</script>
+<section id="player">
+	<div class="row" style="max-width:1080px; margin: 0 auto;">
+		<div class="col-sm-12 player_cover">
+			<% if !Imsoftball::Application.assets.find_asset("player/#{@member.id}/#{@member.id}.png").nil? %>
+				<%= image_tag("player/#{@member.id}/#{@member.id}.png", class:"cover_image") %>
+			<% else %>
+				<%= image_tag("player/infoman.png", class:"cover_image") %>
+			<% end %>
+			<span id="span_title">
+				<%= image_tag("logo.png", height: '35', class:'name_logo') %> #<%= @member.number %> <%= @member.id %> <%= @member.name %> | <%= (@member.position==nil)? "Undecided" : @member.position %>
+			</span>
+		</div>
+		<div class="col-sm-12 player_content">
+			<span id="span_thumbnail">
+				<% if !Imsoftball::Application.assets.find_asset("portrait/#{@member.id}.jpg").nil? %>
+					<%= image_tag("portrait/#{@member.id}.jpg", id:"thumbnail", class:"img-thumbnail center-block") %>
+				<% else %>
+					<%= image_tag("portrait/no_portrait.jpg", id:"thumbnail", class:"img-thumbnail center-block") %>
+				<% end %>
+			</span>
+			<h3 id="title_smaller_screen"><%= image_tag("logo.png", height: '35', class:'name_logo') %> #<%= @member.number %> <%= @member.id %> <%= @member.name %> | <%= (@member.position==nil)? "Undecided" : @member.position %></h3>
+			
+			<ul class="nav nav-tabs" role="tablist" id="personalTab">
+				<li class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">個人資料</a></li>
+				<li><a href="#academicYear" aria-controls="academicYear" role="tab" data-toggle="tab">年度表現( <%= @thisyear %>.09 ~ <%= @thisyear + 1 %>.08 )</a></li>
+				<li><a href="#career" aria-controls="career" role="tab" data-toggle="tab">生涯統計</a></li>
+				<li><a href="#gallery" aria-controls="gallery" role="tab" data-toggle="tab">Photo Gallery</a></li>
+			</ul>
+			<div class="tab-content" id="personalTabContent">
+				<div role="tabpanel" class="tab-pane active" id="info">
+					<div class="table-responsive">
+						<table class="table table-striped" id="table_info">
+							<tbody>
+								<tr>
+									<th scope="row" class="text-right">Full Name：</th>
+									<td><%= @member.nameEN %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">姓名：</th>
+									<td><%= @member.name %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">Birthday：</th>
+									<td><%= @birthdayEN %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">生日：</th>
+									<td><%= @birthdayCH %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">Horoscope：</th>
+									<td><%= @horoscopeEN %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">星座：</th>
+									<td><%= @horoscopeCH %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">Birthplace：</th>
+									<td><%= @member.birthplaceEN %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">出生地：</th>
+									<td><%= @member.birthplaceCH %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">High School：</th>
+									<td><%= @member.high_schoolEN %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">畢業高中：</th>
+									<td><%= @member.high_schoolCH %></td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">Position：</th>
+									<td>
+										<% @positionEN.each do |posEN| %>
+											<%= posEN %>
+											<% if posEN != @positionEN.last %>
+												&nbsp;/&nbsp;
+											<% end %>
+										<% end %>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">守備位置：</th>
+									<td>
+										<% @positionCH.each do |posCH| %>
+											<%= posCH %>
+											<% if posCH != @positionCH.last %>
+												&nbsp;/&nbsp;
+											<% end %>
+										<% end %>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">Bats：</th>
+									<td>
+										<% case(@member.bats) %>
+											<% when 'L' %>
+												LEFT
+											<% when 'R' %>
+												RIGHT
+											<% when 'S' %>
+												SWITCH
+											<% else %>
+												""
+										<% end %>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">打擊：</th>
+									<td>
+										<% case(@member.bats) %>
+											<% when 'L' %>
+												左打
+											<% when 'R' %>
+												右打
+											<% when 'S' %>
+												左右開弓
+											<% else %>
+												""
+										<% end %>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">Throws：</th>
+									<td>
+										<% case(@member.throws) %>
+											<% when 'L' %>
+												LEFT
+											<% when 'R' %>
+												RIGHT
+											<% when 'S' %>
+												SWITCH
+											<% else %>
+												""
+										<% end %>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row" class="text-right">投球：</th>
+									<td>
+										<% case(@member.throws) %>
+											<% when 'L' %>
+												左投
+											<% when 'R' %>
+												右投
+											<% when 'S' %>
+												兩投
+											<% else %>
+												""
+										<% end %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div role="tabpanel" class="tab-pane" id="academicYear">
+				
+					<ul id="acdmcTab" class="nav nav-tabs innerTab">
+						<li class="active"><a href="#acdmcPitching" data-toggle="tab">投球成績</a></li>
+						<li><a href="#acdmcBatting" data-toggle="tab">打擊成績</a></li>
+						<li><a href="#acdmcFielding" data-toggle="tab">守備成績</a></li>
+					</ul>
+					<div id="acdmcTabContent" class="tab-content">
+						<div class="tab-pane fade in active" id="acdmcPitching">
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-condensed" id="table_acdmcPitching">
+									<thead>
+										<tr>
+											<th>No.</th>
+											<th>Time</th>
+											<th>G</th>
+											<th>GS</th>
+											<th>CG</th>
+											<th>W</th>
+											<th>L</th>
+											<th>SV</th>
+											<th>IP</th>
+											<th>H</th>
+											<th>SO</th>
+											<th>BB</th>
+											<th>R</th>
+											<th>ER</th>
+											<th>ERA5</th>
+											<th>ERA7</th>
+										</tr>
+										<tr>
+											<th>場次</th>
+											<th>時間</th>
+											<th>出賽</th>
+											<th>先發</th>
+											<th>完投</th>
+											<th>勝利</th>
+											<th>敗戰</th>
+											<th>救援</th>
+											<th>局數</th>
+											<th>被安打</th>
+											<th>三振</th>
+											<th>四壞</th>
+											<th>失分</th>
+											<th>責失</th>
+											<th>五局防禦率</th>
+											<th>七局防禦率</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% @p_GS_total = 0 %>
+										<% @p_CG_total = 0 %>
+										<% @p_W_total = 0 %>
+										<% @p_L_total = 0 %>
+										<% @p_SV_total = 0 %>
+										<% @p_IP_total = 0 %>
+										<% @p_H_total = 0 %>
+										<% @p_SO_total = 0 %>
+										<% @p_BB_total = 0 %>
+										<% @p_R_total = 0 %>
+										<% @p_ER_total = 0 %>
+										<% @acdmcPitching.each do |acdmicPit| %>
+											<tr>
+												<td><%= acdmicPit.game_id %></td>
+												<td>
+													<% game_time = Time.strptime(acdmicPit.time,"%m/%d/%Y %H:%M:%S") %>
+													<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
+												</td>
+												<td>1</td>
+												<td>
+													<% if acdmicPit.order == 1  %>
+														1
+														<% @p_GS_total += 1 %>
+													<% else %>
+														0
+													<% end %>
+												</td>
+												<td>
+													<% @checkCG = checkforCG(acdmicPit.game_id, acdmicPit.team_id) %>
+													<% if @checkCG > 1 %>
+														0
+													<% else %>
+														1
+														<% @p_CG_total += 1 %>
+													<% end %>
+												</td>
+												<td>
+													<% if acdmicPit.W == 1  %>
+														1
+														<% @p_W_total += 1 %>
+													<% else %>
+														0
+													<% end %>
+												</td>
+												<td>
+													<% if acdmicPit.L == 1  %>
+														1
+														<% @p_L_total += 1 %>
+													<% else %>
+														0
+													<% end %>
+												</td>
+												<td>
+													<% if acdmicPit.SV == 1  %>
+														1
+														<% @p_SV_total += 1 %>
+													<% else %>
+														0
+													<% end %>
+												</td>
+												<td>
+													<%= '%.1f' % (acdmicPit.IPouts / 3.0) %>
+													<% @p_IP_total += acdmicPit.IPouts %>
+												</td>
+												<td>
+													<%= acdmicPit.H %>
+													<% @p_H_total += acdmicPit.H %>
+												</td>
+												<td>
+													<%= acdmicPit.SO %>
+													<% @p_SO_total += acdmicPit.SO %>
+												</td>
+												<td>
+													<%= acdmicPit.BB %>
+													<% @p_BB_total += acdmicPit.BB %>
+												</td>
+												<td>
+													<%= acdmicPit.R %>
+													<% @p_R_total += acdmicPit.R %>
+												</td>
+												<td>
+													<%= acdmicPit.ER %>
+													<% @p_ER_total += acdmicPit.ER %>
+												</td>
+												<td>
+													<% if acdmicPit.IPouts == 0  %>
+														<% if acdmicPit.ER == 0 %>
+															-.--
+														<% else %>
+															∞
+														<% end %>
+													<% else %>
+														<%= '%.2f' % (15.0 * acdmicPit.ER / acdmicPit.IPouts) %>
+													<% end %>
+												</td>
+												<td>
+													<% if acdmicPit.IPouts == 0  %>
+														<% if acdmicPit.ER == 0 %>
+															-.--
+														<% else %>
+															∞
+														<% end %>
+													<% else %>
+														<%= '%.2f' % (21.0 * acdmicPit.ER / acdmicPit.IPouts) %>
+													<% end %>
+												</td>
+											</tr>
+										<% end %>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td>Total</td>
+											<td><%= @thisyear %>.09 ~ <%= @thisyear + 1 %>.08</td>
+											<td><%= @acdmcPitching.size %></td>
+											<td><%= @p_GS_total %></td>
+											<td><%= @p_CG_total %></td>
+											<td><%= @p_W_total %></td>
+											<td><%= @p_L_total %></td>
+											<td><%= @p_SV_total %></td>
+											<td><%= '%.1f' % (@p_IP_total / 3.0) %></td>
+											<td><%= @p_H_total %></td>
+											<td><%= @p_SO_total %></td>
+											<td><%= @p_BB_total %></td>
+											<td><%= @p_R_total %></td>
+											<td><%= @p_ER_total %></td>
+											<td>
+												<% if @p_IP_total == 0  %>
+													<% if @p_ER_total == 0 %>
+														-.--
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.2f' % (15.0 * @p_ER_total / @p_IP_total) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @p_IP_total == 0  %>
+													<% if @p_ER_total == 0 %>
+														-.--
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.2f' % (21.0 * @p_ER_total / @p_IP_total) %>
+												<% end %>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							
+						</div>
+						<div class="tab-pane fade" id="acdmcBatting">
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-condensed" id="table_acdmcBatting">
+									<thead>
+										<tr>
+											<th>No.</th>
+											<th>Time</th>
+											<th>G</th>
+											<th>PA</th>
+											<th>AB</th>
+											<th>H</th>
+											<th>2B</th>
+											<th>3B</th>
+											<th>HR</th>
+											<th>R</th>
+											<th>RBI</th>
+											<th>SF</th>
+											<th>TB</th>
+											<th>SO</th>
+											<th>BB</th>
+											<th>AVG</th>
+											<th>OBP</th>
+											<th>SLG</th>
+											<th>OPS</th>
+										</tr>
+										<tr>
+											<th>場次</th>
+											<th>時間</th>
+											<th>出賽</th>
+											<th>打席</th>
+											<th>打數</th>
+											<th>安打</th>
+											<th>二壘</th>
+											<th>三壘</th>
+											<th>全壘</th>
+											<th>得分</th>
+											<th>打點</th>
+											<th>犧牲</th>
+											<th>壘打數</th>
+											<th>三振</th>
+											<th>四壞</th>
+											<th>打擊率</th>
+											<th>上壘率</th>
+											<th>長打率</th>
+											<th>攻擊指數</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% @b_PA_total = 0 %>
+										<% @b_AB_total = 0 %>
+										<% @b_H_total = 0 %>
+										<% @b_B2_total = 0 %>
+										<% @b_B3_total = 0 %>
+										<% @b_HR_total = 0 %>
+										<% @b_R_total = 0 %>
+										<% @b_RBI_total = 0 %>
+										<% @b_SF_total = 0 %>
+										<% @b_TB_total = 0 %>
+										<% @b_SO_total = 0 %>
+										<% @b_BB_total = 0 %>
+										<% @acdmcBatting.each do |acdmicBat| %>
+											<tr>
+												<td><%= acdmicBat.game_id %></td>
+												<td>
+													<% game_time = Time.strptime(acdmicBat.time,"%m/%d/%Y %H:%M:%S") %>
+													<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
+												</td>
+												<td>1</td>
+												<td>
+													<% @acdmcBat_PA = acdmicBat.AB + acdmicBat.BB + acdmicBat.IBB + acdmicBat.SF %>
+													<%= @acdmcBat_PA %>
+													<% @b_PA_total += @acdmcBat_PA %>
+												</td>
+												<td>
+													<%= acdmicBat.AB %>
+													<% @b_AB_total += acdmicBat.AB %>
+												</td>
+												<td>
+													<%= acdmicBat.H %>
+													<% @b_H_total += acdmicBat.H %>
+												</td>
+												<td>
+													<%= acdmicBat.B2 %>
+													<% @b_B2_total += acdmicBat.B2 %>
+												</td>
+												<td>
+													<%= acdmicBat.B3 %>
+													<% @b_B3_total += acdmicBat.B3 %>
+												</td>
+												<td>
+													<%= acdmicBat.HR %>
+													<% @b_HR_total += acdmicBat.HR %>
+												</td>
+												<td>
+													<%= acdmicBat.R %>
+													<% @b_R_total += acdmicBat.R %>
+												</td>
+												<td>
+													<%= acdmicBat.RBI %>
+													<% @b_RBI_total += acdmicBat.RBI %>
+												</td>
+												<td>
+													<%= acdmicBat.SF %>
+													<% @b_SF_total += acdmicBat.SF %>
+												</td>
+												<td>
+													<% @acdmcBat_TB = acdmicBat.HR * 4 + acdmicBat.B3 * 3 + acdmicBat.B2 * 2 + (acdmicBat.H - acdmicBat.B2 - acdmicBat.B3 - acdmicBat.HR) %>
+													<%= @acdmcBat_TB %>
+													<% @b_TB_total += @acdmcBat_TB %>
+												</td>
+												<td>
+													<%= acdmicBat.SO %>
+													<% @b_SO_total += acdmicBat.SO %>
+												</td>
+												<td>
+													<%= acdmicBat.BB %>
+													<% @b_BB_total += acdmicBat.BB %>
+												</td>
+												<td>
+													<% if acdmicBat.AB == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (acdmicBat.H / acdmicBat.AB.to_f) %>
+													<% end %>
+												</td>
+												<td>
+													<% if @acdmcBat_PA == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % ((acdmicBat.H + acdmicBat.BB) / @acdmcBat_PA.to_f) %>
+													<% end %>
+												</td>
+												<td>
+													<% if acdmicBat.AB == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (@acdmcBat_TB / acdmicBat.AB.to_f) %>
+													<% end %>
+												</td>
+												<td>
+													<% if @acdmcBat_PA == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % ( ((acdmicBat.H + acdmicBat.BB) / @acdmcBat_PA.to_f) + (@acdmcBat_TB / acdmicBat.AB.to_f) ) %>
+													<% end %>
+												</td>
+												
+											</tr>
+										<% end %>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td>Total</td>
+											<td><%= @thisyear %>.09 ~ <%= @thisyear + 1 %>.08</td>
+											<td><%= @acdmcBatting.size %></td>
+											<td><%= @b_PA_total %></td>
+											<td><%= @b_AB_total %></td>
+											<td><%= @b_H_total %></td>
+											<td><%= @b_B2_total %></td>
+											<td><%= @b_B3_total %></td>
+											<td><%= @b_HR_total %></td>
+											<td><%= @b_R_total %></td>
+											<td><%= @b_RBI_total %></td>
+											<td><%= @b_SF_total %></td>
+											<td><%= @b_TB_total %></td>
+											<td><%= @b_SO_total %></td>
+											<td><%= @b_BB_total %></td>
+											<td>
+												<% if @b_AB_total == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % (@b_H_total / @b_AB_total.to_f) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @b_PA_total == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % ((@b_H_total + @b_BB_total) / @b_PA_total.to_f) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @b_AB_total == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % (@b_TB_total / @b_AB_total.to_f) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @b_PA_total == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % ( ((@b_H_total + @b_BB_total) / @b_PA_total.to_f) + (@b_TB_total / @b_AB_total.to_f) ) %>
+												<% end %>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							
+						</div>
+						<div class="tab-pane fade" id="acdmcFielding">
+							
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-condensed" id="table_acdmcFielding">
+									<thead>
+										<tr>
+											<th>No.</th>
+											<th>Time</th>
+											<th>G</th>
+											<th>POS</th>
+											<th>INN</th>
+											<th>TC</th>
+											<th>A</th>
+											<th>PO</th>
+											<th>E</th>
+											<th>FPCT</th>
+										</tr>
+										<tr>
+											<th>場次</th>
+											<th>時間</th>
+											<th>出賽</th>
+											<th>守備位置</th>
+											<th>局數</th>
+											<th>守備機會</th>
+											<th>助殺</th>
+											<th>刺殺</th>
+											<th>失誤</th>
+											<th>守備率</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% @f_INN_total = 0 %>
+										<% @f_TC_total = 0 %>
+										<% @f_A_total = 0 %>
+										<% @f_PO_total = 0 %>
+										<% @f_E_total = 0 %>
+										<% @acdmcFielding.each do |acdmicFld| %>
+											<tr>
+												<td><%= acdmicFld.game_id %></td>
+												<td>
+													<% game_time = Time.strptime(acdmicFld.time,"%m/%d/%Y %H:%M:%S") %>
+													<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
+												</td>
+												<td>1</td>
+												<td><%= acdmicFld.POS %></td>
+												<td>
+													<%= '%.1f' % (acdmicFld.InnOuts / 3.0) %>
+													<% @f_INN_total += acdmicFld.InnOuts %>
+												</td>
+												<td>
+													<% @acdmicFld_TC = acdmicFld.PO + acdmicFld.A + acdmicFld.E %>
+													<%= @acdmicFld_TC %>
+													<% @f_TC_total += @acdmicFld_TC %>
+												</td>
+												<td>
+													<%= acdmicFld.A %>
+													<% @f_A_total += acdmicFld.A %>
+												</td>
+												<td>
+													<%= acdmicFld.PO %>
+													<% @f_PO_total += acdmicFld.PO %>
+												</td>
+												<td>
+													<%= acdmicFld.E %>
+													<% @f_E_total += acdmicFld.E %>
+												</td>
+												<td>
+													<% if @acdmicFld_TC == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % ((acdmicFld.A + acdmicFld.PO) / @acdmicFld_TC.to_f) %>
+													<% end %>
+												</td>
+											</tr>
+										<% end %>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td>Total</td>
+											<td><%= @thisyear %>.09 ~ <%= @thisyear + 1 %>.08</td>
+											<td><%= @acdmcPitching.size %></td>
+											<td></td>
+											<td><%= '%.1f' % (@f_INN_total / 3.0) %></td>
+											<td><%= @f_TC_total %></td>
+											<td><%= @f_A_total %></td>
+											<td><%= @f_PO_total %></td>
+											<td><%= @f_E_total %></td>
+											<td>
+												<% if @f_TC_total == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % ((@f_A_total + @f_PO_total) / @f_TC_total.to_f) %>
+												<% end %>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							
+							
+						</div>
+					</div>
+				
+				</div>
+				<div role="tabpanel" class="tab-pane" id="career">
+				
+					
+					<ul id="careerTab" class="nav nav-tabs innerTab">
+						<li class="active"><a href="#careerPitching" data-toggle="tab">投球成績</a></li>
+						<li><a href="#careerBatting" data-toggle="tab">打擊成績</a></li>
+						<li><a href="#careerFielding" data-toggle="tab">守備成績</a></li>
+					</ul>
+					<div id="careerTabContent" class="tab-content">
+						<div class="tab-pane fade in active" id="careerPitching">
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-condensed" id="table_careerPitching">
+									<thead>
+										<tr>
+											<th>Time</th>
+											<th>G</th>
+											<th>GS</th>
+											<th>CG</th>
+											<th>W</th>
+											<th>L</th>
+											<th>SV</th>
+											<th>IP</th>
+											<th>H</th>
+											<th>SO</th>
+											<th>BB</th>
+											<th>R</th>
+											<th>ER</th>
+											<th>ERA5</th>
+											<th>ERA7</th>
+										</tr>
+										<tr>
+											<th>時間</th>
+											<th>出賽</th>
+											<th>先發</th>
+											<th>完投</th>
+											<th>勝利</th>
+											<th>敗戰</th>
+											<th>救援</th>
+											<th>局數</th>
+											<th>被安打</th>
+											<th>三振</th>
+											<th>四壞</th>
+											<th>失分</th>
+											<th>責失</th>
+											<th>五局防禦率</th>
+											<th>七局防禦率</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% @p_G_CareerTotal = 0 %>
+										<% @p_GS_CareerTotal = 0 %>
+										<% @p_CG_CareerTotal = 0 %>
+										<% @p_W_CareerTotal = 0 %>
+										<% @p_L_CareerTotal = 0 %>
+										<% @p_SV_CareerTotal = 0 %>
+										<% @p_IP_CareerTotal = 0 %>
+										<% @p_H_CareerTotal = 0 %>
+										<% @p_SO_CareerTotal = 0 %>
+										<% @p_BB_CareerTotal = 0 %>
+										<% @p_R_CareerTotal = 0 %>
+										<% @p_ER_CareerTotal = 0 %>
+										<% @careerPitching_findyear.each do |oneyear_p| %>
+											<% oneyearPit = pitchingFromYear(oneyear_p.year) %>
+											<tr>
+												<td>
+													<%= oneyearPit["Time"] %>
+												</td>
+												<td>
+													<%= oneyearPit["G"] %>
+													<% @p_G_CareerTotal += oneyearPit["G"] %>
+												</td>
+												<td>
+													<%= oneyearPit["GS"] %>
+													<% @p_GS_CareerTotal += oneyearPit["GS"] %>
+												</td>
+												<td>
+													<%= oneyearPit["CG"] %>
+													<% @p_CG_CareerTotal += oneyearPit["CG"] %>
+												</td>
+												<td>
+													<%= oneyearPit["W"] %>
+													<% @p_W_CareerTotal += oneyearPit["W"] %>
+												</td>
+												<td>
+													<%= oneyearPit["L"] %>
+													<% @p_L_CareerTotal += oneyearPit["L"] %>
+												</td>
+												<td>
+													<%= oneyearPit["SV"] %>
+													<% @p_SV_CareerTotal += oneyearPit["SV"] %>
+												</td>
+												<td>
+													<%= '%.1f' % (oneyearPit["IP"] / 3.0) %>
+													<% @p_IP_CareerTotal += oneyearPit["IP"] %>
+												</td>
+												<td>
+													<%= oneyearPit["H"] %>
+													<% @p_H_CareerTotal += oneyearPit["H"] %>
+												</td>
+												<td>
+													<%= oneyearPit["SO"] %>
+													<% @p_SO_CareerTotal += oneyearPit["SO"] %>
+												</td>
+												<td>
+													<%= oneyearPit["BB"] %>
+													<% @p_BB_CareerTotal += oneyearPit["BB"] %>
+												</td>
+												<td>
+													<%= oneyearPit["R"] %>
+													<% @p_R_CareerTotal += oneyearPit["R"] %>
+												</td>
+												<td>
+													<%= oneyearPit["ER"] %>
+													<% @p_ER_CareerTotal += oneyearPit["ER"] %>
+												</td>
+												<td>
+													<% if oneyearPit["IP"] == 0  %>
+														<% if oneyearPit["ER"] == 0 %>
+															-.--
+														<% else %>
+															∞
+														<% end %>
+													<% else %>
+														<%= '%.2f' % (oneyearPit["ERA5"]) %>
+													<% end %>
+												</td>
+												<td>
+													<% if oneyearPit["IP"] == 0  %>
+														<% if oneyearPit["ER"] == 0 %>
+															-.--
+														<% else %>
+															∞
+														<% end %>
+													<% else %>
+														<%= '%.2f' % (oneyearPit["ERA7"]) %>
+													<% end %>
+												</td>
+											</tr>
+										<% end %>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td>Total</td>
+											<td><%= @p_G_CareerTotal %></td>
+											<td><%= @p_GS_CareerTotal %></td>
+											<td><%= @p_CG_CareerTotal %></td>
+											<td><%= @p_W_CareerTotal %></td>
+											<td><%= @p_L_CareerTotal %></td>
+											<td><%= @p_SV_CareerTotal %></td>
+											<td><%= '%.1f' % (@p_IP_CareerTotal / 3.0) %></td>
+											<td><%= @p_H_CareerTotal %></td>
+											<td><%= @p_SO_CareerTotal %></td>
+											<td><%= @p_BB_CareerTotal %></td>
+											<td><%= @p_R_CareerTotal %></td>
+											<td><%= @p_ER_CareerTotal %></td>
+											<td>
+												<% if @p_IP_CareerTotal == 0  %>
+													<% if @p_ER_CareerTotal == 0 %>
+														-.--
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.2f' % (15.0 * @p_ER_CareerTotal / @p_IP_CareerTotal) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @p_IP_CareerTotal == 0  %>
+													<% if @p_ER_CareerTotal == 0 %>
+														-.--
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.2f' % (21.0 * @p_ER_CareerTotal / @p_IP_CareerTotal) %>
+												<% end %>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							
+						</div>
+						<div class="tab-pane fade" id="careerBatting">
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-condensed" id="table_careerBatting">
+									<thead>
+										<tr>
+											<th>Time</th>
+											<th>G</th>
+											<th>PA</th>
+											<th>AB</th>
+											<th>H</th>
+											<th>2B</th>
+											<th>3B</th>
+											<th>HR</th>
+											<th>R</th>
+											<th>RBI</th>
+											<th>SF</th>
+											<th>TB</th>
+											<th>SO</th>
+											<th>BB</th>
+											<th>AVG</th>
+											<th>OBP</th>
+											<th>SLG</th>
+											<th>OPS</th>
+										</tr>
+										<tr>
+											<th>時間</th>
+											<th>出賽</th>
+											<th>打席</th>
+											<th>打數</th>
+											<th>安打</th>
+											<th>二壘</th>
+											<th>三壘</th>
+											<th>全壘</th>
+											<th>得分</th>
+											<th>打點</th>
+											<th>犧牲</th>
+											<th>壘打數</th>
+											<th>三振</th>
+											<th>四壞</th>
+											<th>打擊率</th>
+											<th>上壘率</th>
+											<th>長打率</th>
+											<th>攻擊指數</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% @b_G_CareerTotal = 0 %>
+										<% @b_PA_CareerTotal = 0 %>
+										<% @b_AB_CareerTotal = 0 %>
+										<% @b_H_CareerTotal = 0 %>
+										<% @b_B2_CareerTotal = 0 %>
+										<% @b_B3_CareerTotal = 0 %>
+										<% @b_HR_CareerTotal = 0 %>
+										<% @b_R_CareerTotal = 0 %>
+										<% @b_RBI_CareerTotal = 0 %>
+										<% @b_SF_CareerTotal = 0 %>
+										<% @b_TB_CareerTotal = 0 %>
+										<% @b_SO_CareerTotal = 0 %>
+										<% @b_BB_CareerTotal = 0 %>
+										<% @careerBatting_findyear.each do |oneyear_b| %>
+											<% oneyearBat = battingFromYear(oneyear_b.year) %>
+											<tr>
+												<td>
+													<%= oneyearBat["Time"] %>
+												</td>
+												<td>
+													<%= oneyearBat["G"] %>
+													<% @b_G_CareerTotal += oneyearBat["G"] %>
+												</td>
+												<td>
+													<%= oneyearBat["PA"] %>
+													<% @b_PA_CareerTotal += oneyearBat["PA"] %>
+												</td>
+												<td>
+													<%= oneyearBat["AB"] %>
+													<% @b_AB_CareerTotal += oneyearBat["AB"] %>
+												</td>
+												<td>
+													<%= oneyearBat["H"] %>
+													<% @b_H_CareerTotal += oneyearBat["H"] %>
+												</td>
+												<td>
+													<%= oneyearBat["B2"] %>
+													<% @b_B2_CareerTotal += oneyearBat["B2"] %>
+												</td>
+												<td>
+													<%= oneyearBat["B3"] %>
+													<% @b_B3_CareerTotal += oneyearBat["B3"] %>
+												</td>
+												<td>
+													<%= oneyearBat["HR"] %>
+													<% @b_HR_CareerTotal += oneyearBat["HR"] %>
+												</td>
+												<td>
+													<%= oneyearBat["R"] %>
+													<% @b_R_CareerTotal += oneyearBat["R"] %>
+												</td>
+												<td>
+													<%= oneyearBat["RBI"] %>
+													<% @b_RBI_CareerTotal += oneyearBat["RBI"] %>
+												</td>
+												<td>
+													<%= oneyearBat["SF"] %>
+													<% @b_SF_CareerTotal += oneyearBat["SF"] %>
+												</td>
+												<td>
+													<%= oneyearBat["TB"] %>
+													<% @b_TB_CareerTotal += oneyearBat["TB"] %>
+												</td>
+												<td>
+													<%= oneyearBat["SO"] %>
+													<% @b_SO_CareerTotal += oneyearBat["SO"] %>
+												</td>
+												<td>
+													<%= oneyearBat["BB"] %>
+													<% @b_BB_CareerTotal += oneyearBat["BB"] %>
+												</td>
+												<td>
+													<% if oneyearBat["AB"] == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (oneyearBat["AVG"]) %>
+													<% end %>
+												</td>
+												<td>
+													<% if oneyearBat["PA"] == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (oneyearBat["OBP"]) %>
+													<% end %>
+												</td>
+												<td>
+													<% if oneyearBat["AB"] == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (oneyearBat["SLG"]) %>
+													<% end %>
+												</td>
+												<td>
+													<% if oneyearBat["PA"] == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (oneyearBat["OPS"]) %>
+													<% end %>
+												</td>
+												
+											</tr>
+										<% end %>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td>Total</td>
+											<td><%= @b_G_CareerTotal %></td>
+											<td><%= @b_PA_CareerTotal %></td>
+											<td><%= @b_AB_CareerTotal %></td>
+											<td><%= @b_H_CareerTotal %></td>
+											<td><%= @b_B2_CareerTotal %></td>
+											<td><%= @b_B3_CareerTotal %></td>
+											<td><%= @b_HR_CareerTotal %></td>
+											<td><%= @b_R_CareerTotal %></td>
+											<td><%= @b_RBI_CareerTotal %></td>
+											<td><%= @b_SF_CareerTotal %></td>
+											<td><%= @b_TB_CareerTotal %></td>
+											<td><%= @b_SO_CareerTotal %></td>
+											<td><%= @b_BB_CareerTotal %></td>
+											<td>
+												<% if @b_AB_CareerTotal == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % (@b_H_CareerTotal / @b_AB_CareerTotal.to_f) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @b_PA_CareerTotal == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % ((@b_H_CareerTotal + @b_BB_CareerTotal) / @b_PA_CareerTotal.to_f) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @b_AB_CareerTotal == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % (@b_TB_CareerTotal / @b_AB_CareerTotal.to_f) %>
+												<% end %>
+											</td>
+											<td>
+												<% if @b_PA_CareerTotal == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % ( ((@b_H_CareerTotal + @b_BB_CareerTotal) / @b_PA_CareerTotal.to_f) + (@b_TB_CareerTotal / @b_AB_CareerTotal.to_f) ) %>
+												<% end %>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							
+						</div>
+						<div class="tab-pane fade" id="careerFielding">
+							
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-condensed" id="table_careerFielding">
+									<thead>
+										<tr>
+											<th>Time</th>
+											<th>G</th>
+											<th>INN</th>
+											<th>FPOS</th>
+											<th>TC</th>
+											<th>A</th>
+											<th>PO</th>
+											<th>E</th>
+											<th>FPCT</th>
+										</tr>
+										<tr>
+											<th>時間</th>
+											<th>出賽</th>
+											<th>局數</th>
+											<th>最常守備位置</th>
+											<th>守備機會</th>
+											<th>助殺</th>
+											<th>刺殺</th>
+											<th>失誤</th>
+											<th>守備率</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% @f_G_CareerTotal = 0 %>
+										<% @f_INN_CareerTotal = 0 %>
+										<% @f_FPOS_CareerTotal = Hash.new(0) %>
+										<% @f_TC_CareerTotal = 0 %>
+										<% @f_A_CareerTotal = 0 %>
+										<% @f_PO_CareerTotal = 0 %>
+										<% @f_E_CareerTotal = 0 %>
+										<% @careerFielding_findyear.each do |oneyear_f| %>
+											<% oneyearFld = fieldingFromYear(oneyear_f.year) %>
+											<tr>
+												<td><%= oneyearFld["Time"] %></td>
+												<td>
+													<%= oneyearFld["G"] %>
+													<% @f_G_CareerTotal += oneyearFld["G"] %>
+												</td>
+												<td>
+													<%= '%.1f' % (oneyearFld["INN"] / 3.0) %>
+													<% @f_INN_CareerTotal += oneyearFld["INN"] %>
+												</td>
+												<td>
+													<% if oneyearFld["FPOS"].length != 0 %>
+														<%= oneyearFld["FPOS"].max_by{|k,v| v }[0] %>(<%= '%.1f' % (oneyearFld["FPOS"].max_by{|k,v| v }[1] / 3.0) %>局)
+														<% oneyearFld["FPOS"].each do |key, value| %>
+															<% @f_FPOS_CareerTotal[key] += value %>
+														<% end %>
+													<% end %>
+												</td>
+												<td>
+													<%= oneyearFld["TC"] %>
+													<% @f_TC_CareerTotal += oneyearFld["TC"] %>
+												</td>
+												<td>
+													<%= oneyearFld["A"] %>
+													<% @f_A_CareerTotal += oneyearFld["A"] %>
+												</td>
+												<td>
+													<%= oneyearFld["PO"] %>
+													<% @f_PO_CareerTotal += oneyearFld["PO"] %>
+												</td>
+												<td>
+													<%= oneyearFld["E"] %>
+													<% @f_E_CareerTotal += oneyearFld["E"] %>
+												</td>
+												<td>
+													<% if oneyearFld["TC"] == 0  %>
+														-.---
+													<% else %>
+														<%= '%.3f' % (oneyearFld["FPCT"]) %>
+													<% end %>
+												</td>
+											</tr>
+										<% end %>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td>Total</td>
+											<td><%= @f_G_CareerTotal %></td>
+											<td><%= '%.1f' % (@f_INN_CareerTotal / 3.0) %></td>
+											<td>
+												<% if @f_FPOS_CareerTotal.length != 0 %>
+													<%= @f_FPOS_CareerTotal.max_by{|k,v| v }[0] %>(<%= '%.1f' % (@f_FPOS_CareerTotal.max_by{|k,v| v }[1] / 3.0) %>局)
+												<% end %>
+											</td>
+											<td><%= @f_TC_CareerTotal %></td>
+											<td><%= @f_A_CareerTotal %></td>
+											<td><%= @f_PO_CareerTotal %></td>
+											<td><%= @f_E_CareerTotal %></td>
+											<td>
+												<% if @f_TC_CareerTotal == 0  %>
+													-.---
+												<% else %>
+													<%= '%.3f' % ((@f_A_CareerTotal + @f_PO_CareerTotal) / @f_TC_CareerTotal.to_f) %>
+												<% end %>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							
+							
+						</div>
+					</div>
+					
+				
+				</div>
+				<div role="tabpanel" class="tab-pane" id="gallery">
+					
+					<% if !(Imsoftball::Application.assets.find_asset("player/#{@member.id}/#{@member.id}001.jpg").nil?) %>
+						<div class="callbacks_container">
+							<ul class="rslides" id="photoSlider">
+								<% @inner_counter = 1 %>
+								<% while !(Imsoftball::Application.assets.find_asset("player/#{@member.id}/#{@member.id}#{'%03d' % (@inner_counter)}.jpg").nil?) %>
+									<li><%= image_tag("player/#{@member.id}/#{@member.id}#{'%03d' % (@inner_counter)}.jpg") %></li>
+									<% @inner_counter += 1 %>
+								<% end %>
+							</ul>
+						</div>	
+					<% end %>
+						
+					
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</section>
