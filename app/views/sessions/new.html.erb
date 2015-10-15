@@ -30,6 +30,8 @@ $(document).ready(function() {
   var footer = $('footer');
   $('#main_content').css('min-height', $(window).outerHeight() - footer.outerHeight());
   $('#main_content').css('padding-top',nav.outerHeight() + $(window).outerHeight()*0.15);
+
+  console.log(<%=@test%>);
 });
 
 $(window).on('resize', function(){

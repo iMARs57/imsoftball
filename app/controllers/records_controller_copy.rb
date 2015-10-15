@@ -308,35 +308,6 @@ class RecordsController < ApplicationController
 		end
 	end
 	
-	def playersInYear(year)
-		
-		if year == "Wildcard"
-			@playerInThisYear = Batting.find_by_sql('SELECT DISTINCT BAT.player_id
-													   FROM battings AS BAT,
-															players AS PLY
-													  WHERE BAT.player_id = PLY.player_id AND
-															PLY.member = 1
-												   ORDER BY BAT.player_id')
-		else
-			@playerInThisYear = Batting.find_by_sql('SELECT DISTINCT BAT.player_id
-													   FROM battings AS BAT,
-															players AS PLY
-													  WHERE BAT.player_id = PLY.player_id AND
-															PLY.member = 1 AND
-															BAT.game_id IN (SELECT G.game_id 
-																			  FROM battings AS BAT,
-																				   games AS G,
-																				   cups AS C
-																			 WHERE BAT.game_id = G.game_id AND
-																				   G.cup_id = C.cup_id AND
-																				   C.year = "' + year.to_s + '")
-												   ORDER BY BAT.player_id')
-		end
-		
-		return @playerInThisYear
-	end
-	helper_method :playersInYear
-	
 	def batting
 		
 		if logged_in?
@@ -351,94 +322,81 @@ class RecordsController < ApplicationController
 													  WHERE games.cup_id = cups.cup_id
 												   GROUP BY cups.year')
 			@gameNumberInYear = Hash.new(0)
-			@gameNumberInWildcard = 0
+			@years = Array.new(0)
 			@gameNumberInEachYear.each do |gNIEY|
-				@gameNumberInYear[gNIEY.year.to_s] = gNIEY.gameNumber
-				@gameNumberInWildcard += gNIEY.gameNumber
+				@gameNumberInYear[gNIEY.year] = gNIEY.gameNumber
+				@years.push(gNIEY.year)
 			end
-			@gameNumberInYear['Wildcard'] = @gameNumberInWildcard
+			
+			@year = params[:year]
+			@cup = params[:cup]
+			@player_id = params[:player_id]
+			if @year == nil && @player_id != nil # 沒選年次只選人
+				@year = @years[@years.size - 1] # 把年次設為今年度
+			end
+			
+			if @year != nil && @year != "wildcard" && @cup == nil # 年份不是選不分年度且盃賽為空
+				@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id 
+															FROM battings AS BAT,
+																 games AS G,
+																 cups AS C
+														   WHERE BAT.game_id = G.game_id AND
+																 G.cup_id = C.cup_id AND
+																 C.year = "' + @year.to_s + '")'
+			elsif @year == "wildcard" && @cup != nil # 年份選不分年度且盃賽不為空
+				@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id 
+															FROM battings AS BAT,
+																 games AS G,
+																 cups AS C
+														   WHERE BAT.game_id = G.game_id AND
+																 G.cup_id = C.cup_id AND
+																 C.cup_name = "' + @cup.to_s + '")'
+			elsif @year != nil && @cup != nil # 年份非空且盃賽非空
+				if @cup == '官方賽'
+					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id 
+																FROM battings AS BAT,
+																	 games AS G,
+																	 cups AS C
+															   WHERE BAT.game_id = G.game_id AND
+																	 G.cup_id = C.cup_id AND
+																	 C.year = "' + @year.to_s + '" AND
+																	 C.official = 1)'
+				elsif @cup == '正式賽'
+					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id 
+																FROM battings AS BAT,
+																	 games AS G,
+																	 cups AS C
+															   WHERE BAT.game_id = G.game_id AND
+																	 G.cup_id = C.cup_id AND
+																	 C.year = "' + @year.to_s + '" AND
+																	 C.formal = 1)'
+				else
+					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id 
+																FROM battings AS BAT,
+																	 games AS G,
+																	 cups AS C
+															   WHERE BAT.game_id = G.game_id AND
+																	 G.cup_id = C.cup_id AND
+																	 C.year = "' + @year.to_s + '" AND
+																	 C.cup_name = "' + @cup.to_s + '")'
+				end
+			end
 			
 			@type = params[:type]
-			@year = ""
-			@year1 = params[:year1]
-			@year2 = params[:year2]
-			@player = params[:player]
-			@player1 = params[:player1]
-			@player2 = params[:player2]
-			
 			if @type == 'single'
-				@player = params[:player1]
-				@year = params[:year1]
-			elsif @type == 'pk'
-				if params[:player1] == params[:player2] && params[:year1] = params[:year2]
-					@player = params[:player1]
-					@year = params[:year1]
+				@player_id = params[:player_id1]
+			elsif @type = 'pk'
+				if params[:player_id1] == params[:player_id2] && params[:year] = params[:year2]
+					@player_id = params[:player_id1]
 				else
-					@player = "pk"
-					@year = "pk"
+					@player_id = "pk"
 				end
 			end
 			
-			if @player == nil
+			if @player_id == nil
+				@years.push("wildcard")
 				
-				@year_option = Array.new
-				@allyear = Cup.select('DISTINCT cups.year').order('cups.year')
-				@allyear.each do |eachyear|
-					@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
-				end
-				@year_option.push(["不分年度","Wildcard"])
-			
-			elsif @player == "all"	
-				
-				@sorting = params[:sorting]
-				@sql_year = ""
-				if @year == "Wildcard"
-					@sql_year = ""
-				else
-					@sql_year = ' AND BAT.game_id IN (SELECT G.game_id 
-													    FROM battings AS BAT,
-															 games AS G,
-															 cups AS C 
-													   WHERE BAT.game_id = G.game_id AND
-															 G.cup_id = C.cup_id AND
-															 C.year = "' + @year + '") '
-				end
-				@allActiveBatting = Batting.find_by_sql('SELECT BAT.player_id, 
-																COUNT(BAT.game_id) AS G, 
-																SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA, 
-																SUM(BAT.AB) AS AB, 
-																SUM(BAT.H) AS H, 
-																SUM(BAT.B2) AS B2, 
-																SUM(BAT.B3) AS B3, 
-																SUM(BAT.HR) AS HR, 
-																SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB, 
-																SUM(BAT.RBI) AS RBI, 
-																SUM(BAT.R) AS R, 
-																SUM(BAT.SO) AS SO, 
-																SUM(BAT.BB) AS BB, 
-																SUM(BAT.IBB) AS IBB, 
-																SUM(BAT.SF) AS SF, 
-																SUM(BAT.E) AS E, 
-																CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																(CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-																CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
-														   FROM battings AS BAT, 
-																players AS PLY 
-														  WHERE BAT.player_id = PLY.player_id AND
-																PLY.member = 1 ' + @sql_year.to_s +
-													  'GROUP BY BAT.player_id')
-													    # HAVING (SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)) >= ' + (@gameNumberInYear[@year.to_i] * @activePLAYER_rate).to_s + ' OR
-														#		(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)) >= ' + @activePLAYER.to_s)
-				
-			elsif @player == "pk"
-			
-			else
-			
 			end
-			
-			
 		
 		else
 			session[:return_to] = request.fullpath

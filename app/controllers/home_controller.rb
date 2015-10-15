@@ -685,12 +685,4 @@ class HomeController < ApplicationController
 	
   end
 
-  def show
-    if logged_in?
-
-    else
-      redirect_to :action => 'new', :controller => 'sessions'
-    end
-  end
-
 end

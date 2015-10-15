@@ -15,4 +15,6 @@
 //= require jquery.animate-enhanced
 //= require bootstrap-sprockets
 //= require jquery_ujs
+//= require "bootstrap-table/bootstrap-table.js"
+//= require "bootstrap-table/bootstrap-table-zh-TW.js"
 //= require_tree ./common

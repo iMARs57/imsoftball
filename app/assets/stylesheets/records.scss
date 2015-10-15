@@ -20,6 +20,11 @@
 	padding-bottom: 30px;
 }
 
+#records_sidebar * {
+	
+	color: #777777;
+}
+
 #table_game_oneyear > thead > tr > th, #table_game_oneyear > tbody > tr > td{
 	
 	text-align: center;
@@ -40,14 +45,67 @@
 
 #table_game_scoreboard{
 	
-	background:#000088;
+	background:#30334F;
 	color: white;
+	font-size: 1.2em;
 }
 
-#table_game_scoreboard > tbody > tr > td{
+#table_game_scoreboard > tbody > tr > td:not(.board){
 	
 	text-align: center;
 	vertical-align: middle;
 	border-top: none !important;
 	
+}
+
+img.teamLogo{
+	
+	//border-radius: 10px;
+	//padding: 10px 10px;
+	//border: 1px solid #e3e3e3;
+}
+
+#table_game_battingAway > thead > tr > th, #table_game_battingAway > tbody > tr > td, #table_game_battingAway > tfoot > tr > td,
+#table_game_battingHome > thead > tr > th, #table_game_battingHome > tbody > tr > td, #table_game_battingHome > tfoot > tr > td,
+#table_game_pitchingAway > thead > tr > th, #table_game_pitchingAway > tbody > tr > td, #table_game_pitchingAway > tfoot > tr > td,
+#table_game_pitchingHome > thead > tr > th, #table_game_pitchingHome > tbody > tr > td, #table_game_pitchingHome > tfoot > tr > td,
+#table_game_fieldingAway > thead > tr > th, #table_game_fieldingAway > tbody > tr > td, #table_game_fieldingAway > tfoot > tr > td,
+#table_game_fieldingHome > thead > tr > th, #table_game_fieldingHome > tbody > tr > td, #table_game_fieldingHome > tfoot > tr > td{
+	
+	text-align: center;
+	vertical-align: middle;
+}
+
+#table_game_battingAway > tfoot > tr > td,
+#table_game_battingHome > tfoot > tr > td,
+#table_game_pitchingAway > tfoot > tr > td,
+#table_game_pitchingHome > tfoot > tr > td,
+#table_game_fieldingAway > tfoot > tr > td,
+#table_game_fieldingHome > tfoot > tr > td{
+	
+	background:rgb(149,149,149);
+	color:white;
+}
+
+.panel-heading-batting{
+	
+	background-color: rgb(179,0,0) !important;
+	color: white !important;
+}
+
+.panel-heading-pitching{
+	
+	background-color: rgb(51,122,183) !important;
+	color: white !important;
+}
+
+.panel-heading-fielding{
+	
+	background-color: rgb(0,179,0) !important;
+	color: white !important;
+}
+
+.hideFirst{
+	
+	display:none;
 }

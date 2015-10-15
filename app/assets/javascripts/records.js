@@ -22,8 +22,16 @@ $(window).on('load resize', function(){
     $('body').css('padding-top',navHeight);
 	
 	
-	var panel_game_battingHeight = Math.max($('#panel_game_battingAway').height(),$('#panel_game_battingHome').height());
-	$('#panel_game_battingAway').height(panel_game_battingHeight);
-	$('#panel_game_battingHome').height(panel_game_battingHeight);
+	var panel_game_battingHeight = Math.max($('#table_game_battingAway').height(),$('#table_game_battingHome').height());
+	$('#table_game_battingAway').height(panel_game_battingHeight);
+	$('#table_game_battingHome').height(panel_game_battingHeight);
+	
+	var panel_game_pitchingHeight = Math.max($('#table_game_pitchingAway').height(),$('#table_game_pitchingHome').height());
+	$('#table_game_pitchingAway').height(panel_game_pitchingHeight);
+	$('#table_game_pitchingHome').height(panel_game_pitchingHeight);
+	
+	var panel_game_fieldingHeight = Math.max($('#table_game_fieldingAway').height(),$('#table_game_fieldingHome').height());
+	$('#table_game_fieldingAway').height(panel_game_fieldingHeight);
+	$('#table_game_fieldingHome').height(panel_game_fieldingHeight);
 	
 });

@@ -56,19 +56,22 @@
 				
 			<% else %>
 				<div class="panel panel-default">
-					<div class="panel-body">
+					<!--<div class="panel-body">-->
 						<div class="table-responsive" id="div_game_scoreboard">
 							<table class="table table-condensed" id="table_game_scoreboard">
 								<tbody>
+									<tr>
+										<td>　</td><!-- top spacing -->
+									</tr>
 									<tr>
 										<td colspan="6">No. <%= @game_id %></td>
 									</tr>
 									<tr>
 										<td rowspan="7" width="25%">
 											<% if !Imsoftball::Application.assets.find_asset("team_logo/#{@game_onegame.teamAwayName}.png").nil? %>
-												<%= image_tag("team_logo/#{@game_onegame.teamAwayName}.png", width: "150px", height:"150px") %>
+												<%= image_tag("team_logo/#{@game_onegame.teamAwayName}.png", width: "150px", height:"150px", class:"teamLogo") %>
 											<% else %>
-												<%= image_tag("team_logo/logo_template.png", width: "150px", height:"150px") %>
+												<%= image_tag("team_logo/logo_template.png", width: "150px", height:"150px", class:"teamLogo") %>
 											<% end %>
 											<br/>
 											<br/>
@@ -77,9 +80,9 @@
 										<td colspan="4"><%= @game_onegame.year %>年度　<%= @game_onegame.cup_name %></td>
 										<td rowspan="7" width="25%">
 											<% if !Imsoftball::Application.assets.find_asset("team_logo/#{@game_onegame.teamHomeName}.png").nil? %>
-												<%= image_tag("team_logo/#{@game_onegame.teamHomeName}.png", width: "150px", height:"150px") %>
+												<%= image_tag("team_logo/#{@game_onegame.teamHomeName}.png", width: "150px", height:"150px", class:"teamLogo") %>
 											<% else %>
-												<%= image_tag("team_logo/logo_template.png", width: "150px", height:"150px") %>
+												<%= image_tag("team_logo/logo_template.png", width: "150px", height:"150px", class:"teamLogo") %>
 											<% end %>
 											<br/>
 											<br/>
@@ -87,10 +90,10 @@
 										</td>
 									</tr>
 									<tr>
-										<td colspan="4" >
-											<div style="display:inline-block; width:35%; text-align:left;"><%= @game_onegame.teamAwayName %></div>
-											<div style="display:inline-block; width:auto;"><%= @game_onegame.away_score %>：<%= @game_onegame.home_score %></div>
-											<div style="display:inline-block; width:35%; text-align:right;"><%= @game_onegame.teamHomeName %></div>
+										<td colspan="4" style="word-break:keep-all;white-space:nowrap;">
+											<div style="display:inline-block; width:35%; text-align:left; font-size:1.5em"><%= @game_onegame.teamAwayName %></div>
+											<div style="display:inline-block; width:auto; font-size:2em; color: yellow;"><%= @game_onegame.away_score %>：<%= @game_onegame.home_score %></div>
+											<div style="display:inline-block; width:35%; text-align:right; font-size:1.5em"><%= @game_onegame.teamHomeName %></div>
 										</td>
 									</tr>
 									<tr>
@@ -99,42 +102,79 @@
 											<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
 										</td>
 									</tr>
-									<tr>
-										<td style="width:20%; background:black;"></td>
-										<td style="width:10%; background:black;">R</td>
-										<td style="width:10%; background:black;">H</td>
-										<td style="width:10%; background:black;">E</td>
+									<tr style="border-top: 3px double #e3e3e3;">
+										<td style="width:20%; background:black; border-radius:5px 0 0 0; border-left: 3px double #e3e3e3;"></td>
+										<td style="width:10%; background:black; font-weight: bolder;">R</td>
+										<td style="width:10%; background:black; font-weight: bolder;">H</td>
+										<td style="width:10%; background:black; border-radius:0 5px 0 0; border-right: 3px double #e3e3e3; font-weight: bolder;">E</td>
 									</tr>
 									<tr>
-										<td style="background:black;"><%= @game_onegame.teamAwayName %></td>
-										<td style="background:black;"><%= @game_onegame.away_score %></td>
-										<td style="background:black;">1</td>
-										<td style="background:black;">1</td>
+										<td style="background:black; border-left: 3px double #e3e3e3;"><%= @game_onegame.teamAwayName %></td>
+										<td style="background:black; font-weight: bolder;"><%= @game_onegame.away_score %></td>
+										<td style="background:black; font-weight: bolder;">
+											<% if @game_AllBattingAway.team_id != nil %>
+												<%= @game_AllBattingAway.H %>
+											<% elsif @game_AllPitchingHome.team_id != nil %>
+												<%= @game_AllPitchingHome.H %>
+											<% else %>
+												X
+											<% end %>
+										</td>
+										<td style="background:black; border-right: 3px double #e3e3e3; font-weight: bolder;">
+											<% if @game_AllFieldingAway.team_id != nil %>
+												<%= @game_AllFieldingAway.E %>
+											<% else %>
+												X
+											<% end %>
+										</td>
+									</tr>
+									<tr style="border-bottom: 3px double #e3e3e3;">
+										<td style="background:black; border-radius:0 0 0 5px; border-left: 3px double #e3e3e3;"><%= @game_onegame.teamHomeName %></td>
+										<td style="background:black; font-weight: bolder;"><%= @game_onegame.home_score %></td>
+										<td style="background:black; font-weight: bolder;">
+											<% if @game_AllBattingHome.team_id != nil %>
+												<%= @game_AllBattingHome.H %>
+											<% elsif @game_AllPitchingAway.team_id != nil %>
+												<%= @game_AllPitchingAway.H %>
+											<% else %>
+												X
+											<% end %>
+										</td>
+										<td style="background:black; border-radius:0 0 5px 0; border-right: 3px double #e3e3e3; font-weight: bolder;">
+											<% if @game_AllFieldingHome.team_id != nil %>
+												<%= @game_AllFieldingHome.E %>
+											<% else %>
+												X
+											<% end %>
+										</td>
 									</tr>
 									<tr>
-										<td style="background:black;"><%= @game_onegame.teamHomeName %></td>
-										<td style="background:black;"><%= @game_onegame.home_score %></td>
-										<td style="background:black;">2</td>
-										<td style="background:black;">2</td>
+										<td colspan="4">
+											<%= @winner != ""? "W："+@winner : "" %> <%= @loser != ""? "L："+@loser : "" %> <%= @saver != ""? "SV："+@saver : "" %> <%= (@game_onegame.mvp != nil)? "MVP："+@game_onegame.mvp : "" %>
+										</td>
 									</tr>
 									<tr>
-										<td colspan="4">WLSVMVP</td>
+										<td>　</td><!-- bottom spacing -->
 									</tr>
 								</tbody>
 							</table>
 						</div>
-					</div>
+					<!--</div>-->
 				</div>
 			
 				<div class="row">
 					<div class="col-sm-6">
 						<div class="panel panel-default" id="panel_game_battingAway">
+							<div class="panel-heading panel-heading-batting">
+								<h4><%= @game_onegame.teamAwayName %> 打擊成績</h4>
+							</div>
 							<div class="panel-body">
 								<div class="table-responsive" id="div_game_battingAway">
-									<table class="table table-condensed">
+									<table class="table table-condensed" id="table_game_battingAway">
 										<thead>
 											<tr>
-												<th colspan="2">BATTING</th>
+												<th>Order</th>
+												<th>Player</th>
 												<th>PA</th>
 												<th>AB</th>
 												<th>H</th>
@@ -152,7 +192,8 @@
 												<th>AVG</th>
 											</tr>
 											<tr>
-												<th colspan="2">打擊成績</th>
+												<th>打序</th>
+												<th>打者</th>
 												<th>打席</th>
 												<th>打數</th>
 												<th>安打</th>
@@ -190,7 +231,13 @@
 														<td><%= battingAway.IBB %></td>
 														<td><%= battingAway.SF %></td>
 														<td><%= battingAway.E %></td>
-														<td><%= battingAway.AVG %></td>
+														<td>
+															<% if battingAway.AB == 0  %>
+																-.---
+															<% else %>
+																<%= '%.3f' % battingAway.AVG %>
+															<% end %>
+														</td>
 													</tr>
 												<% end %>
 											<% else %>
@@ -199,6 +246,34 @@
 												</tr>
 											<% end %>
 										</tbody>
+										<% if !@game_AllBattingAway.team_id.nil? %>
+											<tfoot>
+												<tr>
+													<td colspan="2">Total</td>
+													<td><%= @game_AllBattingAway.PA %></td>
+													<td><%= @game_AllBattingAway.AB %></td>
+													<td><%= @game_AllBattingAway.H %></td>
+													<td><%= @game_AllBattingAway.B2 %></td>
+													<td><%= @game_AllBattingAway.B3 %></td>
+													<td><%= @game_AllBattingAway.HR %></td>
+													<td><%= @game_AllBattingAway.TB %></td>
+													<td><%= @game_AllBattingAway.RBI %></td>
+													<td><%= @game_AllBattingAway.R %></td>
+													<td><%= @game_AllBattingAway.SO %></td>
+													<td><%= @game_AllBattingAway.BB %></td>
+													<td><%= @game_AllBattingAway.IBB %></td>
+													<td><%= @game_AllBattingAway.SF %></td>
+													<td><%= @game_AllBattingAway.E %></td>
+													<td>
+														<% if @game_AllBattingAway.AB == 0  %>
+															-.---
+														<% else %>
+															<%= '%.3f' % @game_AllBattingAway.AVG %>
+														<% end %>
+													</td>
+												</tr>
+											</tfoot>
+										<% end %>
 									</table>
 								</div>
 							</div>
@@ -208,12 +283,16 @@
 					</div>
 					<div class="col-sm-6">
 						<div class="panel panel-default" id="panel_game_battingHome">
+							<div class="panel-heading panel-heading-batting">
+								<h4><%= @game_onegame.teamHomeName %> 打擊成績</h4>
+							</div>
 							<div class="panel-body">
 								<div class="table-responsive" id="div_game_battingHome">
-									<table class="table table-condensed">
+									<table class="table table-condensed" id="table_game_battingHome">
 										<thead>
 											<tr>
-												<th colspan="2">BATTING</th>
+												<th>Order</th>
+												<th>Player</th>
 												<th>PA</th>
 												<th>AB</th>
 												<th>H</th>
@@ -231,7 +310,8 @@
 												<th>AVG</th>
 											</tr>
 											<tr>
-												<th colspan="2">打擊成績</th>
+												<th>打序</th>
+												<th>打者</th>
 												<th>打席</th>
 												<th>打數</th>
 												<th>安打</th>
@@ -269,7 +349,13 @@
 														<td><%= battingHome.IBB %></td>
 														<td><%= battingHome.SF %></td>
 														<td><%= battingHome.E %></td>
-														<td><%= battingHome.AVG %></td>
+														<td>
+															<% if battingHome.AB == 0  %>
+																-.---
+															<% else %>
+																<%= '%.3f' % battingHome.AVG %>
+															<% end %>
+														</td>
 													</tr>
 												<% end %>
 											<% else %>
@@ -278,6 +364,458 @@
 												</tr>
 											<% end %>
 										</tbody>
+										<% if !@game_AllBattingHome.team_id.nil? %>
+											<tfoot>
+												<tr>
+													<td colspan="2">Total</td>
+													<td><%= @game_AllBattingHome.PA %></td>
+													<td><%= @game_AllBattingHome.AB %></td>
+													<td><%= @game_AllBattingHome.H %></td>
+													<td><%= @game_AllBattingHome.B2 %></td>
+													<td><%= @game_AllBattingHome.B3 %></td>
+													<td><%= @game_AllBattingHome.HR %></td>
+													<td><%= @game_AllBattingHome.TB %></td>
+													<td><%= @game_AllBattingHome.RBI %></td>
+													<td><%= @game_AllBattingHome.R %></td>
+													<td><%= @game_AllBattingHome.SO %></td>
+													<td><%= @game_AllBattingHome.BB %></td>
+													<td><%= @game_AllBattingHome.IBB %></td>
+													<td><%= @game_AllBattingHome.SF %></td>
+													<td><%= @game_AllBattingHome.E %></td>
+													<td>
+														<% if @game_AllBattingHome.AB == 0  %>
+															-.---
+														<% else %>
+															<%= '%.3f' % @game_AllBattingHome.AVG %>
+														<% end %>
+													</td>
+												</tr>
+											</tfoot>
+										<% end %>
+									</table>
+								</div>
+							</div>
+							<!--/panel-body-->
+						</div>
+						<!--/panel-->
+					</div>
+					<div class="col-sm-6">
+						<div class="panel panel-default" id="panel_game_pitchingAway">
+							<div class="panel-heading panel-heading-pitching">
+								<h4><%= @game_onegame.teamAwayName %> 投球成績</h4>
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive" id="div_game_pitchingAway">
+									<table class="table table-condensed" id="table_game_pitchingAway">
+										<thead>
+											<tr>
+												<th>Player</th>
+												<th>IP</th>
+												<th>BAOpp</th>
+												<th>H</th>
+												<th>HR</th>
+												<th>SO</th>
+												<th>BB</th>
+												<th>IBB</th>
+												<th>R</th>
+												<th>ER</th>
+												<th>ERA5</th>
+												<th>ERA7</th>
+											</tr>
+											<tr>
+												<th>投手</th>
+												<th>投球局數</th>
+												<th>面對打席</th>
+												<th>被安打數</th>
+												<th>被全壘打數</th>
+												<th>三振</th>
+												<th>四壞</th>
+												<th>故意</th>
+												<th>失分</th>
+												<th>自責</th>
+												<th>五局防禦率</th>
+												<th>七局防禦率</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% if @game_PitchingAway.size != 0 %>
+												<% @game_PitchingAway.each do |pitchingAway| %>
+													<tr>
+														<td><%= pitchingAway.player_id %></td>
+														<td><%= '%.1f' % pitchingAway.IP %></td>
+														<td><%= pitchingAway.BAOpp %></td>
+														<td><%= pitchingAway.H %></td>
+														<td><%= pitchingAway.HR %></td>
+														<td><%= pitchingAway.SO %></td>
+														<td><%= pitchingAway.BB %></td>
+														<td><%= pitchingAway.IBB %></td>
+														<td><%= pitchingAway.R %></td>
+														<td><%= pitchingAway.ER %></td>
+														<td>
+															<% if pitchingAway.IP == 0.0  %>
+																<% if pitchingAway.ER == 0 %>
+																	-.--
+																<% else %>
+																	∞
+																<% end %>
+															<% else %>
+																<%= '%.2f' % pitchingAway.ERA5 %>
+															<% end %>
+														</td>
+														<td>
+															<% if pitchingAway.IP == 0.0  %>
+																<% if pitchingAway.ER == 0 %>
+																	-.--
+																<% else %>
+																	∞
+																<% end %>
+															<% else %>
+																<%= '%.2f' % pitchingAway.ERA7 %>
+															<% end %>
+														</td>
+													</tr>
+												<% end %>
+											<% else %>
+												<tr>
+													<td colspan="12">未登錄客隊投球數據<td>
+												</tr>
+											<% end %>
+										</tbody>
+										<% if !@game_AllPitchingAway.team_id.nil? %>
+											<tfoot>
+												<tr>
+													<td>Total</td>
+													<td><%= '%.1f' % @game_AllPitchingAway.IP %></td>
+													<td><%= @game_AllPitchingAway.BAOpp %></td>
+													<td><%= @game_AllPitchingAway.H %></td>
+													<td><%= @game_AllPitchingAway.HR %></td>
+													<td><%= @game_AllPitchingAway.SO %></td>
+													<td><%= @game_AllPitchingAway.BB %></td>
+													<td><%= @game_AllPitchingAway.IBB %></td>
+													<td><%= @game_AllPitchingAway.R %></td>
+													<td><%= @game_AllPitchingAway.ER %></td>
+													<td>
+														<% if @game_AllPitchingAway.IP == 0.0  %>
+															<% if @game_AllPitchingAway.ER == 0 %>
+																-.--
+															<% else %>
+																∞
+															<% end %>
+														<% else %>
+															<%= '%.2f' % @game_AllPitchingAway.ERA5 %>
+														<% end %>
+													</td>
+													<td>
+														<% if @game_AllPitchingAway.IP == 0.0  %>
+															<% if @game_AllPitchingAway.ER == 0 %>
+																-.--
+															<% else %>
+																∞
+															<% end %>
+														<% else %>
+															<%= '%.2f' % @game_AllPitchingAway.ERA7 %>
+														<% end %>
+													</td>
+												</tr>
+											</tfoot>
+										<% end %>
+									</table>
+								</div>
+							</div>
+							<!--/panel-body-->
+						</div>
+						<!--/panel-->
+					</div>
+					<div class="col-sm-6">
+						<div class="panel panel-default" id="panel_game_pitchingHome">
+							<div class="panel-heading panel-heading-pitching">
+								<h4><%= @game_onegame.teamHomeName %> 投球成績</h4>
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive" id="div_game_pitchingHome">
+									<table class="table table-condensed" id="table_game_pitchingHome">
+										<thead>
+											<tr>
+												<th>Player</th>
+												<th>IP</th>
+												<th>BAOpp</th>
+												<th>H</th>
+												<th>HR</th>
+												<th>SO</th>
+												<th>BB</th>
+												<th>IBB</th>
+												<th>R</th>
+												<th>ER</th>
+												<th>ERA5</th>
+												<th>ERA7</th>
+											</tr>
+											<tr>
+												<th>投手</th>
+												<th>投球局數</th>
+												<th>面對打席</th>
+												<th>被安打數</th>
+												<th>被全壘打數</th>
+												<th>三振</th>
+												<th>四壞</th>
+												<th>故意</th>
+												<th>失分</th>
+												<th>自責</th>
+												<th>五局防禦率</th>
+												<th>七局防禦率</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% if @game_PitchingHome.size != 0 %>
+												<% @game_PitchingHome.each do |pitchingHome| %>
+													<tr>
+														<td><%= pitchingHome.player_id %></td>
+														<td><%= '%.1f' % pitchingHome.IP %></td>
+														<td><%= pitchingHome.BAOpp %></td>
+														<td><%= pitchingHome.H %></td>
+														<td><%= pitchingHome.HR %></td>
+														<td><%= pitchingHome.SO %></td>
+														<td><%= pitchingHome.BB %></td>
+														<td><%= pitchingHome.IBB %></td>
+														<td><%= pitchingHome.R %></td>
+														<td><%= pitchingHome.ER %></td>
+														<td>
+															<% if pitchingHome.IP == 0.0  %>
+																<% if pitchingHome.ER == 0 %>
+																	-.--
+																<% else %>
+																	∞
+																<% end %>
+															<% else %>
+																<%= '%.2f' % pitchingHome.ERA5 %>
+															<% end %>
+														</td>
+														<td>
+															<% if pitchingHome.IP == 0.0  %>
+																<% if pitchingHome.ER == 0 %>
+																	-.--
+																<% else %>
+																	∞
+																<% end %>
+															<% else %>
+																<%= '%.2f' % pitchingHome.ERA7 %>
+															<% end %>
+														</td>
+													</tr>
+												<% end %>
+											<% else %>
+												<tr>
+													<td colspan="12">未登錄主隊投球數據<td>
+												</tr>
+											<% end %>
+										</tbody>
+										<% if !@game_AllPitchingHome.team_id.nil? %>
+											<tfoot>
+												<tr>
+													<td>Total</td>
+													<td><%= '%.1f' % @game_AllPitchingHome.IP %></td>
+													<td><%= @game_AllPitchingHome.BAOpp %></td>
+													<td><%= @game_AllPitchingHome.H %></td>
+													<td><%= @game_AllPitchingHome.HR %></td>
+													<td><%= @game_AllPitchingHome.SO %></td>
+													<td><%= @game_AllPitchingHome.BB %></td>
+													<td><%= @game_AllPitchingHome.IBB %></td>
+													<td><%= @game_AllPitchingHome.R %></td>
+													<td><%= @game_AllPitchingHome.ER %></td>
+													<td>
+														<% if @game_AllPitchingHome.IP == 0.0  %>
+															<% if @game_AllPitchingHome.ER == 0 %>
+																-.--
+															<% else %>
+																∞
+															<% end %>
+														<% else %>
+															<%= '%.2f' % @game_AllPitchingHome.ERA5 %>
+														<% end %>
+													</td>
+													<td>
+														<% if @game_AllPitchingHome.IP == 0.0  %>
+															<% if @game_AllPitchingHome.ER == 0 %>
+																-.--
+															<% else %>
+																∞
+															<% end %>
+														<% else %>
+															<%= '%.2f' % @game_AllPitchingHome.ERA7 %>
+														<% end %>
+													</td>
+												</tr>
+											</tfoot>
+										<% end %>
+									</table>
+								</div>
+							</div>
+							<!--/panel-body-->
+						</div>
+						<!--/panel-->
+					</div>
+					<div class="col-sm-6">
+						<div class="panel panel-default" id="panel_game_fieldingAway">
+							<div class="panel-heading panel-heading-fielding">
+								<h4><%= @game_onegame.teamAwayName %> 守備成績</h4>
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive" id="div_game_fieldingAway">
+									<table class="table table-condensed" id="table_game_fieldingAway">
+										<thead>
+											<tr>
+												<th>POS</th>
+												<th>Player</th>
+												<th>INN</th>
+												<th>TC</th>
+												<th>PO</th>
+												<th>SO</th>
+												<th>A</th>
+												<th>E</th>
+												<th>FPCT</th>
+											</tr>
+											<tr>
+												<th>守備位置</th>
+												<th>守備員</th>
+												<th>守備局數</th>
+												<th>守備機會</th>
+												<th>刺殺</th>
+												<th>三振</th>
+												<th>助殺</th>
+												<th>失誤</th>
+												<th>守備率</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% if @game_FieldingAway.size != 0 %>
+												<% @game_FieldingAway.each do |fieldingAway| %>
+													<tr>
+														<td><%= fieldingAway.POS %></td>
+														<td><%= fieldingAway.player_id %></td>
+														<td><%= '%.1f' % fieldingAway.INN %></td>
+														<td><%= fieldingAway.TC %></td>
+														<td><%= fieldingAway.PO %></td>
+														<td><%= fieldingAway.K %></td>
+														<td><%= fieldingAway.A %></td>
+														<td><%= fieldingAway.E %></td>
+														<td>
+															<% if fieldingAway.TC == 0  %>
+																-.---
+															<% else %>
+																<%= '%.3f' % fieldingAway.FPCT %>
+															<% end %>
+														</td>
+													</tr>
+												<% end %>
+											<% else %>
+												<tr>
+													<td colspan="9">未登錄客隊守備數據<td>
+												</tr>
+											<% end %>
+										</tbody>
+										<% if !@game_AllFieldingAway.team_id.nil? %>
+											<tfoot>
+												<tr>
+													<td colspan="3">Total</td>
+													<td><%= @game_AllFieldingAway.TC %></td>
+													<td><%= @game_AllFieldingAway.PO %></td>
+													<td><%= @game_AllFieldingAway.K %></td>
+													<td><%= @game_AllFieldingAway.A %></td>
+													<td><%= @game_AllFieldingAway.E %></td>
+													<td>
+														<% if @game_AllFieldingAway.TC == 0  %>
+															-.---
+														<% else %>
+															<%= '%.3f' % @game_AllFieldingAway.FPCT %>
+														<% end %>
+													</td>
+												</tr>
+											</tfoot>
+										<% end %>
+									</table>
+								</div>
+							</div>
+							<!--/panel-body-->
+						</div>
+						<!--/panel-->
+					</div>
+					<div class="col-sm-6">
+						<div class="panel panel-default" id="panel_game_fieldingHome">
+							<div class="panel-heading panel-heading-fielding">
+								<h4><%= @game_onegame.teamHomeName %> 守備成績</h4>
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive" id="div_game_fieldingHome">
+									<table class="table table-condensed" id="table_game_fieldingHome">
+										<thead>
+											<tr>
+												<th>POS</th>
+												<th>Player</th>
+												<th>INN</th>
+												<th>TC</th>
+												<th>PO</th>
+												<th>SO</th>
+												<th>A</th>
+												<th>E</th>
+												<th>FPCT</th>
+											</tr>
+											<tr>
+												<th>守備位置</th>
+												<th>守備員</th>
+												<th>守備局數</th>
+												<th>守備機會</th>
+												<th>刺殺</th>
+												<th>三振</th>
+												<th>助殺</th>
+												<th>失誤</th>
+												<th>守備率</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% if @game_FieldingHome.size != 0 %>
+												<% @game_FieldingHome.each do |fieldingHome| %>
+													<tr>
+														<td><%= fieldingHome.POS %></td>
+														<td><%= fieldingHome.player_id %></td>
+														<td><%= '%.1f' % fieldingHome.INN %></td>
+														<td><%= fieldingHome.TC %></td>
+														<td><%= fieldingHome.PO %></td>
+														<td><%= fieldingHome.K %></td>
+														<td><%= fieldingHome.A %></td>
+														<td><%= fieldingHome.E %></td>
+														<td>
+															<% if fieldingHome.TC == 0  %>
+																-.---
+															<% else %>
+																<%= '%.3f' % fieldingHome.FPCT %>
+															<% end %>
+														</td>
+													</tr>
+												<% end %>
+											<% else %>
+												<tr>
+													<td colspan="9">未登錄主隊守備數據<td>
+												</tr>
+											<% end %>
+										</tbody>
+										<% if !@game_AllFieldingHome.team_id.nil? %>
+											<tfoot>
+												<tr>
+													<td colspan="3">Total</td>
+													<td><%= @game_AllFieldingHome.TC %></td>
+													<td><%= @game_AllFieldingHome.PO %></td>
+													<td><%= @game_AllFieldingHome.K %></td>
+													<td><%= @game_AllFieldingHome.A %></td>
+													<td><%= @game_AllFieldingHome.E %></td>
+													<td>
+														<% if @game_AllFieldingHome.TC == 0  %>
+															-.---
+														<% else %>
+															<%= '%.3f' % @game_AllFieldingHome.FPCT %>
+														<% end %>
+													</td>
+												</tr>
+											</tfoot>
+										<% end %>
 									</table>
 								</div>
 							</div>

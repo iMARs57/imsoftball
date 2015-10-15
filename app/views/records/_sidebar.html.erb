@@ -1,6 +1,6 @@
 <div class="col-sm-3" id="records_sidebar">
 	<!-- Left column -->
-	<a href="#"><strong><i class="glyphicon glyphicon-wrench"></i> 成績紀錄</strong></a>
+	<strong><i class="glyphicon glyphicon-wrench"></i> 成績紀錄</strong>
 
 	<hr>
 
@@ -8,7 +8,7 @@
 		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu">一般查詢 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse in" id="userMenu">
 				<li><%= link_to '<i class="glyphicon glyphicon-home"></i> 球賽查詢'.html_safe, {controller: "records", action: "game"} %></li>
-				<li><a href="#"><i class="glyphicon glyphicon-envelope"></i> 打擊查詢</a></li>
+				<li><%= link_to '<i class="glyphicon glyphicon-envelope"></i> 打擊查詢'.html_safe, {controller: "records", action: "batting"} %></li>
 				<li><a href="#"><i class="glyphicon glyphicon-cog"></i> 投球查詢</a></li>
 				<li><a href="#"><i class="glyphicon glyphicon-comment"></i> 守備查詢</a></li>
 				<li><a href="#"><i class="glyphicon glyphicon-user"></i> 對戰成績查詢</a></li>
@@ -48,7 +48,7 @@
 
 	<hr>
 
-	<a href="#"><strong><i class="glyphicon glyphicon-link"></i> 資料變更</strong></a>
+	<strong><i class="glyphicon glyphicon-link"></i> 資料變更</strong>
 
 	<hr>
 
@@ -64,7 +64,7 @@
 	
 	<hr>
 	
-	<a href="#"><strong><i class="glyphicon glyphicon-link"></i> 相關連結</strong></a>
+	<strong><i class="glyphicon glyphicon-link"></i> 相關連結</strong>
 
 	<hr>
 	
