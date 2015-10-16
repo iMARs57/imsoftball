@@ -1,20 +1,11 @@
 <%= javascript_include_tag 'records' %>
 <!-- Main -->
-<section id="record_index">
+<section id="records">
 <div class="container-fluid">
     <div class="row">
         <%= render :partial => "sidebar" %>
 		<div class="col-sm-9">
-			<% if(params[:game_id] == nil && params[:year] == nil) %>
-				<%= form_tag "/search" do %>
-					<%= text_field_tag :keyword %>
-					<%= submit_tag %>
-				<% end %>
-			<% elsif(params[:game_id] == nil && params[:year] != nil) %>
 			
-			<% else %>
-			
-			<% end %>
         </div>
         <!--/col-span-9-->
     </div>

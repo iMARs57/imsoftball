@@ -403,34 +403,113 @@ class RecordsController < ApplicationController
 															 G.cup_id = C.cup_id AND
 															 C.year = "' + @year + '") '
 				end
-				@allActiveBatting = Batting.find_by_sql('SELECT BAT.player_id, 
-																COUNT(BAT.game_id) AS G, 
-																SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA, 
-																SUM(BAT.AB) AS AB, 
-																SUM(BAT.H) AS H, 
-																SUM(BAT.B2) AS B2, 
-																SUM(BAT.B3) AS B3, 
-																SUM(BAT.HR) AS HR, 
-																SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB, 
-																SUM(BAT.RBI) AS RBI, 
-																SUM(BAT.R) AS R, 
-																SUM(BAT.SO) AS SO, 
-																SUM(BAT.BB) AS BB, 
-																SUM(BAT.IBB) AS IBB, 
-																SUM(BAT.SF) AS SF, 
-																SUM(BAT.E) AS E, 
-																CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																(CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-																CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
-														   FROM battings AS BAT, 
-																players AS PLY 
-														  WHERE BAT.player_id = PLY.player_id AND
-																PLY.member = 1 ' + @sql_year.to_s +
-													  'GROUP BY BAT.player_id')
-													    # HAVING (SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)) >= ' + (@gameNumberInYear[@year.to_i] * @activePLAYER_rate).to_s + ' OR
-														#		(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)) >= ' + @activePLAYER.to_s)
+				@allBatting = Batting.find_by_sql('SELECT BAT.player_id, 
+														  COUNT(BAT.game_id) AS G, 
+														  SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA, 
+														  SUM(BAT.AB) AS AB, 
+														  SUM(BAT.H) AS H, 
+														  SUM(BAT.B2) AS B2, 
+														  SUM(BAT.B3) AS B3, 
+														  SUM(BAT.HR) AS HR, 
+														  SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB, 
+														  SUM(BAT.RBI) AS RBI, 
+														  SUM(BAT.R) AS R, 
+														  SUM(BAT.SO) AS SO, 
+														  SUM(BAT.BB) AS BB, 
+														  SUM(BAT.IBB) AS IBB, 
+														  SUM(BAT.SF) AS SF, 
+														  SUM(BAT.E) AS E, 
+														  CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+														  CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
+														  CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
+														  (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
+														  CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+												     FROM battings AS BAT, 
+														  players AS PLY 
+												    WHERE BAT.player_id = PLY.player_id AND
+														  PLY.member = 1 ' + @sql_year.to_s +
+											    'GROUP BY BAT.player_id')
+				@mainPlayer = ' AND BAT.player_id IN (SELECT BAT.player_id 
+														FROM battings AS BAT 
+													   WHERE BAT.game_id <> "0" ' + @sql_year.to_s + 
+												   'GROUP BY BAT.player_id 
+													  HAVING SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @gameNumberInYear[@year.to_s].to_s + ' OR
+															 SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @activePLAYER.to_s + ') '
+				@notMainPlayer = ' AND BAT.player_id IN (SELECT BAT.player_id 
+														   FROM battings AS BAT
+														  WHERE BAT.game_id <> "0" ' + @sql_year.to_s +
+													  'GROUP BY BAT.player_id 
+													     HAVING SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) < ' + @gameNumberInYear[@year.to_s].to_s + ' AND
+																SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) < ' + @activePLAYER.to_s + ') '
+				@allBattingSummary_M = Batting.find_by_sql('SELECT SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																   SUM(BAT.AB) AS AB,
+																   SUM(BAT.H) AS H,
+																   SUM(BAT.B2) AS B2,
+																   SUM(BAT.B3) AS B3,
+																   SUM(BAT.HR) AS HR,
+																   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																   SUM(BAT.RBI) AS RBI,
+																   SUM(BAT.R) AS R,
+																   SUM(BAT.SO) AS SO,
+																   SUM(BAT.BB) AS BB,
+																   SUM(BAT.IBB) AS IBB,
+																   SUM(BAT.SF) AS SF,
+																   SUM(BAT.E) AS E,
+																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
+																   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
+																   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+															  FROM battings AS BAT,
+																   players AS PLY
+															 WHERE BAT.player_id = PLY.player_id AND
+																   PLY.member = 1 ' + @mainPlayer + @sql_year)[0]
+				@allBattingSummary_nM = Batting.find_by_sql('SELECT SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																    SUM(BAT.AB) AS AB,
+																    SUM(BAT.H) AS H,
+																    SUM(BAT.B2) AS B2,
+																    SUM(BAT.B3) AS B3,
+																    SUM(BAT.HR) AS HR,
+																    SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																    SUM(BAT.RBI) AS RBI,
+																    SUM(BAT.R) AS R,
+																    SUM(BAT.SO) AS SO,
+																    SUM(BAT.BB) AS BB,
+																    SUM(BAT.IBB) AS IBB,
+																    SUM(BAT.SF) AS SF,
+																    SUM(BAT.E) AS E,
+																    CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
+																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
+																    (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
+																    CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+															   FROM battings AS BAT,
+																	players AS PLY
+															  WHERE BAT.player_id = PLY.player_id AND
+																    PLY.member = 1 ' + @notMainPlayer + @sql_year)[0]
+				@allBattingSummary_all = Batting.find_by_sql('SELECT SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																     SUM(BAT.AB) AS AB,
+																     SUM(BAT.H) AS H,
+																     SUM(BAT.B2) AS B2,
+																     SUM(BAT.B3) AS B3,
+																     SUM(BAT.HR) AS HR,
+																     SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																     SUM(BAT.RBI) AS RBI,
+																     SUM(BAT.R) AS R,
+																     SUM(BAT.SO) AS SO,
+																     SUM(BAT.BB) AS BB,
+																     SUM(BAT.IBB) AS IBB,
+																     SUM(BAT.SF) AS SF,
+																     SUM(BAT.E) AS E,
+																     CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																     CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
+																     CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
+																     (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
+																     CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+															    FROM battings AS BAT,
+																	 players AS PLY
+															   WHERE BAT.player_id = PLY.player_id AND
+																     PLY.member = 1 ' + @sql_year)[0]												   
 				
 			elsif @player == "pk"
 			

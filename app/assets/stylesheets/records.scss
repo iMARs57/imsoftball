@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-#record_index{
+#records{
 	
 	background: white;
 	padding-top: 25px;
@@ -10,7 +10,7 @@
 	color: black;
 }
 
-#record_index * h1, #record_index * h2, #record_index * h3, #record_index * h4{
+#records * h1, #records * h2, #records * h3, #records * h4{
 	
 	margin: 0 0;
 }
@@ -31,7 +31,7 @@
 	vertical-align: middle;
 }
 
-#table_game_oneyear > thead > tr > th{
+#table_game_oneyear > thead > tr > th, #table_batting_all_summary > thead > tr > th{
 	
 	background:rgba(192,192,192,0.7);
 }
@@ -70,7 +70,8 @@ img.teamLogo{
 #table_game_pitchingAway > thead > tr > th, #table_game_pitchingAway > tbody > tr > td, #table_game_pitchingAway > tfoot > tr > td,
 #table_game_pitchingHome > thead > tr > th, #table_game_pitchingHome > tbody > tr > td, #table_game_pitchingHome > tfoot > tr > td,
 #table_game_fieldingAway > thead > tr > th, #table_game_fieldingAway > tbody > tr > td, #table_game_fieldingAway > tfoot > tr > td,
-#table_game_fieldingHome > thead > tr > th, #table_game_fieldingHome > tbody > tr > td, #table_game_fieldingHome > tfoot > tr > td{
+#table_game_fieldingHome > thead > tr > th, #table_game_fieldingHome > tbody > tr > td, #table_game_fieldingHome > tfoot > tr > td,
+#table_batting_all_summary > thead > tr > th, #table_batting_all_summary > tbody > tr > td, #table_batting_all_summary > tfoot > tr > td{
 	
 	text-align: center;
 	vertical-align: middle;
@@ -81,7 +82,8 @@ img.teamLogo{
 #table_game_pitchingAway > tfoot > tr > td,
 #table_game_pitchingHome > tfoot > tr > td,
 #table_game_fieldingAway > tfoot > tr > td,
-#table_game_fieldingHome > tfoot > tr > td{
+#table_game_fieldingHome > tfoot > tr > td,
+#table_batting_all_summary > tfoot > tr > td{
 	
 	background:rgb(149,149,149);
 	color:white;
@@ -108,4 +110,35 @@ img.teamLogo{
 .hideFirst{
 	
 	display:none;
+}
+
+#wrapperForScrollbar{
+	border: none;
+	overflow-x: auto;
+	overflow-y:hidden;
+	height:20px;
+}
+
+#fakeContentForScrollBar{
+	height:20px;
+	overflow:auto;
+}
+
+.sorting{
+	
+	background-color:lightblue !important;
+}
+
+#table_batting_all * a{
+	
+	color: blue;
+}
+
+#table_batting_all * a:hover{
+	
+	color: #1D9B6C;
+}
+
+#table_batting_all tbody tr:hover td, #table_batting_all tbody tr:hover th {
+  background-color: #dcdcdc;
 }
