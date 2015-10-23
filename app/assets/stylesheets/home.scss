@@ -15,7 +15,7 @@ body, #navbar{
 img.menu_icon{
 	
 	float:left;
-	margin:-5px 10px 0 10px;
+	margin:-7px 10px 0 10px;
 }
 
 nav.menu{
@@ -186,6 +186,18 @@ ul.ul_menu > li.active > a{
 #panel_last5, #panel_standings, #panel_battingTop5, #panel_pitchingTop5{
 
 	margin-top:5px;
+}
+
+#panel_last5 * table > tbody > tr > td > a{
+	
+	color: white;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#panel_last5 * table > tbody > tr > td > a:hover{
+	
+	color: blue;
+	text-shadow: none;
 }
 
 #div_news{

@@ -85,7 +85,8 @@
                 inherit_height_from: '.height-fill',
                 inherit_width_from: '.height-fill',
 				hashchange: false,
-                play: 7000 // 7s per slide
+                play: 7000, // 7s per slide
+				animation: 'fade'
             });
             
             // superslides play setting

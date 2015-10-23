@@ -628,7 +628,7 @@ class HomeController < ApplicationController
                                                          AS (SELECT PIT.player_id AS Pitcher,
                                                                     PLY.player_fname AS fName,
                                                                     PLY.player_lname AS lName,
-                                                                    (SUM(PIT.H)+SUM(PIT.BB)+0.0)/((SUM(PIT.IPouts)/3)+0.0) AS WHIPs, 
+                                                                    (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/((SUM(PIT.IPouts)/3)+0.0) AS WHIPs, 
                                                                     SUM(PIT.IPouts)/3 AS IPs
                                                                FROM pitchings AS PIT, 
                                                                     players AS PLY

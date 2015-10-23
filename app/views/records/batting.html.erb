@@ -58,7 +58,7 @@
 				
 					<% @year_option.each do |yearOption| %>
 						var <%= 'playerIn' + yearOption[1].to_s %> = new Array();
-						<% @playerInThisYear = playersInYear(yearOption[1]) %>
+						<% @playerInThisYear = playersInYear(yearOption[1],'Batting') %>
 						<% @playerInThisYear.each do |playerITY| %>
 							<%= 'playerIn' + yearOption[1].to_s %>.push("<%= playerITY.player_id %>");
 						<% end %>
@@ -88,10 +88,10 @@
 				<h4><%= @year == "Wildcard"? ("不分"):(@year) %>年度打擊成績</h4>
 				<br/>
 				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為每場<%= @activePLAYER_rate %>打席 -- 目前 <%= @gameNumberInYear[@year.to_s] %> 場；或打席達<%= @activePLAYER %>以上者。</h5>
-				<h5 style="margin:0 0 10px; text-transform:none" id="description"></h5>
+				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionBat"></h5>
 				<h5 style="margin:0 0 10px; text-transform:none"><點選各項目表頭以進行排序></h5>
-				<div id="wrapperForScrollbar">
-					<div id="fakeContentForScrollBar"></div>
+				<div class="wrapperForScrollbar" id="wrapper_batting_all">
+					<div class="fakeContentForScrollBar" id="content_batting_all"></div>
 				</div>
 				<div class="table-responsive" id="div_batting_all">
 					<table class="table table-striped table-condensed" id="table_batting_all" data-toggle="table" data-sort-name="AVG" data-sort-order="desc">
@@ -139,20 +139,20 @@
 								});
 							});
 							$(window).on('load resize', function(){
-								$('#wrapperForScrollbar').width($('#div_batting_all').width());
-								$('#fakeContentForScrollBar').width($('#table_batting_all').width());
+								$('#wrapper_batting_all').width($('#div_batting_all').width());
+								$('#content_batting_all').width($('#table_batting_all').width());
 							});
 							$(function(){
 								wrapperForTable = $("#table_batting_all").parent('div')
-								$("#wrapperForScrollbar").scroll(function(){
-									wrapperForTable.scrollLeft($("#wrapperForScrollbar").scrollLeft());
+								$("#wrapper_batting_all").scroll(function(){
+									wrapperForTable.scrollLeft($("#wrapper_batting_all").scrollLeft());
 								});
 								wrapperForTable.scroll(function(){
-									$("#wrapperForScrollbar").scrollLeft(wrapperForTable.scrollLeft());
+									$("#wrapper_batting_all").scrollLeft(wrapperForTable.scrollLeft());
 								});
 							});
 							function clearDescription(){
-								$('#description').text('');
+								$('#descriptionBat').text('');
 							}
 							function NameSorter(a, b) {
 								clearDescription();
@@ -167,7 +167,7 @@
 								return 0;
 							}
 							function AVGSorter(a, b) {
-								$('#description').text('打擊率 = 安打數 / 打數');
+								$('#descriptionBat').text('打擊率 = 安打數 / 打數');
 								// 兩階段sorting - 先過濾打席是否足額
 								threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
 								if(a.pa >= threshold && b.pa < threshold)
@@ -182,7 +182,7 @@
 								}
 							}
 							function OBPSorter(a, b) {
-								$('#description').text('上壘率 = 安打數 + 四死球 / 打席');
+								$('#descriptionBat').text('上壘率 = 安打數 + 四死球 / 打席');
 								// 兩階段sorting - 先過濾打席是否足額
 								threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
 								if(a.pa >= threshold && b.pa < threshold)
@@ -197,7 +197,7 @@
 								}
 							}
 							function SLGSorter(a, b) {
-								$('#description').text('長打率 = 壘打數 / 打數');
+								$('#descriptionBat').text('長打率 = 壘打數 / 打數');
 								// 兩階段sorting - 先過濾打席是否足額
 								threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
 								if(a.pa >= threshold && b.pa < threshold)
@@ -212,7 +212,7 @@
 								}
 							}
 							function OPSSorter(a, b) {
-								$('#description').text('整體攻擊指數 = 上壘率 + 長打率');
+								$('#descriptionBat').text('整體攻擊指數 = 上壘率 + 長打率');
 								// 兩階段sorting - 先過濾打席是否足額
 								threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
 								if(a.pa >= threshold && b.pa < threshold)
@@ -227,7 +227,7 @@
 								}
 							}
 							function TASorter(a, b) {
-								$('#description').text('攻擊指數 = (壘打數 + 盜壘成功數 + 四死球) / (打數 - 安打數 + 雙殺打)');
+								$('#descriptionBat').text('攻擊指數 = (壘打數 + 盜壘成功數 + 四死球) / (打數 - 安打數 + 雙殺打)');
 								// 兩階段sorting - 先過濾打席是否足額
 								threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
 								if(a.pa >= threshold && b.pa < threshold)
@@ -245,31 +245,35 @@
 						<% if @allBatting.size != 0 %>
 							<tbody>
 								<% @allBatting.each do |allBat| %>
-									<tr>
-										<td class="colName">
-											<%= link_to allBat.player_id, controller: "records", action: "batting", player: allBat.player_id, year: @year %>
-										</td>
-										<td class="colG"><%= allBat.G %></td>
-										<td class="colPA"><%= allBat.PA %></td>
-										<td class="colAB"><%= allBat.AB %></td>
-										<td class="colH"><%= allBat.H %></td>
-										<td class="colB2"><%= allBat.B2 %></td>
-										<td class="colB3"><%= allBat.B3 %></td>
-										<td class="colHR"><%= allBat.HR %></td>
-										<td class="colTB"><%= allBat.TB %></td>
-										<td class="colRBI"><%= allBat.RBI %></td>
-										<td class="colR"><%= allBat.R %></td>
-										<td class="colSO"><%= allBat.SO %></td>
-										<td class="colBB"><%= allBat.BB %></td>
-										<td class="colIBB"><%= allBat.IBB %></td>
-										<td class="colSF"><%= allBat.SF %></td>
-										<td class="colE"><%= allBat.E %></td>
-										<td class="colAVG sorting" data-PA="<%= allBat.PA %>" data-AVG="<%= '%.3f' % allBat.AVG %>"><%= '%.3f' % allBat.AVG %></td>
-										<td class="colOBP" data-PA="<%= allBat.PA %>" data-OBP="<%= '%.3f' % allBat.OBP %>"><%= '%.3f' % allBat.OBP %></td>
-										<td class="colSLG" data-PA="<%= allBat.PA %>" data-SLG="<%= '%.3f' % allBat.SLG %>"><%= '%.3f' % allBat.SLG %></td>
-										<td class="colOPS" data-PA="<%= allBat.PA %>" data-OPS="<%= '%.3f' % allBat.OPS %>"><%= '%.3f' % allBat.OPS %></td>
-										<td class="colTA" data-PA="<%= allBat.PA %>" data-TA="<%= '%.3f' % allBat.TA %>"><%= '%.3f' % allBat.TA %></td>
-									</tr>
+									<% if allBat.PA >= @gameNumberInYear[@year.to_s] * @activePLAYER_rate || allBat.PA >= @activePLAYER %>
+										<tr>
+									<% else %>
+										<tr class="nonActive">
+									<% end %>
+											<td class="colName">
+												<%= link_to allBat.player_id, controller: "records", action: "batting", player: allBat.player_id, year: @year %>
+											</td>
+											<td class="colG"><%= allBat.G %></td>
+											<td class="colPA"><%= allBat.PA %></td>
+											<td class="colAB"><%= allBat.AB %></td>
+											<td class="colH"><%= allBat.H %></td>
+											<td class="colB2"><%= allBat.B2 %></td>
+											<td class="colB3"><%= allBat.B3 %></td>
+											<td class="colHR"><%= allBat.HR %></td>
+											<td class="colTB"><%= allBat.TB %></td>
+											<td class="colRBI"><%= allBat.RBI %></td>
+											<td class="colR"><%= allBat.R %></td>
+											<td class="colSO"><%= allBat.SO %></td>
+											<td class="colBB"><%= allBat.BB %></td>
+											<td class="colIBB"><%= allBat.IBB %></td>
+											<td class="colSF"><%= allBat.SF %></td>
+											<td class="colE"><%= allBat.E %></td>
+											<td class="colAVG sorting" data-PA="<%= allBat.PA %>" data-AVG="<%= '%.3f' % allBat.AVG %>"><%= '%.3f' % allBat.AVG %></td>
+											<td class="colOBP" data-PA="<%= allBat.PA %>" data-OBP="<%= '%.3f' % allBat.OBP %>"><%= '%.3f' % allBat.OBP %></td>
+											<td class="colSLG" data-PA="<%= allBat.PA %>" data-SLG="<%= '%.3f' % allBat.SLG %>"><%= '%.3f' % allBat.SLG %></td>
+											<td class="colOPS" data-PA="<%= allBat.PA %>" data-OPS="<%= '%.3f' % allBat.OPS %>"><%= '%.3f' % allBat.OPS %></td>
+											<td class="colTA" data-PA="<%= allBat.PA %>" data-TA="<%= '%.3f' % allBat.TA %>"><%= '%.3f' % allBat.TA %></td>
+										</tr>
 								<% end %>
 							</tbody>
 						<% end %>
@@ -305,77 +309,561 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>Active</td>
-								<td><%= @allBattingSummary_M.PA %></td>
-								<td><%= @allBattingSummary_M.AB %></td>
-								<td><%= @allBattingSummary_M.H %></td>
-								<td><%= @allBattingSummary_M.B2 %></td>
-								<td><%= @allBattingSummary_M.B3 %></td>
-								<td><%= @allBattingSummary_M.HR %></td>
-								<td><%= @allBattingSummary_M.TB %></td>
-								<td><%= @allBattingSummary_M.RBI %></td>
-								<td><%= @allBattingSummary_M.R %></td>
-								<td><%= @allBattingSummary_M.SO %></td>
-								<td><%= @allBattingSummary_M.BB %></td>
-								<td><%= @allBattingSummary_M.IBB %></td>
-								<td><%= @allBattingSummary_M.SF %></td>
-								<td><%= @allBattingSummary_M.E %></td>
-								<td><%= '%.3f' % @allBattingSummary_M.AVG %></td>
-								<td><%= '%.3f' % @allBattingSummary_M.OBP %></td>
-								<td><%= '%.3f' % @allBattingSummary_M.SLG %></td>
-								<td><%= '%.3f' % @allBattingSummary_M.OPS %></td>
-								<td><%= '%.3f' % @allBattingSummary_M.TA %></td>
-							</tr>
-							<tr>
-								<td>Non-Active</td>
-								<td><%= @allBattingSummary_nM.PA %></td>
-								<td><%= @allBattingSummary_nM.AB %></td>
-								<td><%= @allBattingSummary_nM.H %></td>
-								<td><%= @allBattingSummary_nM.B2 %></td>
-								<td><%= @allBattingSummary_nM.B3 %></td>
-								<td><%= @allBattingSummary_nM.HR %></td>
-								<td><%= @allBattingSummary_nM.TB %></td>
-								<td><%= @allBattingSummary_nM.RBI %></td>
-								<td><%= @allBattingSummary_nM.R %></td>
-								<td><%= @allBattingSummary_nM.SO %></td>
-								<td><%= @allBattingSummary_nM.BB %></td>
-								<td><%= @allBattingSummary_nM.IBB %></td>
-								<td><%= @allBattingSummary_nM.SF %></td>
-								<td><%= @allBattingSummary_nM.E %></td>
-								<td><%= '%.3f' % @allBattingSummary_nM.AVG %></td>
-								<td><%= '%.3f' % @allBattingSummary_nM.OBP %></td>
-								<td><%= '%.3f' % @allBattingSummary_nM.SLG %></td>
-								<td><%= '%.3f' % @allBattingSummary_nM.OPS %></td>
-								<td><%= '%.3f' % @allBattingSummary_nM.TA %></td>
-							</tr>
+							<% if @allBattingSummary_M.PA != nil %>
+								<tr>
+									<td>Active</td>
+									<td><%= @allBattingSummary_M.PA %></td>
+									<td><%= @allBattingSummary_M.AB %></td>
+									<td><%= @allBattingSummary_M.H %></td>
+									<td><%= @allBattingSummary_M.B2 %></td>
+									<td><%= @allBattingSummary_M.B3 %></td>
+									<td><%= @allBattingSummary_M.HR %></td>
+									<td><%= @allBattingSummary_M.TB %></td>
+									<td><%= @allBattingSummary_M.RBI %></td>
+									<td><%= @allBattingSummary_M.R %></td>
+									<td><%= @allBattingSummary_M.SO %></td>
+									<td><%= @allBattingSummary_M.BB %></td>
+									<td><%= @allBattingSummary_M.IBB %></td>
+									<td><%= @allBattingSummary_M.SF %></td>
+									<td><%= @allBattingSummary_M.E %></td>
+									<td><%= '%.3f' % @allBattingSummary_M.AVG %></td>
+									<td><%= '%.3f' % @allBattingSummary_M.OBP %></td>
+									<td><%= '%.3f' % @allBattingSummary_M.SLG %></td>
+									<td><%= '%.3f' % @allBattingSummary_M.OPS %></td>
+									<td><%= '%.3f' % @allBattingSummary_M.TA %></td>
+								</tr>
+							<% end %>
+							<% if @allBattingSummary_nM.PA != nil %>
+								<tr>
+									<td>Non-Active</td>
+									<td><%= @allBattingSummary_nM.PA %></td>
+									<td><%= @allBattingSummary_nM.AB %></td>
+									<td><%= @allBattingSummary_nM.H %></td>
+									<td><%= @allBattingSummary_nM.B2 %></td>
+									<td><%= @allBattingSummary_nM.B3 %></td>
+									<td><%= @allBattingSummary_nM.HR %></td>
+									<td><%= @allBattingSummary_nM.TB %></td>
+									<td><%= @allBattingSummary_nM.RBI %></td>
+									<td><%= @allBattingSummary_nM.R %></td>
+									<td><%= @allBattingSummary_nM.SO %></td>
+									<td><%= @allBattingSummary_nM.BB %></td>
+									<td><%= @allBattingSummary_nM.IBB %></td>
+									<td><%= @allBattingSummary_nM.SF %></td>
+									<td><%= @allBattingSummary_nM.E %></td>
+									<td><%= '%.3f' % @allBattingSummary_nM.AVG %></td>
+									<td><%= '%.3f' % @allBattingSummary_nM.OBP %></td>
+									<td><%= '%.3f' % @allBattingSummary_nM.SLG %></td>
+									<td><%= '%.3f' % @allBattingSummary_nM.OPS %></td>
+									<td><%= '%.3f' % @allBattingSummary_nM.TA %></td>
+								</tr>
+							<% end %>
 						</tbody>
 						<tfoot>
-							<tr>
-								<td>Total</td>
-								<td><%= @allBattingSummary_all.PA %></td>
-								<td><%= @allBattingSummary_all.AB %></td>
-								<td><%= @allBattingSummary_all.H %></td>
-								<td><%= @allBattingSummary_all.B2 %></td>
-								<td><%= @allBattingSummary_all.B3 %></td>
-								<td><%= @allBattingSummary_all.HR %></td>
-								<td><%= @allBattingSummary_all.TB %></td>
-								<td><%= @allBattingSummary_all.RBI %></td>
-								<td><%= @allBattingSummary_all.R %></td>
-								<td><%= @allBattingSummary_all.SO %></td>
-								<td><%= @allBattingSummary_all.BB %></td>
-								<td><%= @allBattingSummary_all.IBB %></td>
-								<td><%= @allBattingSummary_all.SF %></td>
-								<td><%= @allBattingSummary_all.E %></td>
-								<td><%= '%.3f' % @allBattingSummary_all.AVG %></td>
-								<td><%= '%.3f' % @allBattingSummary_all.OBP %></td>
-								<td><%= '%.3f' % @allBattingSummary_all.SLG %></td>
-								<td><%= '%.3f' % @allBattingSummary_all.OPS %></td>
-								<td><%= '%.3f' % @allBattingSummary_all.TA %></td>
-							</tr>
+							<% if @allBattingSummary_all.PA != nil %>
+								<tr>
+									<td>Total</td>
+									<td><%= @allBattingSummary_all.PA %></td>
+									<td><%= @allBattingSummary_all.AB %></td>
+									<td><%= @allBattingSummary_all.H %></td>
+									<td><%= @allBattingSummary_all.B2 %></td>
+									<td><%= @allBattingSummary_all.B3 %></td>
+									<td><%= @allBattingSummary_all.HR %></td>
+									<td><%= @allBattingSummary_all.TB %></td>
+									<td><%= @allBattingSummary_all.RBI %></td>
+									<td><%= @allBattingSummary_all.R %></td>
+									<td><%= @allBattingSummary_all.SO %></td>
+									<td><%= @allBattingSummary_all.BB %></td>
+									<td><%= @allBattingSummary_all.IBB %></td>
+									<td><%= @allBattingSummary_all.SF %></td>
+									<td><%= @allBattingSummary_all.E %></td>
+									<td><%= '%.3f' % @allBattingSummary_all.AVG %></td>
+									<td><%= '%.3f' % @allBattingSummary_all.OBP %></td>
+									<td><%= '%.3f' % @allBattingSummary_all.SLG %></td>
+									<td><%= '%.3f' % @allBattingSummary_all.OPS %></td>
+									<td><%= '%.3f' % @allBattingSummary_all.TA %></td>
+								</tr>
+							<% end %>
 						</tfoot>
 					</table>
 				</div>
+			<% elsif @player == "pk" %>
+				<h4><%= @player1 %> (<%= @year1 == "Wildcard"? ("不分年度"):(@year1) %>) vs. <%= @player2 %> (<%= @year2 == "Wildcard"? ("不分年度"):(@year2) %>)</h4>
+				<br/>
+				<div class="col-sm-4">
+					<div class="table-responsive" id="div_batting_vs1">
+						<table class="table table-condensed" id="table_batting_vs1">
+							<thead>
+								<tr>
+									<th><%= @player1 %><br/>(<%= @year1 == "Wildcard"? ("不分年度"):(@year1) %>)</th>
+									<th></th>
+									<th><%= @player2 %><br/>(<%= @year2 == "Wildcard"? ("不分年度"):(@year2) %>)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="pk_value <%= (@player1_batting.G > @player2_batting.G)? 'win':'' %>"><%= @player1_batting.G %></td>
+									<td class="middleTitle">場次</td>
+									<td class="pk_value <%= (@player1_batting.G < @player2_batting.G)? 'win':'' %>"><%= @player2_batting.G %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.PA > @player2_batting.PA)? 'win':'' %>"><%= @player1_batting.PA %></td>
+									<td class="middleTitle">總打席</td>
+									<td class="<%= (@player1_batting.PA < @player2_batting.PA)? 'win':'' %>"><%= @player2_batting.PA %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.AB > @player2_batting.AB)? 'win':'' %>"><%= @player1_batting.AB %></td>
+									<td class="middleTitle">總打數</td>
+									<td class="<%= (@player1_batting.AB < @player2_batting.AB)? 'win':'' %>"><%= @player2_batting.AB %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.H > @player2_batting.H)? 'win':'' %>"><%= @player1_batting.H %></td>
+									<td class="middleTitle">安打</td>
+									<td class="<%= (@player1_batting.H < @player2_batting.H)? 'win':'' %>"><%= @player2_batting.H %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.B2 > @player2_batting.B2)? 'win':'' %>"><%= @player1_batting.B2 %></td>
+									<td class="middleTitle">二壘</td>
+									<td class="<%= (@player1_batting.B2 < @player2_batting.B2)? 'win':'' %>"><%= @player2_batting.B2 %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.B3 > @player2_batting.B3)? 'win':'' %>"><%= @player1_batting.B3 %></td>
+									<td class="middleTitle">三壘</td>
+									<td class="<%= (@player1_batting.B3 < @player2_batting.B3)? 'win':'' %>"><%= @player2_batting.B3 %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.HR > @player2_batting.HR)? 'win':'' %>"><%= @player1_batting.HR %></td>
+									<td class="middleTitle">全壘</td>
+									<td class="<%= (@player1_batting.HR < @player2_batting.HR)? 'win':'' %>"><%= @player2_batting.HR %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.TB > @player2_batting.TB)? 'win':'' %>"><%= @player1_batting.TB %></td>
+									<td class="middleTitle">壘打數</td>
+									<td class="<%= (@player1_batting.TB < @player2_batting.TB)? 'win':'' %>"><%= @player2_batting.TB %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.RBI > @player2_batting.RBI)? 'win':'' %>"><%= @player1_batting.RBI %></td>
+									<td class="middleTitle">打點</td>
+									<td class="<%= (@player1_batting.RBI < @player2_batting.RBI)? 'win':'' %>"><%= @player2_batting.RBI %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.R > @player2_batting.R)? 'win':'' %>"><%= @player1_batting.R %></td>
+									<td class="middleTitle">得分</td>
+									<td class="<%= (@player1_batting.R < @player2_batting.R)? 'win':'' %>"><%= @player2_batting.R %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.SO > @player2_batting.SO)? 'win':'' %>"><%= @player1_batting.SO %></td>
+									<td class="middleTitle">三振</td>
+									<td class="<%= (@player1_batting.SO < @player2_batting.SO)? 'win':'' %>"><%= @player2_batting.SO %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.BB > @player2_batting.BB)? 'win':'' %>"><%= @player1_batting.BB %></td>
+									<td class="middleTitle">四壞</td>
+									<td class="<%= (@player1_batting.BB < @player2_batting.BB)? 'win':'' %>"><%= @player2_batting.BB %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.IBB > @player2_batting.IBB)? 'win':'' %>"><%= @player1_batting.IBB %></td>
+									<td class="middleTitle">故意</td>
+									<td class="<%= (@player1_batting.IBB < @player2_batting.IBB)? 'win':'' %>"><%= @player2_batting.IBB %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.SF > @player2_batting.SF)? 'win':'' %>"><%= @player1_batting.SF %></td>
+									<td class="middleTitle">犧牲</td>
+									<td class="<%= (@player1_batting.SF < @player2_batting.SF)? 'win':'' %>"><%= @player2_batting.SF %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.E > @player2_batting.E)? 'win':'' %>"><%= @player1_batting.E %></td>
+									<td class="middleTitle">因失誤上壘</td>
+									<td class="<%= (@player1_batting.E < @player2_batting.E)? 'win':'' %>"><%= @player2_batting.E %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.AVG > @player2_batting.AVG)? 'win':'' %>"><%= '%.3f' % @player1_batting.AVG %></td>
+									<td class="middleTitle">打擊率</td>
+									<td class="<%= (@player1_batting.AVG < @player2_batting.AVG)? 'win':'' %>"><%= '%.3f' % @player2_batting.AVG %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.OBP > @player2_batting.OBP)? 'win':'' %>"><%= '%.3f' % @player1_batting.OBP %></td>
+									<td class="middleTitle">上壘率</td>
+									<td class="<%= (@player1_batting.OBP < @player2_batting.OBP)? 'win':'' %>"><%= '%.3f' % @player2_batting.OBP %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.SLG > @player2_batting.SLG)? 'win':'' %>"><%= '%.3f' % @player1_batting.SLG %></td>
+									<td class="middleTitle">長打率</td>
+									<td class="<%= (@player1_batting.SLG < @player2_batting.SLG)? 'win':'' %>"><%= '%.3f' % @player2_batting.SLG %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.OPS > @player2_batting.OPS)? 'win':'' %>"><%= '%.3f' % @player1_batting.OPS %></td>
+									<td class="middleTitle">整體攻擊指數</td>
+									<td class="<%= (@player1_batting.OPS < @player2_batting.OPS)? 'win':'' %>"><%= '%.3f' % @player2_batting.OPS %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.TA > @player2_batting.TA)? 'win':'' %>"><%= '%.3f' % @player1_batting.TA %></td>
+									<td class="middleTitle">攻擊指數</td>
+									<td class="<%= (@player1_batting.TA < @player2_batting.TA)? 'win':'' %>"><%= '%.3f' % @player2_batting.TA %></td>
+								</tr>
+								<tr>
+									<td class="<%= (@player1_batting.SILVER > @player2_batting.SILVER)? 'win':'' %>"><%= '%.1f' % @player1_batting.SILVER %></td>
+									<td class="middleTitle">銀棒指數</td>
+									<td class="<%= (@player1_batting.SILVER < @player2_batting.SILVER)? 'win':'' %>"><%= '%.1f' % @player2_batting.SILVER %></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive" id="div_batting_vs2">
+						<table class="table table-condensed" id="table_batting_vs2">
+							<thead>
+								<tr>
+									<th><%= @player1 %><br/>(<%= @year1 == "Wildcard"? ("不分年度"):(@year1) %>)</th>
+									<th></th>
+									<th><%= @player2 %><br/>(<%= @year2 == "Wildcard"? ("不分年度"):(@year2) %>)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="pk_value"></td>
+									<td class="middleTitle">每場三打席</td>
+									<td class="pk_value"></td>
+								</tr>
+								<tr>
+									<td><%= '%.3f' % (@player1_batting.PA * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">總打席</td>
+									<td><%= '%.3f' % (@player2_batting.PA * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.AB * 3.0 / @player1_batting.PA) > (@player2_batting.AB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.AB * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">總打數</td>
+									<td class="<%= ((@player1_batting.AB * 3.0 / @player1_batting.PA) < (@player2_batting.AB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.AB * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.H * 3.0 / @player1_batting.PA) > (@player2_batting.H * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.H * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">安打</td>
+									<td class="<%= ((@player1_batting.H * 3.0 / @player1_batting.PA) < (@player2_batting.H * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.H * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.B2 * 3.0 / @player1_batting.PA) > (@player2_batting.B2 * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.B2 * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">二壘</td>
+									<td class="<%= ((@player1_batting.B2 * 3.0 / @player1_batting.PA) < (@player2_batting.B2 * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.B2 * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.B3 * 3.0 / @player1_batting.PA) > (@player2_batting.B3 * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.B3 * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">三壘</td>
+									<td class="<%= ((@player1_batting.B3 * 3.0 / @player1_batting.PA) < (@player2_batting.B3 * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.B3 * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.HR * 3.0 / @player1_batting.PA) > (@player2_batting.HR * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.HR * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">全壘</td>
+									<td class="<%= ((@player1_batting.HR * 3.0 / @player1_batting.PA) < (@player2_batting.HR * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.HR * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.TB * 3.0 / @player1_batting.PA) > (@player2_batting.TB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.TB * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">壘打數</td>
+									<td class="<%= ((@player1_batting.TB * 3.0 / @player1_batting.PA) < (@player2_batting.TB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.TB * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.RBI * 3.0 / @player1_batting.PA) > (@player2_batting.RBI * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.RBI * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">打點</td>
+									<td class="<%= ((@player1_batting.RBI * 3.0 / @player1_batting.PA) < (@player2_batting.RBI * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.RBI * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.R * 3.0 / @player1_batting.PA) > (@player2_batting.R * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.R * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">得分</td>
+									<td class="<%= ((@player1_batting.R * 3.0 / @player1_batting.PA) < (@player2_batting.R * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.R * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.SO * 3.0 / @player1_batting.PA) > (@player2_batting.SO * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.SO * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">三振</td>
+									<td class="<%= ((@player1_batting.SO * 3.0 / @player1_batting.PA) < (@player2_batting.SO * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.SO * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.BB * 3.0 / @player1_batting.PA) > (@player2_batting.BB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.BB * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">四壞</td>
+									<td class="<%= ((@player1_batting.BB * 3.0 / @player1_batting.PA) < (@player2_batting.BB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.BB * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.IBB * 3.0 / @player1_batting.PA) > (@player2_batting.IBB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.IBB * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">故意</td>
+									<td class="<%= ((@player1_batting.IBB * 3.0 / @player1_batting.PA) < (@player2_batting.IBB * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.IBB * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.SF * 3.0 / @player1_batting.PA) > (@player2_batting.SF * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.SF * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">犧牲</td>
+									<td class="<%= ((@player1_batting.SF * 3.0 / @player1_batting.PA) < (@player2_batting.SF * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.SF * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+								<tr>
+									<td class="<%= ((@player1_batting.E * 3.0 / @player1_batting.PA) > (@player2_batting.E * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player1_batting.E * 3.0 / @player1_batting.PA) %></td>
+									<td class="middleTitle">因失誤上壘</td>
+									<td class="<%= ((@player1_batting.E * 3.0 / @player1_batting.PA) < (@player2_batting.E * 3.0 / @player2_batting.PA))? 'win':'' %>"><%= '%.3f' % (@player2_batting.E * 3.0 / @player2_batting.PA) %></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			<% else %>
+				<h4><%= @player %></h4>
+				<br/>
+				<h4><%= @year == "Wildcard"? ("不分"):(@year) %>年度 <%= @cup %> 統計資料</h4>
+				<br/>
+				<div class="table-responsive" id="div_batting_player">
+					<table class="table table-condensed" id="table_batting_player">
+						<thead>
+							<tr>
+								<th>G<br/>場次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+								<th>SSI<br/>銀棒指數</th>
+							</tr>
+						</thead>
+						<% if @playerBattingSummary.PA != nil %>
+							<tbody>
+								<tr>
+									<td><%= @playerBattingSummary.G %></td>
+									<td><%= @playerBattingSummary.PA %></td>
+									<td><%= @playerBattingSummary.AB %></td>
+									<td><%= @playerBattingSummary.H %></td>
+									<td><%= @playerBattingSummary.B2 %></td>
+									<td><%= @playerBattingSummary.B3 %></td>
+									<td><%= @playerBattingSummary.HR %></td>
+									<td><%= @playerBattingSummary.TB %></td>
+									<td><%= @playerBattingSummary.RBI %></td>
+									<td><%= @playerBattingSummary.R %></td>
+									<td><%= @playerBattingSummary.SO %></td>
+									<td><%= @playerBattingSummary.BB %></td>
+									<td><%= @playerBattingSummary.IBB %></td>
+									<td><%= @playerBattingSummary.SF %></td>
+									<td><%= @playerBattingSummary.E %></td>
+									<td><%= '%.3f' % @playerBattingSummary.AVG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingSummary.OBP.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingSummary.SLG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingSummary.OPS.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingSummary.TA.round(3) %></td>
+									<td><%= '%.1f' % @playerBattingSummary.SILVER.round(1) %></td>
+								</tr>
+							</tbody>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>平均三打席表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_batting_player3PA">
+					<table class="table table-condensed" id="table_batting_player3PA">
+						<thead>
+							<tr>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+							</tr>
+						</thead>
+						<% if @playerBattingSummary.PA != nil %>
+							<tbody>
+								<tr>
+									<td><%= '%.3f' % (@playerBattingSummary.PA * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.AB * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.H * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.B2 * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.B3 * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.HR * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.TB * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.RBI * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.R * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.SO * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.BB * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.IBB * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.SF * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerBattingSummary.E * 3.0 / @playerBattingSummary.PA).round(3) %></td>
+								</tr>
+							</tbody>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>打擊長條圖</h4>
+				<br/>
+				<div class="table-responsive" id="div_batting_Graph">
+					<div id="bar-chart">
+						<div class="y-title">
+							打<br/>擊<br/>率
+						</div>
+						<div class="graph">
+							<ul class="x-axis">
+								<li><span>個 人 出 賽 場 次</span></li>
+							</ul>
+							<ul class="y-axis">
+								<li><span>1.000</span></li>
+								<li><span>0.750</span></li>
+								<li><span>0.500</span></li>
+								<li><span>0.250</span></li>
+								<li><span>0.000</span></li>
+							</ul>
+							<div class="bars">
+								<div class="bar-group">
+									<% if @AVGData.size != 0 %>
+										<% @AVGData.each do |avgData| %>
+											<div class="bar bar-<%= avgData[0] + 1 %> stat" data-height="<%= '%.3f' % avgData[1] %>" style="height: <%= '%.2f' % (avgData[1] * 100.0) %>%;" data-toggle="tooltip" title="<%= '%.3f' % avgData[1] %>">
+												<span><%= '%.3f' % avgData[1] %></span>
+											</div>
+										<% end %>
+									<% end %>
+								</div>
+							</div>
+						</div>
+						<div class="graphSummary">
+							<% if @AVGData.size != 0 %>
+								Max : <%= '%.3f' % @AVG_Max.round(3) %><br/>
+								Cur : <%= '%.3f' % @AVGData[@AVGData.size - 1][1].round(3) %><br/>
+								Min : <%= '%.3f' % @AVG_Min.round(3) %>
+							<% else %>
+								Max:0.000<br/>
+								Cur:0.000<br/>
+								Min:0.000
+							<% end %>
+						</div>
+					</div>
+				</div>
+				<script>
+					$(function () {
+						$('[data-toggle="tooltip"]').tooltip()
+					})
+					$(window).on('load resize', function(){
+						$('.stat').each(function(){
+							dataHeight = $(this).attr('data-height');
+							red_index = parseInt(255 * dataHeight);
+							green_index = parseInt(255 * (1 - dataHeight));
+							color_light = "rgba(" + red_index + "," + green_index + ",0,1)";
+							color_dark = "rgba(" + red_index + "," + green_index + ",0,0.8)";
+							
+							$(this).css({
+								background: "-webkit-linear-gradient(left, " + color_light + " 0%, " + color_light + " 47%, " + color_dark + " 50%, " + color_dark + " 100%)"
+							});
+							$(this).css({
+								'background-image': "linear-gradient(to right, " + color_light + " 0%, " + color_light + " 47%, " + color_dark + " 50%, " + color_dark + " 100%)"
+							});
+						});
+						
+						for(i = 1 ; i <= <%= @AVGData.size %> ; i++){
+							$('.bar-'+i).css({
+								'animation-delay': (0.1 + 0.02 * i).toString() + 's',
+								'-webkit-animation-delay': (0.1 + 0.02 * i).toString() + 's'
+							});
+							if(i >= 2){
+								$('.bar:nth-child('+i+')').css({
+									left: (15 * (i - 1)).toString() + '%' 
+								});
+							}
+						}
+						if(<%= @AVGData.size %> >= 2)
+							graphLength = parseInt($('.bar:last-child').css('left')) + 40;
+						else
+							graphLength = 40;
+						
+						$('.x-axis').css({
+							width: graphLength,
+							'min-width': '100%'
+						});
+						$('.y-axis').css({
+							width: graphLength,
+							'min-width': '100%'
+						});
+						$('.graphSummary').css('left',graphLength);
+						summaryHeight = parseInt($('.bars').height() * (1- $('.bar:last-child').attr('data-height'))) - 30;
+						$('.graphSummary').css('top',summaryHeight);
+					});
+				</script>
+				<br/>
+				<h4><%= @year == "Wildcard"? ("不分"):(@year) %>年度 <%= @cup %> 詳細資料</h4>
+				<br/>
+				<div class="table-responsive" id="div_batting_playerDetail">
+					<table class="table table-striped table-condensed" id="table_batting_playerDetail">
+						<thead>
+							<tr>
+								<th>G<br/>場次</th>
+								<th>PA<br/>打席</th>
+								<th>AB<br/>打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>CAVG<br/>累積打擊率</th>
+								<th>COBP<br/>累積上壘率</th>
+								<th>CSLG<br/>累積長打率</th>
+								<th>COPS<br/>累積整體攻擊指數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerBattingForGraph.size != 0 %>
+								<% @playerBattingForGraph.each_with_index do |detail, index| %>
+									<tr>
+										<td><%= link_to detail.game_id, controller: "records", action: "game", game_id: detail.game_id %></td>
+										<td><%= detail.PA %></td>
+										<td><%= detail.AB %></td>
+										<td><%= detail.H %></td>
+										<td><%= detail.B2 %></td>
+										<td><%= detail.B3 %></td>
+										<td><%= detail.HR %></td>
+										<td><%= detail.TB %></td>
+										<td><%= detail.RBI %></td>
+										<td><%= detail.R %></td>
+										<td><%= detail.SO %></td>
+										<td><%= detail.BB %></td>
+										<td><%= detail.IBB %></td>
+										<td><%= detail.SF %></td>
+										<td><%= detail.E %></td>
+										<td><%= '%.3f' % detail.AVG.round(3) %></td>
+										<td><%= '%.3f' % detail.OBP.round(3) %></td>
+										<td><%= '%.3f' % detail.SLG.round(3) %></td>
+										<td><%= '%.3f' % detail.OPS.round(3) %></td>
+										<td><%= '%.3f' % @AVGData[index][1].round(3) %></td>
+										<td><%= '%.3f' % @OBPData[index][1].round(3) %></td>
+										<td><%= '%.3f' % @SLGData[index][1].round(3) %></td>
+										<td><%= '%.3f' % @OPSData[index][1].round(3) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				
 			<% end %>
         </div>
         <!--/col-span-9-->

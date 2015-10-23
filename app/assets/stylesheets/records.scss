@@ -13,6 +13,11 @@
 #records * h1, #records * h2, #records * h3, #records * h4{
 	
 	margin: 0 0;
+	text-transform: none;
+}
+
+#records * div.table-responsive{
+	border-radius: 5px;
 }
 
 #records_sidebar{
@@ -31,12 +36,27 @@
 	vertical-align: middle;
 }
 
-#table_game_oneyear > thead > tr > th, #table_batting_all_summary > thead > tr > th{
+#table_game_oneyear > thead > tr > th,
+#table_batting_all_summary > thead > tr > th,
+#table_batting_vs1 > thead > tr > th,
+#table_batting_vs2 > thead > tr > th,
+#table_batting_player > thead > tr > th,
+#table_batting_player3PA > thead > tr > th,
+#table_batting_playerDetail > thead > tr > th,
+#table_pitching_all_summary > thead > tr > th,
+#table_pitching_all_IP > thead > tr > th,
+#table_pitching_player > thead > tr > th,
+#table_pitching_playerIP > thead > tr > th,
+#table_pitching_playerDetail > thead > tr > th,
+#table_pitching_playerEachYear > thead > tr > th{
 	
 	background:rgba(192,192,192,0.7);
 }
 
-#div_game_oneyear{
+#div_game_oneyear,
+#div_batting_playerDetail,
+#div_pitching_playerDetail,
+#div_pitching_playerEachYear{
 	
 	border: 1px solid #e3e3e3;
 	border-radius: 5px;
@@ -71,7 +91,18 @@ img.teamLogo{
 #table_game_pitchingHome > thead > tr > th, #table_game_pitchingHome > tbody > tr > td, #table_game_pitchingHome > tfoot > tr > td,
 #table_game_fieldingAway > thead > tr > th, #table_game_fieldingAway > tbody > tr > td, #table_game_fieldingAway > tfoot > tr > td,
 #table_game_fieldingHome > thead > tr > th, #table_game_fieldingHome > tbody > tr > td, #table_game_fieldingHome > tfoot > tr > td,
-#table_batting_all_summary > thead > tr > th, #table_batting_all_summary > tbody > tr > td, #table_batting_all_summary > tfoot > tr > td{
+#table_batting_all_summary > thead > tr > th, #table_batting_all_summary > tbody > tr > td, #table_batting_all_summary > tfoot > tr > td,
+#table_batting_vs1 > thead > tr > th, #table_batting_vs1 > tbody > tr > td,
+#table_batting_vs2 > thead > tr > th, #table_batting_vs2 > tbody > tr > td,
+#table_batting_player > thead > tr > th, #table_batting_player > tbody > tr > td,
+#table_batting_player3PA > thead > tr > th, #table_batting_player3PA > tbody > tr > td,
+#table_batting_playerDetail > thead > tr > th, #table_batting_playerDetail > tbody > tr > td,
+#table_pitching_all_summary > thead > tr > th, #table_pitching_all_summary > tbody > tr > td,
+#table_pitching_all_IP > thead > tr > th, #table_pitching_all_IP > tbody > tr > td,
+#table_pitching_player > thead > tr > th, #table_pitching_player > tbody > tr > td,
+#table_pitching_playerIP > thead > tr > th, #table_pitching_playerIP > tbody > tr > td,
+#table_pitching_playerDetail > thead > tr > th, #table_pitching_playerDetail > tbody > tr > td,
+#table_pitching_playerEachYear > thead > tr > th, #table_pitching_playerEachYear > tbody > tr > td{
 	
 	text-align: center;
 	vertical-align: middle;
@@ -112,33 +143,261 @@ img.teamLogo{
 	display:none;
 }
 
-#wrapperForScrollbar{
+.wrapperForScrollbar{
 	border: none;
 	overflow-x: auto;
 	overflow-y:hidden;
 	height:20px;
 }
 
-#fakeContentForScrollBar{
+.fakeContentForScrollBar{
 	height:20px;
 	overflow:auto;
 }
 
 .sorting{
 	
-	background-color:lightblue !important;
+	background-color:rgba(173,216,230,0.7) !important;
 }
 
-#table_batting_all * a{
+#table_batting_all * a, #table_pitching_all * a, #table_pitching_allInYear * a{
 	
 	color: blue;
 }
 
-#table_batting_all * a:hover{
+#table_batting_all * a:hover, #table_pitching_all * a:hover, #table_pitching_allInYear * a:hover{
 	
 	color: #1D9B6C;
 }
 
-#table_batting_all tbody tr:hover td, #table_batting_all tbody tr:hover th {
-  background-color: #dcdcdc;
+#table_batting_all tbody tr:hover td, #table_batting_all tbody tr:hover th,
+#table_pitching_all tbody tr:hover td, #table_pitching_all tbody tr:hover th,
+#table_pitching_allInYear tbody tr:hover td, #table_pitching_allInYear tbody tr:hover th{
+  background-color: #FFB732;
+  //color:white;
+}
+
+tr.nonActive{
+	background-color: rgb(230,230,230) !important;
+}
+
+td.middleTitle{
+	background:rgba(235,235,235,0.7);
+	width: 30%;
+}
+
+td.pk_value{
+	width: 35%;
+} 
+
+td.win{
+	background:rgba(173,216,230,0.7);
+}
+
+#table_batting_player > tbody > tr > td,
+#table_batting_player3PA > tbody > tr > td,
+#table_pitching_all_summary > tbody > tr > td,
+#table_pitching_player > tbody > tr > td,
+#table_pitching_playerIP > tbody > tr > td{	
+	background:rgba(235,235,235,0.7);
+}
+
+#table_pitching_all_IP > tbody > tr > td,
+#table_pitching_playerIP > tbody > tr > td{	
+	white-space: nowrap;
+}
+
+/*/////////// Bar Chart /////////////*/
+
+// VARIABLES
+$default-delay: .2s;
+$bars: 15;
+$graph-height: 303px;
+
+// MIXINS
+
+// Animation Mixin 
+@mixin bar-animation($time, $dimension) {
+  visibility: hidden;
+  @if $dimension == width {
+    width: 0;
+    -webkit-animation: animate-width; 
+    -moz-animation: animate-width;
+    animation: animate-width;
+  }
+  @if $dimension == height {
+    height: 0;
+    -webkit-animation: animate-height; 
+    -moz-animation: animate-height;
+    animation: animate-height;
+  }
+  animation-timing-function: cubic-bezier(.35,.95,.67,.99);
+  -webkit-animation-timing-function: cubic-bezier(.35,.95,.67,.99);
+  -moz-animation-timing-function: cubic-bezier(.35,.95,.67,.99);
+  animation-duration: $time*2;
+  -webkit-animation-duration: $time*2;
+  -moz-animation-duration: $time*2;
+  animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes animate-width {
+  0% {
+    width: 0;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+@-moz-keyframes animate-width {
+  0% {
+    width: 0;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+@keyframes animate-width {
+  0% {
+    width: 0;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+@-webkit-keyframes animate-height {
+  0% {
+    height: 0;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+@-moz-keyframes animate-height {
+  0% {
+    height: 0;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+@keyframes animate-height {
+  0% {
+    height: 0;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+
+//STYLES
+
+#bar-chart {
+  height: 400px;
+  width: 70%;
+  position: relative;
+  margin: 50px auto 0 100px;
+  * {
+   box-sizing: border-box; 
+  }
+  .graph {
+    height: 333px;
+    position: relative; 
+  }
+  .bars {
+    height: $graph-height;
+    padding: 0 2%;
+    position: absolute;
+    width: 100%;
+    z-index: 10; 
+  }
+  .bar-group {
+    display: block;
+    float: left;
+    height: 100%;
+    position: relative;
+    width: 12%;
+    margin-right: 10%;
+    &:last-child {
+		margin-right: 0; 
+    }
+    .bar {
+      @include bar-animation($default-delay, height);
+      box-shadow: 1px 0 2px rgba(0,0,0,.15);
+      border: 1px solid #2d2d2d; 
+      border-radius: 3px 3px 0 0;
+      bottom: 0;
+      cursor: pointer;
+      height: 0;
+      position: absolute;
+      text-align: center;
+      width: 10%;
+      span {
+       display: none; 
+      }
+    }
+    
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .x-axis {
+    bottom: 0;
+    position: absolute;
+    text-align: center;
+	white-space: nowrap;
+    //width: 100%;
+    li {
+      float: left;
+      //margin-right: 10.5%;
+      font-size: 14px;
+      width: 100%;
+	  text-align: center;
+    }
+  }
+  .y-axis {
+    position: absolute;
+    text-align: right;
+    //width: 100%;
+	li {
+      border-top: 1px solid #4e5464;
+      display: block;
+      height: $graph-height/4;
+	  //width: 100%;
+      span {
+        display: block;
+        font-size: 14px;
+        margin: -10px 0 0 -60px;
+        padding: 0 10px;
+        width: 40px;  
+      }
+    }
+  }
+  .y-title{
+	  width: 30px;
+	  height: 100%;
+	  position:absolute;
+	  left: -85px;
+	  text-align: center;
+	  font-size: 14px;
+	  line-height:100px;
+  }
+  
+  .graphSummary{
+	  margin-left: -5px;
+	  padding: 0 15px 0 5px;
+	  width: auto;
+	  height: auto;
+	  background:rgba(255,255,255,1);
+	  position:absolute;
+	  white-space: nowrap;
+	  
+  }
+}
+
+#div_batting_Graph{
+	
+	height: 450px;
 }

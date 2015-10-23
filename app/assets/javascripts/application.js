@@ -17,4 +17,5 @@
 //= require jquery_ujs
 //= require "bootstrap-table/bootstrap-table.js"
 //= require "bootstrap-table/bootstrap-table-zh-TW.js"
+//= require "bootstrap-switch/bootstrap-switch.js"
 //= require_tree ./common

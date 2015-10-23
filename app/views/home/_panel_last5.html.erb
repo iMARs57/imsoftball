@@ -11,7 +11,7 @@
 <tbody>
     <% panel_last5.each do |game| %>
     <tr>	
-        <td><%= game.game_id %></td>
+        <td><%= link_to game.game_id, controller: "records", action: "game", game_id: game.game_id %></td>
         <td><%= game.cup_name %></td>
     	<td><%= game.teamAway_name %></td>
     	<td><%= game.teamHome_name %></td>
