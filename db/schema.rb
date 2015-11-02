@@ -11,168 +11,156 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150912030523) do
+ActiveRecord::Schema.define(version: 0) do
 
   create_table "battings", id: false, force: :cascade do |t|
-    t.text    "game_id",   null: false
-    t.text    "player_id", null: false
-    t.text    "team_id",   null: false
-    t.integer "AB"
-    t.integer "R"
-    t.integer "H"
-    t.integer "B2"
-    t.integer "B3"
-    t.integer "HR"
-    t.integer "RBI"
-    t.integer "BB"
-    t.integer "SO"
-    t.integer "IBB"
-    t.integer "SF"
-    t.integer "E"
-    t.integer "GIDP"
-    t.integer "order",     null: false
+    t.string  "game_id",   limit: 5,              null: false
+    t.string  "player_id", limit: 16,             null: false
+    t.string  "team_id",   limit: 8,              null: false
+    t.integer "AB",        limit: 4
+    t.integer "R",         limit: 4
+    t.integer "H",         limit: 4
+    t.integer "B2",        limit: 4,  default: 0
+    t.integer "B3",        limit: 4,  default: 0
+    t.integer "HR",        limit: 4,  default: 0
+    t.integer "RBI",       limit: 4
+    t.integer "BB",        limit: 4,  default: 0
+    t.integer "SO",        limit: 4,  default: 0
+    t.integer "IBB",       limit: 4,  default: 0
+    t.integer "SF",        limit: 4,  default: 0
+    t.integer "E",         limit: 4,  default: 0
+    t.integer "GIDP",      limit: 4,  default: 0
+    t.integer "order",     limit: 4,  default: 0, null: false
+    t.integer "欄位1",       limit: 4
   end
 
-  add_index "battings", ["game_id", "player_id", "team_id", "order"], name: "sqlite_autoindex_battings_1", unique: true
-  add_index "battings", ["game_id"], name: "game_id"
-  add_index "battings", ["player_id"], name: "battingplayer_id"
-  add_index "battings", ["team_id"], name: "battingteam_id"
+  add_index "battings", ["game_id"], name: "game_id", using: :btree
+  add_index "battings", ["player_id"], name: "player_id", using: :btree
+  add_index "battings", ["team_id"], name: "team_id", using: :btree
 
   create_table "cups", primary_key: "cup_id", force: :cascade do |t|
-    t.text    "cup_name"
-    t.integer "year"
-    t.integer "formal"
-    t.integer "official"
+    t.string  "cup_name", limit: 16
+    t.integer "year",     limit: 4,  default: 0
+    t.boolean "formal",   limit: 1
+    t.boolean "official", limit: 1
   end
 
-  add_index "cups", ["cup_id"], name: "cup_id"
-  add_index "cups", ["cup_id"], name: "sqlite_autoindex_cups_1", unique: true
+  add_index "cups", ["cup_id"], name: "cup_id", using: :btree
 
   create_table "fieldings", id: false, force: :cascade do |t|
-    t.text    "game_id",   null: false
-    t.text    "player_id", null: false
-    t.text    "team_id",   null: false
-    t.text    "POS",       null: false
-    t.integer "InnOuts"
-    t.integer "PO"
-    t.integer "A"
-    t.integer "E"
-    t.integer "K"
+    t.string  "game_id",   limit: 5,   null: false
+    t.string  "player_id", limit: 16,  null: false
+    t.string  "team_id",   limit: 8,   null: false
+    t.string  "POS",       limit: 2,   null: false
+    t.integer "InnOuts",   limit: 4
+    t.integer "PO",        limit: 4
+    t.integer "A",         limit: 4
+    t.integer "E",         limit: 4
+    t.integer "K",         limit: 4
+    t.integer "欄位1",       limit: 4
+    t.string  "欄位2",       limit: 255
   end
 
-  add_index "fieldings", ["game_id", "player_id", "team_id", "POS"], name: "sqlite_autoindex_fieldings_1", unique: true
-  add_index "fieldings", ["game_id"], name: "fieldinggame_id"
-  add_index "fieldings", ["player_id"], name: "player_id"
-  add_index "fieldings", ["team_id"], name: "fieldingteam_id"
+  add_index "fieldings", ["game_id"], name: "game_id", using: :btree
+  add_index "fieldings", ["player_id"], name: "player_id", using: :btree
+  add_index "fieldings", ["team_id"], name: "team_id", using: :btree
 
   create_table "games", primary_key: "game_id", force: :cascade do |t|
-    t.text    "cup_id"
-    t.text    "time"
-    t.text    "home_team_id"
-    t.integer "home_score"
-    t.integer "home_ipouts"
-    t.text    "away_team_id"
-    t.integer "away_score"
-    t.integer "away_ipouts"
-    t.integer "grassfield"
-    t.text    "mvp"
+    t.string   "cup_id",       limit: 4
+    t.datetime "time"
+    t.string   "home_team_id", limit: 8
+    t.integer  "home_score",   limit: 4,  default: 0
+    t.integer  "home_ipouts",  limit: 4,  default: 0
+    t.string   "away_team_id", limit: 8
+    t.integer  "away_score",   limit: 4,  default: 0
+    t.integer  "away_ipouts",  limit: 4,  default: 0
+    t.boolean  "grassfield",   limit: 1,  default: true
+    t.string   "mvp",          limit: 16
   end
 
-  add_index "games", ["cup_id"], name: "gamecup_id"
-  add_index "games", ["game_id"], name: "game_id_1"
-  add_index "games", ["game_id"], name: "sqlite_autoindex_games_1", unique: true
+  add_index "games", ["cup_id"], name: "cup_id", using: :btree
+  add_index "games", ["game_id"], name: "game_id", using: :btree
 
-  create_table "information", force: :cascade do |t|
-    t.date     "date"
-    t.text     "description"
-    t.boolean  "is_public"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+  create_table "information", id: false, force: :cascade do |t|
+    t.integer "id",          limit: 4
+    t.string  "date",        limit: 13
+    t.string  "description", limit: 23
+    t.string  "is_public",   limit: 1
+    t.string  "created_at",  limit: 26
+    t.string  "updated_at",  limit: 26
   end
 
-  create_table "members", force: :cascade do |t|
-    t.string   "member_id"
-    t.integer  "number"
-    t.string   "name"
-    t.date     "birthday"
-    t.string   "birthplaceCH"
-    t.string   "birthplaceEN"
-    t.string   "high_schoolCH"
-    t.string   "high_schoolEN"
-    t.string   "position"
-    t.string   "bats"
-    t.string   "throws"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.integer  "IM_age"
-    t.boolean  "active"
-    t.integer  "leadership"
-  end
-
-  create_table "namecards", force: :cascade do |t|
-    t.string   "name"
-    t.string   "tel"
-    t.string   "address"
-    t.string   "company"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table "members", id: false, force: :cascade do |t|
+    t.string  "id",            limit: 12
+    t.string  "number",        limit: 2
+    t.string  "name",          limit: 3
+    t.string  "nameEN",        limit: 14
+    t.string  "birthday",      limit: 10
+    t.string  "birthplaceCH",  limit: 3
+    t.string  "birthplaceEN",  limit: 14
+    t.string  "high_schoolCH", limit: 10
+    t.string  "high_schoolEN", limit: 43
+    t.string  "position",      limit: 6
+    t.string  "bats",          limit: 1
+    t.string  "throws",        limit: 1
+    t.string  "created_at",    limit: 26
+    t.string  "updated_at",    limit: 26
+    t.integer "IM_age",        limit: 4
+    t.integer "active",        limit: 4
+    t.string  "leadership",    limit: 1
   end
 
   create_table "pitchings", id: false, force: :cascade do |t|
-    t.text    "game_id",   null: false
-    t.text    "player_id", null: false
-    t.text    "team_id",   null: false
-    t.integer "W"
-    t.integer "L"
-    t.integer "SV"
-    t.integer "IPouts"
-    t.integer "H"
-    t.integer "ER"
-    t.integer "HR"
-    t.integer "BB"
-    t.integer "SO"
-    t.integer "BAOpp"
-    t.integer "IBB"
-    t.integer "R"
-    t.integer "order"
+    t.string  "game_id",   limit: 5,              null: false
+    t.string  "player_id", limit: 16,             null: false
+    t.string  "team_id",   limit: 8,              null: false
+    t.integer "W",         limit: 4
+    t.integer "L",         limit: 4
+    t.integer "SV",        limit: 4
+    t.integer "IPouts",    limit: 4
+    t.integer "H",         limit: 4
+    t.integer "ER",        limit: 4
+    t.integer "HR",        limit: 4
+    t.integer "BB",        limit: 4
+    t.integer "SO",        limit: 4
+    t.integer "BAOpp",     limit: 4
+    t.integer "IBB",       limit: 4
+    t.integer "R",         limit: 4
+    t.integer "order",     limit: 4,  default: 0
   end
 
-  add_index "pitchings", ["game_id", "player_id", "team_id"], name: "sqlite_autoindex_pitchings_1", unique: true
-  add_index "pitchings", ["game_id"], name: "pitchinggame_id"
-  add_index "pitchings", ["player_id"], name: "pitchingplayer_id"
-  add_index "pitchings", ["team_id"], name: "pitchingteam_id"
+  add_index "pitchings", ["game_id"], name: "game_id", using: :btree
+  add_index "pitchings", ["player_id"], name: "player_id", using: :btree
+  add_index "pitchings", ["team_id"], name: "team_id", using: :btree
 
   create_table "players", primary_key: "player_id", force: :cascade do |t|
-    t.text    "player_fname"
-    t.text    "player_lname"
-    t.integer "active"
-    t.integer "member"
+    t.string  "player_fname", limit: 8
+    t.string  "player_lname", limit: 8
+    t.boolean "active",       limit: 1
+    t.boolean "member",       limit: 1
   end
 
-  add_index "players", ["player_id"], name: "player_id_1"
-  add_index "players", ["player_id"], name: "sqlite_autoindex_players_1", unique: true
+  add_index "players", ["player_id"], name: "player_id", using: :btree
 
   create_table "positions", primary_key: "POS", force: :cascade do |t|
-    t.integer "pos_num"
-    t.text    "field"
+    t.integer "pos_num", limit: 4, default: 0
+    t.string  "field",   limit: 3
   end
-
-  add_index "positions", ["POS"], name: "sqlite_autoindex_positions_1", unique: true
 
   create_table "teams", primary_key: "team_id", force: :cascade do |t|
-    t.text "team_name"
+    t.string "team_name", limit: 12
   end
 
-  add_index "teams", ["team_id"], name: "sqlite_autoindex_teams_1", unique: true
-  add_index "teams", ["team_id"], name: "team_id"
+  add_index "teams", ["team_id"], name: "team_id", using: :btree
 
-  create_table "users", force: :cascade do |t|
-    t.string   "name"
-    t.string   "password_digest"
-    t.boolean  "revisable"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.string   "remember_digest"
+  create_table "users", id: false, force: :cascade do |t|
+    t.integer "id",              limit: 4
+    t.string  "name",            limit: 14
+    t.string  "password_digest", limit: 60
+    t.string  "revisable",       limit: 1
+    t.string  "created_at",      limit: 26
+    t.string  "updated_at",      limit: 26
+    t.string  "remember_digest", limit: 10
   end
 
 end

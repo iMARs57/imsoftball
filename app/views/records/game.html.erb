@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row">
         <%= render :partial => "sidebar" %>
-		<div class="col-sm-9">
+		<div class="recordsContent col-sm-9">
 			<h3>球賽查詢</h3>
 			<hr>
 			<% if(params[:game_id] == nil && params[:year] == nil) %>
@@ -45,7 +45,7 @@
 									<td><%= onegame.home_score %></td>
 									<td><%= onegame.teamHomeName %></td>
 									<td>
-										<% game_time = Time.strptime(onegame.time,"%m/%d/%Y %H:%M:%S") %>
+										<% game_time = onegame.time %>
 										<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
 									</td>
 									<td><%= onegame.mvp %></td>
@@ -98,7 +98,7 @@
 									</tr>
 									<tr>
 										<td colspan="4">
-											<% game_time = Time.strptime(@game_onegame.time,"%m/%d/%Y %H:%M:%S") %>
+											<% game_time = @game_onegame.time %>
 											<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
 										</td>
 									</tr>

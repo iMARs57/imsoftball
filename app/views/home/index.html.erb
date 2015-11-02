@@ -186,12 +186,12 @@
 										<% if @panel_standings_GP == 0 %>
 											<td>-.---</td>
 										<% else %>
-											<td><%= '%.3f' % (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f) %></td>	
+											<td><%= '%.3f' % (@panel_standings_forAvgBat.allH.to_f / @panel_standings_forAvgBat.allAB.to_f).round(3) %></td>	
 										<% end %>
 										<% if @panel_standings_GP == 0 %>
 											<td>-.---</td>
 										<% else %>	
-											<td><%= '%.3f' % ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f) %></td>
+											<td><%= '%.3f' % ((@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA).to_f / (@panel_standings_forAvgDef.allPO + @panel_standings_forAvgDef.allA + @panel_standings_forAvgDef.allE).to_f).round(3) %></td>
 										<% end %>
 										<% if @panel_standings_GP == 0 %>
 											<td>-.-- / -.--</td>
@@ -268,32 +268,32 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="panel_AVG">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_AVG, :format => '%.3f'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_AVG, :format => '%.3f', :digit => 3} %>
                                     </table>       
                                 </div>
                                 <div class="tab-pane" id="panel_AVGS">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_AVGS, :format => '%s'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_AVGS, :format => '%s', :digit => 0} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_H">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_H, :format => '%d'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_H, :format => '%d', :digit => 0} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_HR">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_HR, :format => '%d'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_HR, :format => '%d', :digit => 0} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_RBI">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_RBI, :format => '%d'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_RBI, :format => '%d', :digit => 0} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_R">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_R, :format => '%d'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_R, :format => '%d', :digit => 0} %>
                                     </table>
                                 </div>
                             </div>                        
@@ -330,27 +330,27 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="panel_W">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_W, :format => '%d'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_W, :format => '%d', :digit => 0} %>
                                     </table>        
                                 </div>
                                 <div class="tab-pane" id="panel_SO">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_SO, :format => '%d'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_SO, :format => '%d', :digit => 0} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_ERA5">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_ERA5, :format => '%.2f'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_ERA5, :format => '%.2f', :digit => 2} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_ERA7">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_ERA7, :format => '%.2f'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_ERA7, :format => '%.2f', :digit => 2} %>
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="panel_WHIP">
                                     <table class="table table-hover">
-                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_WHIP, :format => '%.2f'} %>
+                                        <%= render :partial => "panel_top5", :locals => {:panel_top5 => @panel_top5_WHIP, :format => '%.2f', :digit => 2} %>
                                     </table>
                                 </div>
                             </div>
@@ -773,7 +773,7 @@
 								<td style="padding-left:5%; border-top: none !important;">
 									<ul class="list-inline text-left">
 										<% @memberQuery[i-1].each do |member| %>
-											<% if member.active == true && member.leadership == nil %>
+											<% if member.active == true && member.leadership == 0 %>
 												<li><span class="roster_number">#<%= (member.number == nil)? '??' : '%02d' % (member.number) %></span><span class="roster_name">　<%= link_to member.name, Member.find(member.id) %></span></li>
 											<% end %>
 										<% end %>

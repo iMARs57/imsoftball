@@ -18,8 +18,12 @@ $(window).resize(ReadyandResize);
 
 */
 $(window).on('load resize', function(){
+	
+	var footerHeight = $("footer").outerHeight();
 	var navHeight = $("#navbar").outerHeight();
     $('body').css('padding-top',navHeight);
+	$('#records').css('min-height',$(window).height() - navHeight - footerHeight);
+	//console.log($(window).height() - navHeight - footerHeight);
 	
 	
 	var panel_game_battingHeight = Math.max($('#table_game_battingAway').height(),$('#table_game_battingHome').height());

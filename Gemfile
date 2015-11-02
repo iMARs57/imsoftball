@@ -58,6 +58,12 @@ gem 'bootstrap-kaminari-views'
 #gem 'devise'
 #gem 'devise-bootstrap-views'
 
+# Use thin
+gem 'thin'
+
+# Use mysql
+gem 'mysql2', "~> 0.3.11"
+
 gem 'tzinfo-data'
 
 # Use Capistrano for deployment

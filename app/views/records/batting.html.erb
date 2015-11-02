@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row">
         <%= render :partial => "sidebar" %>
-		<div class="col-sm-9">
+		<div class="recordsContent col-sm-9">
 			<h3>打擊查詢</h3>
 			<hr>
 			<% if @player == nil %>
@@ -94,7 +94,7 @@
 					<div class="fakeContentForScrollBar" id="content_batting_all"></div>
 				</div>
 				<div class="table-responsive" id="div_batting_all">
-					<table class="table table-striped table-condensed" id="table_batting_all" data-toggle="table" data-sort-name="AVG" data-sort-order="desc">
+					<table class="table table-striped table-condensed" id="table_batting_all" data-toggle="table" data-sort-name="<%= @sortBy %>" data-sort-order="desc">
 						<thead>
 							<tr>
 								<th class= "colName" data-field="Name" data-sortable="true" data-sorter="NameSorter" data-align="center">Name<br/>姓名</th>
@@ -122,6 +122,11 @@
 						</thead>
 						<script>
 							$(function(){
+								<% if @sortBy != nil %>
+									if(!$('td.col<%= @sortBy %>').hasClass('sorting'))
+										$('td.col<%= @sortBy %>').addClass('sorting')
+								<% end %>
+								
 								var SortedName = '';
 								$('#table_batting_all').on('sort.bs.table', function (e, name, order) {
 									SortedName = name;
@@ -268,7 +273,7 @@
 											<td class="colIBB"><%= allBat.IBB %></td>
 											<td class="colSF"><%= allBat.SF %></td>
 											<td class="colE"><%= allBat.E %></td>
-											<td class="colAVG sorting" data-PA="<%= allBat.PA %>" data-AVG="<%= '%.3f' % allBat.AVG %>"><%= '%.3f' % allBat.AVG %></td>
+											<td class="colAVG" data-PA="<%= allBat.PA %>" data-AVG="<%= '%.3f' % allBat.AVG %>"><%= '%.3f' % allBat.AVG %></td>
 											<td class="colOBP" data-PA="<%= allBat.PA %>" data-OBP="<%= '%.3f' % allBat.OBP %>"><%= '%.3f' % allBat.OBP %></td>
 											<td class="colSLG" data-PA="<%= allBat.PA %>" data-SLG="<%= '%.3f' % allBat.SLG %>"><%= '%.3f' % allBat.SLG %></td>
 											<td class="colOPS" data-PA="<%= allBat.PA %>" data-OPS="<%= '%.3f' % allBat.OPS %>"><%= '%.3f' % allBat.OPS %></td>

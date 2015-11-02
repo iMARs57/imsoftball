@@ -260,7 +260,7 @@ class MembersController < ApplicationController
 			end
 		else
 			if Time.now.month >= 9
-				@academicYear = (Time.now.year - 1912).to_s
+				@academicYear = (Time.now.year - 1911).to_s
 				@thisyear = Time.now.year
 			else
 				@academicYear = (Time.now.year - 1912).to_s

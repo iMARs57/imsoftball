@@ -3,8 +3,17 @@ class RecordsController < ApplicationController
 	
 		if logged_in?
 
-			
-			
+			#member = Member.find('shilamus')
+			#member.nameEN = "HUANG, Chun-szu"
+			#member.birthday = Date.new(1993,2,16)
+			#member.birthplaceCH = "台北市"
+			#member.birthplaceEN = "Taipei  City"
+			#member.high_schoolCH = "台北市私立延平高級中學"
+			#member.high_schoolEN = "Yan Ping High School"
+			#member.position = "P"
+			#member.bats = "R"
+			#member.throws = "R"
+			#member.save
 			
 		else
 			session[:previous_url] = request.fullpath
@@ -65,11 +74,11 @@ class RecordsController < ApplicationController
 														 teams AS teamHome,
 														 teams AS teamAway
 												   WHERE G.cup_id = C.cup_id AND
-														 teamHomeID = G.home_team_id AND
-														 teamAwayID = G.away_team_id AND
+														 teamHome.team_id = G.home_team_id AND
+														 teamAway.team_id = G.away_team_id AND
 														 G.game_id = "' + @game_id + '"')[0]
 				@game_BattingAway = Batting.find_by_sql('SELECT BAT.team_id,
-																BAT."order",
+																BAT.order,
 																BAT.player_id,
 																(BAT.AB+BAT.BB+BAT.IBB+BAT.SF) AS PA,
 																BAT.AB,
@@ -85,11 +94,11 @@ class RecordsController < ApplicationController
 																BAT.IBB,
 																BAT.SF,
 																BAT.E,
-																CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*1000) AS INTEGER) AS REAL)/1000.0 AS AVG
+																CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*1000) AS SIGNED) AS DECIMAL)/1000.0 AS AVG
 														   FROM battings AS BAT 
 														  WHERE BAT.game_id = "' + @game_id + '" AND
 																BAT.team_id = "' + @game_onegame.teamAwayID + '"
-													   ORDER BY BAT."order"')
+													   ORDER BY BAT.order')
 				@game_AllBattingAway = Batting.find_by_sql('SELECT BAT.team_id,
 																   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
 																   SUM(BAT.AB) AS AB,
@@ -105,12 +114,12 @@ class RecordsController < ApplicationController
 																   SUM(BAT.IBB) AS IBB,
 																   SUM(BAT.SF) AS SF,
 																   SUM(BAT.E) AS E,
-																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*1000) AS INTEGER) AS REAL)/1000.0 AS AVG
+																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*1000) AS SIGNED) AS DECIMAL)/1000.0 AS AVG
 															  FROM battings AS BAT
 															 WHERE BAT.game_id = "' + @game_id + '" AND
 																   BAT.team_id = "' + @game_onegame.teamAwayID + '"')[0]
 				@game_BattingHome = Batting.find_by_sql('SELECT BAT.team_id,
-																BAT."order",
+																BAT.order,
 																BAT.player_id,
 																(BAT.AB+BAT.BB+BAT.IBB+BAT.SF) AS PA,
 																BAT.AB,
@@ -126,11 +135,11 @@ class RecordsController < ApplicationController
 																BAT.IBB,
 																BAT.SF,
 																BAT.E,
-																CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*1000) AS INTEGER) AS REAL)/1000.0 AS AVG
+																CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*1000) AS SIGNED) AS DECIMAL)/1000.0 AS AVG
 														   FROM battings AS BAT 
 														  WHERE BAT.game_id = "' + @game_id + '" AND
 																BAT.team_id = "' + @game_onegame.teamHomeID + '"
-													   ORDER BY BAT."order"')
+													   ORDER BY BAT.order')
 				@game_AllBattingHome = Batting.find_by_sql('SELECT BAT.team_id,
 																   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
 																   SUM(BAT.AB) AS AB,
@@ -146,13 +155,13 @@ class RecordsController < ApplicationController
 																   SUM(BAT.IBB) AS IBB,
 																   SUM(BAT.SF) AS SF,
 																   SUM(BAT.E) AS E,
-																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*1000) AS INTEGER) AS REAL)/1000.0 AS AVG
+																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*1000) AS SIGNED) AS DECIMAL)/1000.0 AS AVG
 															  FROM battings AS BAT
 															 WHERE BAT.game_id = "' + @game_id + '" AND
 																   BAT.team_id = "' + @game_onegame.teamHomeID + '"')[0]
 				@game_PitchingAway = Pitching.find_by_sql('SELECT PIT.team_id,
 																  PIT.player_id,
-																  CAST(PIT.IPouts/3.0*10 AS REAL)/10 AS IP,
+																  CAST(PIT.IPouts/3.0*10 AS DECIMAL)/10 AS IP,
 																  PIT.BAOpp,
 																  PIT.H,
 																  PIT.HR,
@@ -161,17 +170,17 @@ class RecordsController < ApplicationController
 																  PIT.IBB,
 																  PIT.R,
 																  PIT.ER,
-																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS INTEGER) AS REAL)/100.0 AS ERA5,
-																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS INTEGER) AS REAL)/100.0 AS ERA7,
+																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA5,
+																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA7,
 																  PIT.W,
 																  PIT.L,
 																  PIT.SV
 															 FROM pitchings AS PIT 
 															WHERE PIT.game_id = "' + @game_id + '" AND
 																  PIT.team_id = "' + @game_onegame.teamAwayID + '"
-														 ORDER BY PIT."order"')
+														 ORDER BY PIT.order')
 				@game_AllPitchingAway = Pitching.find_by_sql('SELECT PIT.team_id,
-																	 CAST(SUM(PIT.IPouts)/3.0*10 AS REAL)/10 AS IP,
+																	 CAST(SUM(PIT.IPouts)/3.0*10 AS DECIMAL)/10 AS IP,
 																	 SUM(PIT.BAOpp) AS BAOpp,
 																	 SUM(PIT.H) AS H,
 																	 SUM(PIT.HR) AS HR,
@@ -180,14 +189,14 @@ class RecordsController < ApplicationController
 																	 SUM(PIT.IBB) AS IBB,
 																	 SUM(PIT.R) AS R,
 																	 SUM(PIT.ER) AS ER,
-																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS INTEGER) AS REAL)/100.0 AS ERA5,
-																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS INTEGER) AS REAL)/100.0 AS ERA7
+																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA5,
+																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA7
 																FROM pitchings AS PIT
 															   WHERE PIT.game_id = "' + @game_id + '" AND
 																	 PIT.team_id = "' + @game_onegame.teamAwayID + '"')[0]
 				@game_PitchingHome = Pitching.find_by_sql('SELECT PIT.team_id,
 																  PIT.player_id,
-																  CAST(PIT.IPouts/3.0*10 AS REAL)/10 AS IP,
+																  CAST(PIT.IPouts/3.0*10 AS DECIMAL)/10 AS IP,
 																  PIT.BAOpp,
 																  PIT.H,
 																  PIT.HR,
@@ -196,17 +205,17 @@ class RecordsController < ApplicationController
 																  PIT.IBB,
 																  PIT.R,
 																  PIT.ER,
-																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS INTEGER) AS REAL)/100.0 AS ERA5,
-																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS INTEGER) AS REAL)/100.0 AS ERA7,
+																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA5,
+																  CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA7,
 																  PIT.W,
 																  PIT.L,
 																  PIT.SV
 															 FROM pitchings AS PIT 
 															WHERE PIT.game_id = "' + @game_id + '" AND
 																  PIT.team_id = "' + @game_onegame.teamHomeID + '"
-														 ORDER BY PIT."order"')
+														 ORDER BY PIT.order')
 				@game_AllPitchingHome = Pitching.find_by_sql('SELECT PIT.team_id,
-																	 CAST(SUM(PIT.IPouts)/3.0*10 AS REAL)/10 AS IP,
+																	 CAST(SUM(PIT.IPouts)/3.0*10 AS DECIMAL)/10 AS IP,
 																	 SUM(PIT.BAOpp) AS BAOpp,
 																	 SUM(PIT.H) AS H,
 																	 SUM(PIT.HR) AS HR,
@@ -215,21 +224,21 @@ class RecordsController < ApplicationController
 																	 SUM(PIT.IBB) AS IBB,
 																	 SUM(PIT.R) AS R,
 																	 SUM(PIT.ER) AS ER,
-																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS INTEGER) AS REAL)/100.0 AS ERA5,
-																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS INTEGER) AS REAL)/100.0 AS ERA7
+																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA5,
+																	 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA7
 																FROM pitchings AS PIT
 															   WHERE PIT.game_id = "' + @game_id + '" AND
 																	 PIT.team_id = "' + @game_onegame.teamHomeID + '"')[0]
 				@game_FieldingAway = Fielding.find_by_sql('SELECT FIELD.team_id,
 																  FIELD.POS,
 																  FIELD.player_id,
-																  CAST(FIELD.InnOuts/3.0*10 AS REAL)/10 AS INN,
+																  CAST(FIELD.InnOuts/3.0*10 AS DECIMAL)/10 AS INN,
 																  FIELD.PO+FIELD.K+FIELD.A+FIELD.E AS TC,
 																  FIELD.PO,
 																  FIELD.K,
 																  FIELD.A,
 																  FIELD.E,
-																  CAST(CAST((FIELD.PO+FIELD.K+FIELD.A)/(FIELD.PO+FIELD.K+FIELD.A+FIELD.E+0.000000000000000000000000000001)*1000 AS INTEGER) AS REAL)/1000.0 AS FPCT
+																  CAST(CAST((FIELD.PO+FIELD.K+FIELD.A)/(FIELD.PO+FIELD.K+FIELD.A+FIELD.E+0.000000000000000000000000000001)*1000 AS SIGNED) AS DECIMAL)/1000.0 AS FPCT
 															 FROM fieldings AS FIELD,
 																  positions AS POSITION
 															WHERE FIELD.POS = POSITION.POS AND
@@ -243,20 +252,20 @@ class RecordsController < ApplicationController
 																	 SUM(FIELD.K) AS K,
 																	 SUM(FIELD.A) AS A,
 																	 SUM(FIELD.E) AS E,
-																	 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A)+SUM(FIELD.E)+0.00000000000000000000000000000000001)*1000 AS INTEGER) AS REAL)/1000.0 AS FPCT
+																	 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A)+SUM(FIELD.E)+0.00000000000000000000000000000000001)*1000 AS SIGNED) AS DECIMAL)/1000.0 AS FPCT
 																FROM fieldings AS FIELD
 															   WHERE FIELD.game_id = "' + @game_id + '" AND
 																	 FIELD.team_id = "' + @game_onegame.teamAwayID + '"')[0]
 				@game_FieldingHome = Fielding.find_by_sql('SELECT FIELD.team_id,
 																  FIELD.POS,
 																  FIELD.player_id,
-																  CAST(FIELD.InnOuts/3.0*10 AS REAL)/10 AS INN,
+																  CAST(FIELD.InnOuts/3.0*10 AS DECIMAL)/10 AS INN,
 																  FIELD.PO+FIELD.K+FIELD.A+FIELD.E AS TC,
 																  FIELD.PO,
 																  FIELD.K,
 																  FIELD.A,
 																  FIELD.E,
-																  CAST(CAST((FIELD.PO+FIELD.K+FIELD.A)/(FIELD.PO+FIELD.K+FIELD.A+FIELD.E+0.000000000000000000000000000001)*1000 AS INTEGER) AS REAL)/1000.0 AS FPCT
+																  CAST(CAST((FIELD.PO+FIELD.K+FIELD.A)/(FIELD.PO+FIELD.K+FIELD.A+FIELD.E+0.000000000000000000000000000001)*1000 AS SIGNED) AS DECIMAL)/1000.0 AS FPCT
 															 FROM fieldings AS FIELD,
 																  positions AS POSITION
 															WHERE FIELD.POS = POSITION.POS AND
@@ -270,7 +279,7 @@ class RecordsController < ApplicationController
 																	 SUM(FIELD.K) AS K,
 																	 SUM(FIELD.A) AS A,
 																	 SUM(FIELD.E) AS E,
-																	 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A)+SUM(FIELD.E)+0.00000000000000000000000000000000001)*1000 AS INTEGER) AS REAL)/1000.0 AS FPCT
+																	 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.K)+SUM(FIELD.A)+SUM(FIELD.E)+0.00000000000000000000000000000000001)*1000 AS SIGNED) AS DECIMAL)/1000.0 AS FPCT
 																FROM fieldings AS FIELD
 															   WHERE FIELD.game_id = "' + @game_id + '" AND
 																	 FIELD.team_id = "' + @game_onegame.teamHomeID + '"')[0]
@@ -356,6 +365,29 @@ class RecordsController < ApplicationController
 																					   C.year = "' + year.to_s + '")
 													   ORDER BY PIT.player_id')
 			end
+		elsif type == 'Fielding'
+			if year == "Wildcard"
+				@playerInThisYear = Batting.find_by_sql('SELECT DISTINCT FIELD.player_id
+														   FROM fieldings AS FIELD,
+																players AS PLY
+														  WHERE FIELD.player_id = PLY.player_id AND
+																PLY.member = 1
+													   ORDER BY FIELD.player_id')
+			else
+				@playerInThisYear = Batting.find_by_sql('SELECT DISTINCT FIELD.player_id
+														   FROM fieldings AS FIELD,
+																players AS PLY
+														  WHERE FIELD.player_id = PLY.player_id AND
+																PLY.member = 1 AND 
+																FIELD.game_id IN (SELECT G.game_id 
+																					FROM fieldings AS FIELD,
+																						 games AS G,
+																						 cups AS C
+																				   WHERE FIELD.game_id = G.game_id AND
+																						 G.cup_id = C.cup_id AND
+																						 C.year = "' + year.to_s + '")
+													   ORDER BY FIELD.player_id')
+			end
 		end
 		
 		return @playerInThisYear
@@ -391,6 +423,7 @@ class RecordsController < ApplicationController
 			@player = params[:player]
 			@player1 = params[:player1]
 			@player2 = params[:player2]
+			@sortBy = (params[:sortBy] == nil)? ('AVG'):(params[:sortBy])
 			
 			if @type == 'single'
 				@player = params[:player1]
@@ -408,61 +441,61 @@ class RecordsController < ApplicationController
 				end
 			end
 			
-			@sql_year = ''
+			@sql_year = ' '
 			# 別頁傳入cup參數導入此頁時會用到
 			if @year != nil && @year != 'Wildcard' && @cup == nil # 年份不是選不分年度且盃賽為空
-				@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id
+				@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
-														C.year = ' + @year.to_s + ')'
+														C.year = ' + @year.to_s + ') '
 			elsif @year == 'Wildcard' && @cup != nil # 年份選不分年度且盃賽不為空
-				@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id
+				@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
-														C.cup_name = "' + @cup + '")'
+														C.cup_name = "' + @cup + '") '
 			elsif @year != nil && @cup != nil # 年份非空且盃賽非空
 				if @cup == '官方賽'
-					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
 														C.year = ' + @year.to_s + ' AND
-														C.official = 1)'
+														C.official = 1) '
 				elsif @cup == '正式賽'
-					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
 														C.year = ' + @year.to_s + ' AND
-														C.formal = 1)'
+														C.formal = 1) '
 				elsif @cup == '聯盟賽'
-					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
 														C.year = ' + @year.to_s + ' AND
-														C.cup_name = "台大聯盟")'
+														C.cup_name = "台大聯盟") '
 				else
-					@sql_year = 'AND BAT.game_id IN (SELECT DISTINCT G.game_id
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
 														C.year = ' + @year.to_s + ' AND
-														C.cup_name = "' + @cup + '")'
+														C.cup_name = "' + @cup + '") '
 				end
 			end
 			
@@ -480,7 +513,7 @@ class RecordsController < ApplicationController
 				
 				@sorting = params[:sorting]
 				if @year == "Wildcard"
-					@sql_year = ''
+					@sql_year = ' '
 				else
 					@sql_year = ' AND BAT.game_id IN (SELECT G.game_id 
 													    FROM battings AS BAT,
@@ -506,11 +539,11 @@ class RecordsController < ApplicationController
 														  SUM(BAT.IBB) AS IBB, 
 														  SUM(BAT.SF) AS SF, 
 														  SUM(BAT.E) AS E, 
-														  CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-														  CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-														  CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-														  (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-														  CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+														  CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+														  CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+														  CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+														  (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+														  CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
 												     FROM battings AS BAT, 
 														  players AS PLY 
 												    WHERE BAT.player_id = PLY.player_id AND
@@ -542,11 +575,11 @@ class RecordsController < ApplicationController
 																   SUM(BAT.IBB) AS IBB,
 																   SUM(BAT.SF) AS SF,
 																   SUM(BAT.E) AS E,
-																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-																   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
 															  FROM battings AS BAT,
 																   players AS PLY
 															 WHERE BAT.player_id = PLY.player_id AND
@@ -565,11 +598,11 @@ class RecordsController < ApplicationController
 																    SUM(BAT.IBB) AS IBB,
 																    SUM(BAT.SF) AS SF,
 																    SUM(BAT.E) AS E,
-																    CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																    (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-																    CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+																    CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																    (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																    CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
 															   FROM battings AS BAT,
 																	players AS PLY
 															  WHERE BAT.player_id = PLY.player_id AND
@@ -588,11 +621,11 @@ class RecordsController < ApplicationController
 																     SUM(BAT.IBB) AS IBB,
 																     SUM(BAT.SF) AS SF,
 																     SUM(BAT.E) AS E,
-																     CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																     CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																     CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																     (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-																     CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA
+																     CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																     CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																     CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																     (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																     CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
 															    FROM battings AS BAT,
 																	 players AS PLY
 															   WHERE BAT.player_id = PLY.player_id AND
@@ -625,12 +658,12 @@ class RecordsController < ApplicationController
 															   SUM(BAT.IBB) AS IBB,
 															   SUM(BAT.SF) AS SF,
 															   SUM(BAT.E) AS E,
-															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA,
-													           (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA,
+													           (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
 															   FROM battings AS BAT 
 															   WHERE BAT.player_id = "' + @player1  + '" ' + @sql_year1 +
 															  'GROUP BY BAT.player_id')[0]
@@ -650,12 +683,12 @@ class RecordsController < ApplicationController
 															   SUM(BAT.IBB) AS IBB,
 															   SUM(BAT.SF) AS SF,
 															   SUM(BAT.E) AS E,
-															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA,
-													           (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA,
+													           (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
 															   FROM battings AS BAT 
 															   WHERE BAT.player_id = "' + @player2  + '" ' + @sql_year2 +
 															  'GROUP BY BAT.player_id')[0]
@@ -684,12 +717,12 @@ class RecordsController < ApplicationController
 																    SUM(BAT.IBB) AS IBB,
 																    SUM(BAT.SF) AS SF,
 																	SUM(BAT.E) AS E,
-																    CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																    (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS,
-																    CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS TA,
-																    (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+																    CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																    CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																    (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																    CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA,
+																    (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
 																    FROM battings AS BAT 
 																    WHERE BAT.player_id = "' + @player + '" ' + @sql_year)[0]
 				@playerBattingForGraph = Batting.find_by_sql('SELECT BAT.game_id,
@@ -707,10 +740,10 @@ class RecordsController < ApplicationController
 																	 BAT.IBB,
 																	 BAT.SF,
 																	 BAT.E,
-																	 CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
-																     CAST(CAST(((BAT.H+BAT.BB+BAT.IBB)/(BAT.AB+BAT.BB+BAT.IBB+BAT.SF+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS OBP,
-																     CAST(CAST(((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS SLG,
-																     (CAST(CAST(((BAT.H+BAT.BB+BAT.IBB)/(BAT.AB+BAT.BB+BAT.IBB+BAT.SF+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) + (CAST(CAST(((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0) AS OPS
+																	 CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																     CAST(CAST(((BAT.H+BAT.BB+BAT.IBB)/(BAT.AB+BAT.BB+BAT.IBB+BAT.SF+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																     CAST(CAST(((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																     (CAST(CAST(((BAT.H+BAT.BB+BAT.IBB)/(BAT.AB+BAT.BB+BAT.IBB+BAT.SF+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS
 																FROM battings AS BAT
 															   WHERE BAT.player_id = "' + @player + '" ' + @sql_year +
 														   'ORDER BY BAT.game_id')
@@ -818,7 +851,8 @@ class RecordsController < ApplicationController
 			
 			@player = params[:player]
 			@year = params[:year]
-			@sql_year = ''
+			@sortBy = (params[:sortBy] == nil)? ('W'):(params[:sortBy])
+			@sql_year = ' '
 			
 			if @year != nil && @year != 'Wildcard'
 				@sql_year = ' AND PIT.game_id IN (SELECT G.game_id 
@@ -854,12 +888,12 @@ class RecordsController < ApplicationController
 															SUM(PIT.IBB) AS IBB,
 															SUM(PIT.R) AS R,
 															SUM(PIT.ER) AS ER,
-															CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+															CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
 															(SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
-															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS ERA5,
-															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS ERA7,
-															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS R5,
-															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS R7
+															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
 													   FROM pitchings AS PIT, 
 															players AS PLY
 													  WHERE PLY.player_id = PIT.player_id AND
@@ -880,12 +914,12 @@ class RecordsController < ApplicationController
 																	SUM(PIT.IBB) AS IBB,
 																	SUM(PIT.R) AS R,
 																	SUM(PIT.ER) AS ER,
-																	CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																	CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
 																	(SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
-																	CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS ERA5,
-																	CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS ERA7,
-																	CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS R5,
-																	CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS R7
+																	CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																	CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																	CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																	CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
 															   FROM pitchings AS PIT, 
 																	players AS PLY,
 																	games AS G,
@@ -907,12 +941,12 @@ class RecordsController < ApplicationController
 															SUM(PIT.IBB) AS IBB,
 															SUM(PIT.R) AS R,
 															SUM(PIT.ER) AS ER,
-															CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+															CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
 															(SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
-															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS ERA5,
-															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS ERA7,
-															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS R5,
-															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS R7 
+															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+															CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+															CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7 
 													   FROM pitchings AS PIT,
 															players AS PLY 
 													  WHERE PIT.player_id = PLY.player_id AND
@@ -945,7 +979,7 @@ class RecordsController < ApplicationController
 			elsif @player != 'all'
 				
 				if @year == 'Wildcard'
-					@sql_year = ''
+					@sql_year = ' '
 					@playerPitchingEachYear = Pitching.find_by_sql('SELECT C.year,
 																		   COUNT(PIT.game_id) AS G,
 																		   SUM(PIT.W) AS W,
@@ -959,12 +993,12 @@ class RecordsController < ApplicationController
 																		   SUM(PIT.IBB) AS IBB,
 																		   SUM(PIT.R) AS R,
 																		   SUM(PIT.ER) AS ER,
-																		   CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																		   CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
 																		   (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
-																		   CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS ERA5,
-																		   CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS ERA7,
-																		   CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS R5,
-																		   CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS R7
+																		   CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																		   CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																		   CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																		   CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
 																	  FROM pitchings AS PIT, 
 																		   games AS G,
 																		   cups AS C 
@@ -994,12 +1028,12 @@ class RecordsController < ApplicationController
 																	  SUM(PIT.IBB) AS IBB,
 																	  SUM(PIT.R) AS R,
 																	  SUM(PIT.ER) AS ER,
-																	  CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																	  CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
 																	  (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
-																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS ERA5,
-																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS ERA7,
-																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS R5,
-																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS R7
+																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
 																 FROM pitchings AS PIT
 																WHERE PIT.player_id = "' + @player + '" ' + @sql_year)[0]
 				@playerPitchingForGraph = Pitching.find_by_sql('SELECT PIT.game_id,
@@ -1015,12 +1049,12 @@ class RecordsController < ApplicationController
 																	   PIT.IBB AS IBB,
 																	   PIT.R AS R,
 																	   PIT.ER AS ER,
-																	   CAST(CAST((PIT.H/(PIT.BAOpp-PIT.BB-PIT.IBB+0.0000000000000000000000000000000000001)*10000) AS INTEGER) AS REAL)/10000.0 AS AVG,
+																	   CAST(CAST((PIT.H/(PIT.BAOpp-PIT.BB-PIT.IBB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
 																	   (PIT.H+PIT.BB+PIT.IBB+0.0)/(PIT.IPouts+0.0000000000000000000000000000000000001)*3 AS WHIP,
-																	   CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS ERA5,
-																	   CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS ERA7,
-																	   CAST(CAST(PIT.R/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS INTEGER) AS REAL)/1000.0 AS R5,
-																	   CAST(CAST(PIT.R/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS INTEGER) AS REAL)/1000.0 AS R7
+																	   CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																	   CAST(CAST(PIT.ER/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																	   CAST(CAST(PIT.R/(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																	   CAST(CAST(PIT.R/(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
 																  FROM pitchings AS PIT,
 																	   games AS G,
 																	   cups AS C
@@ -1090,4 +1124,683 @@ class RecordsController < ApplicationController
 		end
 	end
 	
+	def fielding
+		if logged_in?
+			
+			@activePOS_rate = 1.5
+			@activePOS = 100
+			@activePLAYER_rate = 2
+			@activePLAYER = 200
+			# 每年有幾場比賽
+			@gameNumberInEachYear = Cup.find_by_sql('SELECT cups.year,
+															COUNT(*) AS gameNumber
+													   FROM games,
+															cups
+													  WHERE games.cup_id = cups.cup_id
+												   GROUP BY cups.year')
+			@gameNumberInYear = Hash.new(0)
+			@gameNumberInWildcard = 0
+			@gameNumberInEachYear.each do |gNIEY|
+				@gameNumberInYear[gNIEY.year.to_s] = gNIEY.gameNumber
+				@gameNumberInWildcard += gNIEY.gameNumber
+			end
+			@gameNumberInYear['Wildcard'] = @gameNumberInWildcard
+			
+			@player = params[:player]
+			@year = params[:year]
+			@cup = params[:cup]
+			@sql_year = ''
+			
+			if @year != nil && @year != 'Wildcard'
+				@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+													 FROM fieldings AS FIELD, 
+														  games AS G,
+														  cups AS C
+													WHERE FIELD.game_id = G.game_id AND
+														  G.cup_id = C.cup_id AND
+														  C.year = ' + @year.to_s + ') '
+			elsif @year == 'Wildcard' && @cup != nil
+				@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+													 FROM fieldings AS FIELD,
+														  games AS G, 
+														  cups AS C
+													WHERE FIELD.game_id = G.game_id AND
+														  G.cup_id = C.cup_id AND
+														  C.cup_name = "' + @cup + '") '
+			elsif @year != nil && @cup != nil
+				if @cup == '官方賽'
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.year = ' + @year.to_s + 'AND
+															  C.official = 1) '
+				elsif @cup == '正式賽'
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.year = ' + @year.to_s + 'AND
+															  C.formal = 1) '
+				elsif @cup == '聯盟賽'
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.year = ' + @year.to_s + 'AND
+															  C.cup_name = "台大聯盟") '
+				else
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.year = ' + @year.to_s + 'AND
+															  C.cup_name = "' + @cup + '") '
+				end
+			end
+			
+			if @player == nil && @year == nil
+				@year_option = Array.new
+				@allyear = Cup.select('DISTINCT cups.year').order('cups.year')
+				@allyear.each do |eachyear|
+					@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
+				end
+				@year_option.push(["不分年度","Wildcard"])
+			elsif @player == 'all'
+				@allFieldingPOS = Fielding.find_by_sql('SELECT FIELD.player_id,
+															   FIELD.POS,
+															   COUNT(FIELD.game_id) AS G,
+															   SUM(FIELD.Innouts/3.0) AS INN,
+															   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															   SUM(FIELD.PO) AS PO,
+															   SUM(FIELD.A) AS A,
+															   SUM(FIELD.E) AS E,
+															   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+															   (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+															   (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+														  FROM fieldings AS FIELD,
+															   players AS PLY,
+															   positions AS POSITION
+														 WHERE FIELD.player_id = PLY.player_id AND
+															   POSITION.POS = FIELD.POS AND
+															   PLY.member = 1 ' + @sql_year + 
+													 'GROUP BY FIELD.player_id,
+															   FIELD.POS,
+															   POSITION.pos_num
+													  ORDER BY POSITION.pos_num,
+															   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 DESC,
+															   (SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)) DESC')
+				@allFielding = Fielding.find_by_sql('SELECT FIELD.player_id,
+															COUNT(FIELD.game_id) AS G,
+															SUM(FIELD.Innouts/3.0) AS INN,
+															SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															SUM(FIELD.PO) AS PO,
+															SUM(FIELD.A) AS A,
+															SUM(FIELD.E) AS E,
+															CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+															(SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+															(SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+													   FROM fieldings AS FIELD,
+															players AS PLY 
+													  WHERE FIELD.player_id = PLY.player_id AND
+															PLY.member = 1 ' + @sql_year + 
+												  'GROUP BY FIELD.player_id
+												   ORDER BY CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 DESC,
+															SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')
+				@allFieldingSummary = Fielding.find_by_sql('SELECT FIELD.POS,
+																   SUM(FIELD.Innouts/3.0) AS INN,
+																   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																   SUM(FIELD.PO) AS PO,
+																   SUM(FIELD.A) AS A,
+																   SUM(FIELD.E) AS E,
+																   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																   (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																   (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+															  FROM fieldings AS FIELD,
+																   players AS PLY
+															 WHERE FIELD.player_id = PLY.player_id AND
+																   PLY.member = 1 ' + @sql_year +
+														 'GROUP BY UPPER(FIELD.POS)
+														  ORDER BY CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 DESC,
+																   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')
+				@allFieldingSummaryTotal = Fielding.find_by_sql('SELECT SUM(FIELD.Innouts/3.0) AS INN,
+																		SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																		SUM(FIELD.PO) AS PO,
+																		SUM(FIELD.A) AS A,
+																		SUM(FIELD.E) AS E,
+																		CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																		(SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																		(SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+																   FROM fieldings AS FIELD,
+																		players AS PLY
+																  WHERE FIELD.player_id = PLY.player_id AND
+																		PLY.member = 1 ' + @sql_year +
+															  'ORDER BY CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 DESC,
+																		SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+			elsif @year == 'Wildcard' && @player != 'all'
+				@playerFieldingByYearAndPos = Fielding.find_by_sql('SELECT C.year AS year,
+																		   FIELD.POS AS POS,
+																		   COUNT(*) AS G,
+																		   SUM(FIELD.Innouts/3.0) AS INN,
+																		   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																		   SUM(FIELD.PO) AS PO,
+																		   SUM(FIELD.A) AS A,
+																		   SUM(FIELD.E) AS E,
+																		   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																		   (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																		   (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+																	  FROM fieldings AS FIELD,
+																		   games AS G,
+																		   cups AS C
+																	 WHERE C.cup_id = G.cup_id AND
+																		   FIELD.game_id = G.game_id AND
+																		   FIELD.player_id = "' + @player + '" ' + @sql_year +
+																 'GROUP BY C.year,
+																		   UPPER(FIELD.POS)
+																  ORDER BY FIELD.POS, C.year')
+				@playerFieldingByYear = Fielding.find_by_sql('SELECT C.year AS year,
+																     COUNT(*) AS G,
+																     SUM(FIELD.Innouts/3.0) AS INN,
+																     SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																     SUM(FIELD.PO) AS PO,
+																     SUM(FIELD.A) AS A,
+																     SUM(FIELD.E) AS E,
+																     CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																     (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																     (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+																FROM fieldings AS FIELD,
+																	 games AS G,
+																	 cups AS C,
+																	 positions
+															   WHERE C.cup_id = G.cup_id AND
+																	 FIELD.game_id = G.game_id AND
+																	 positions.POS = FIELD.POS AND
+																	 FIELD.player_id = "' + @player + '" ' + @sql_year +
+														   'GROUP BY C.year')
+				@playerFieldingByPOS = Fielding.find_by_sql('SELECT FIELD.POS AS POS,
+																	COUNT(*) AS G,
+																    SUM(FIELD.Innouts/3.0) AS INN,
+																    SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																    SUM(FIELD.PO) AS PO,
+																    SUM(FIELD.A) AS A,
+																    SUM(FIELD.E) AS E,
+																    CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																    (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																    (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+															   FROM fieldings AS FIELD,
+																	games AS G,
+																	cups AS C
+															  WHERE C.cup_id = G.cup_id AND
+																	FIELD.game_id = G.game_id AND
+																	FIELD.player_id = "' + @player + '" ' + @sql_year +
+														  'GROUP BY UPPER(FIELD.POS)
+														   ORDER BY COUNT(*) DESC')
+				@playerFieldingByYearAndIO = Fielding.find_by_sql('SELECT C.year AS year,
+																		  positions.field,
+																		  COUNT(*) AS G,
+																		  SUM(FIELD.Innouts/3.0) AS INN,
+																		  SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																		  SUM(FIELD.PO) AS PO,
+																		  SUM(FIELD.A) AS A,
+																		  SUM(FIELD.E) AS E,
+																		  CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																		  (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																		  (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+																	 FROM fieldings AS FIELD,
+																		  games AS G,
+																		  cups AS C,
+																		  positions
+																	WHERE C.cup_id = G.cup_id AND
+																		  FIELD.game_id = G.game_id AND
+																		  positions.POS = FIELD.POS AND
+																		  FIELD.player_id = "' + @player + '" ' + @sql_year +
+																'GROUP BY C.year,
+																		  positions.field')
+			elsif @year != 'Wildcard' && @player != 'all'
+				@playerFielding = Fielding.find_by_sql('SELECT FIELD.POS,
+															   COUNT(FIELD.game_id) AS G,
+															   SUM(FIELD.Innouts/3.0) AS INN,
+															   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															   SUM(FIELD.PO) AS PO,
+															   SUM(FIELD.A) AS A,
+															   SUM(FIELD.E) AS E,
+															   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+														  FROM fieldings AS FIELD
+														 WHERE FIELD.player_id = "' + @player + '" ' + @sql_year +
+													 'GROUP BY FIELD.POS 
+													  ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')
+				@playerFieldingGrass = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																	SUM(FIELD.Innouts/3.0) AS INN,
+																	SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																	SUM(FIELD.PO) AS PO,
+																	SUM(FIELD.A) AS A,
+																	SUM(FIELD.E) AS E,
+																	CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															   FROM fieldings AS FIELD,
+																	positions AS PO,
+																	games AS G
+															  WHERE G.game_id = FIELD.game_id AND
+																	PO.pos = FIELD.POS AND
+																	FIELD.player_id = "' + @player + '" AND
+																	G.grassfield = 1 AND
+																	FIELD.POS IN (SELECT POS 
+																					FROM positions
+																				   WHERE field = "IF") ' + @sql_year + 
+																			   'ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingGrass.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingGrass = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingClay = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																   SUM(FIELD.Innouts/3.0) AS INN,
+																   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																   SUM(FIELD.PO) AS PO,
+																   SUM(FIELD.A) AS A,
+																   SUM(FIELD.E) AS E,
+																   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															  FROM fieldings AS FIELD,
+																   positions AS PO,
+																   games AS G
+															 WHERE G.game_id = FIELD.game_id AND
+																   PO.pos = FIELD.POS AND
+																   FIELD.player_id = "' + @player + '" AND
+																   G.grassfield = 0 AND
+																   FIELD.POS IN (SELECT POS 
+																				   FROM positions
+																				  WHERE field = "IF") ' + @sql_year + 
+																			  'ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingClay.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingClay = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingIn = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																 SUM(FIELD.Innouts/3.0) AS INN,
+																 SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																 SUM(FIELD.PO) AS PO,
+																 SUM(FIELD.A) AS A,
+																 SUM(FIELD.E) AS E,
+																 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															FROM fieldings AS FIELD,
+																 positions AS PO
+														   WHERE PO.pos = FIELD.POS AND
+																 FIELD.player_id = "' + @player + '" AND
+																 FIELD.POS IN (SELECT POS
+																				 FROM positions
+																				WHERE field = "IF") ' + @sql_year +
+																			'ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingIn.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingIn = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingOut = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																  SUM(FIELD.Innouts/3.0) AS INN,
+																  SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																  SUM(FIELD.PO) AS PO,
+																  SUM(FIELD.A) AS A,
+																  SUM(FIELD.E) AS E,
+																  CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															 FROM fieldings AS FIELD,
+																  positions AS PO
+															WHERE PO.pos = FIELD.POS AND
+																  FIELD.player_id = "' + @player + '" AND
+																  FIELD.POS IN (SELECT POS
+																				  FROM positions
+																				 WHERE field = "OF") ' + @sql_year +
+																			 'ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingOut.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingOut = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingTotal = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																	SUM(FIELD.Innouts/3.0) AS INN,
+																	SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																	SUM(FIELD.PO) AS PO,
+																	SUM(FIELD.A) AS A,
+																	SUM(FIELD.E) AS E,
+																	CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															   FROM fieldings AS FIELD,
+																	positions AS PO
+															  WHERE PO.pos = FIELD.POS AND
+																	FIELD.player_id = "' + @player + '" ' + @sql_year)[0]
+				
+				@playerFieldingDetail = Fielding.find_by_sql('SELECT FIELD.game_id,
+																	 FIELD.POS,
+																	 (FIELD.Innouts/3.0) AS INN,
+																	 FIELD.PO+FIELD.A+FIELD.E AS TC,
+																	 FIELD.PO AS PO,
+																	 FIELD.A AS A,
+																	 FIELD.E AS E,
+																	 CAST(CAST((FIELD.PO+FIELD.A)/(FIELD.PO+FIELD.A+FIELD.E+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+																FROM fieldings AS FIELD
+															   WHERE FIELD.player_id = "' + @player + '" ' + @sql_year +
+														   'ORDER BY FIELD.game_id')
+			end
+			
+			
+			
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	
+	end
+	
+	def king
+		
+		if logged_in?
+		
+			@activePLAYER = 150
+			@topNumber = 7
+			@year = params[:year]
+			
+			# 每年有幾場比賽
+			@gameNumberInEachYear = Cup.find_by_sql('SELECT cups.year,
+															COUNT(*) AS gameNumber
+													   FROM games,
+															cups
+													  WHERE games.cup_id = cups.cup_id
+												   GROUP BY cups.year')
+			@gameNumberInYear = Hash.new(0)
+			@gameNumberInWildcard = 0
+			@gameNumberInEachYear.each do |gNIEY|
+				@gameNumberInYear[gNIEY.year.to_s] = gNIEY.gameNumber
+				@gameNumberInWildcard += gNIEY.gameNumber
+			end
+			@gameNumberInYear['Wildcard'] = @gameNumberInWildcard
+			
+			if @year == nil
+			
+				@year_option = Array.new
+				@allyear = Cup.select('DISTINCT cups.year').order('cups.year')
+				@allyear.each do |eachyear|
+					@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
+				end
+				@year_option.push(["不分年度","Wildcard"])
+			
+			else
+				
+				if @year != 'Wildcard'
+					@sql_year = ' AND  C.year = ' + @year.to_s + ' '
+				else
+					@sql_year = ' '
+				end
+				
+				@pit_year = ' AND PIT.game_id IN (SELECT G.game_id 
+												    FROM pitchings AS PIT,
+														 games AS G,
+														 cups AS C 
+												   WHERE PIT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id ' + @sql_year + ' ) '
+				@bat_year = ' AND BAT.game_id IN (SELECT G.game_id
+													FROM battings AS BAT,
+														 games AS G,
+														 cups AS C
+												   WHERE BAT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id ' + @sql_year + ' ) '
+				@game_year = ' AND G.game_id IN (SELECT G.game_id 
+												   FROM games AS G,
+														cups AS C
+												  WHERE G.cup_id = C.cup_id ' + @sql_year + ' ) '
+				
+				@king_avg = Batting.find_by_sql('SELECT BAT.player_id,
+														MBR.name,
+														CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+														SUM(BAT.AB) AS AB,
+														SUM(BAT.H) AS H
+												   FROM battings AS BAT,
+														players AS PLY,
+														members AS MBR
+												  WHERE BAT.player_id = PLY.player_id AND
+														PLY.player_id = MBR.id AND
+														PLY.member = 1 ' + @bat_year + 
+											  'GROUP BY BAT.player_id 
+												 HAVING ( SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @gameNumberInYear[@year.to_s].to_s + ' OR
+														  SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @activePLAYER.to_s + ' )
+											   ORDER BY SUM(BAT.H)/SUM(BAT.AB+0.00000000000000000000000000000000001) DESC,
+														SUM(BAT.H) DESC,
+														SUM(BAT.RBI) DESC
+												  LIMIT ' + @topNumber.to_s)
+				@king_avgs = Batting.find_by_sql('SELECT BAT.player_id,
+														 MBR.name,
+														 SUM(BAT.AB) AS AB,
+														 SUM(BAT.H) AS H,
+														 SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+														 SUM(BAT.RBI) AS RBI
+													FROM battings AS BAT,
+														 players AS PLY,
+														 members AS MBR
+												   WHERE BAT.player_id = PLY.player_id AND
+														 PLY.player_id = MBR.id AND
+														 PLY.member = 1 ' + @bat_year +
+											   'GROUP BY BAT.player_id')
+				@avgs_order = 0;
+				Struct.new("KingAVGS", :player_id, :name, :AVGS, :AVG, :H, :AB, :PA, :RBI)
+				@Array_king_avgs = Array.new
+				@king_avgs.each do |k_avgs|
+					@PA_diff = [@gameNumberInYear[@year.to_s],@activePLAYER].min - k_avgs.PA
+					if @PA_diff <= 0
+						@king_avgs_oneplayer = Struct::KingAVGS.new(k_avgs.player_id,k_avgs.name,k_avgs.H / k_avgs.AB.to_f,k_avgs.H / k_avgs.AB.to_f,k_avgs.H,k_avgs.AB,k_avgs.PA,k_avgs.RBI)
+					else
+						@king_avgs_oneplayer = Struct::KingAVGS.new(k_avgs.player_id,k_avgs.name,k_avgs.H / (k_avgs.AB + @PA_diff).to_f,k_avgs.H / k_avgs.AB.to_f,k_avgs.H,k_avgs.AB,k_avgs.PA,k_avgs.RBI)
+					end
+					@Array_king_avgs.push(@king_avgs_oneplayer)
+				end
+				
+				@Array_king_avgs.sort! {|a,b| [b.AVGS,b.H,b.RBI] <=> [a.AVGS,a.H,a.RBI] }
+				
+				@king_h = Batting.find_by_sql('SELECT BAT.player_id,
+													  MBR.name,
+													  SUM(BAT.H) AS H,
+													  SUM(BAT.AB) AS AB
+												 FROM battings AS BAT,
+													  players AS PLY,
+													  members AS MBR
+												WHERE BAT.player_id = PLY.player_id AND
+													  PLY.player_id = MBR.id AND
+													  PLY.member = 1 ' + @bat_year + 
+											'GROUP BY BAT.player_id
+											   HAVING SUM(BAT.H) > 0
+											 ORDER BY SUM(BAT.H) DESC,
+													  SUM(BAT.AB)
+											    LIMIT ' + @topNumber.to_s)
+				@king_hr = Batting.find_by_sql('SELECT BAT.player_id,
+													   MBR.name,
+													   SUM(BAT.HR) AS HR,
+													   SUM(BAT.AB) AS AB
+												  FROM battings AS BAT,
+													   players AS PLY,
+													   members AS MBR
+												 WHERE BAT.player_id = PLY.player_id AND
+													   PLY.player_id = MBR.id AND
+													   PLY.member = 1 ' + @bat_year + 
+											 'GROUP BY BAT.player_id
+											    HAVING SUM(BAT.HR) > 0
+											  ORDER BY SUM(BAT.HR) DESC,
+													   SUM(BAT.AB),
+													   SUM(BAT.RBI) DESC
+											     LIMIT ' + @topNumber.to_s)
+				@king_rbi = Batting.find_by_sql('SELECT BAT.player_id,
+													    MBR.name,
+													    SUM(BAT.RBI) AS RBI,
+													    SUM(BAT.AB) AS AB
+												   FROM battings AS BAT,
+													    players AS PLY,
+													    members AS MBR
+												  WHERE BAT.player_id = PLY.player_id AND
+													    PLY.player_id = MBR.id AND
+													    PLY.member = 1 ' + @bat_year + 
+											  'GROUP BY BAT.player_id
+											   ORDER BY SUM(BAT.RBI) DESC,
+													    SUM(BAT.H)/SUM(BAT.AB+0.00000000000000000000000000000000001) DESC,
+													    SUM(BAT.AB) DESC
+											      LIMIT ' + @topNumber.to_s)
+				@king_r = Batting.find_by_sql('SELECT BAT.player_id,
+													  MBR.name,
+													  SUM(BAT.R) AS R
+												 FROM battings AS BAT,
+													  players AS PLY,
+													  members AS MBR
+												WHERE BAT.player_id = PLY.player_id AND
+													  PLY.player_id = MBR.id AND
+													  PLY.member = 1 ' + @bat_year + 
+											'GROUP BY BAT.player_id
+											 ORDER BY SUM(BAT.R) DESC,
+													  SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)
+											    LIMIT ' + @topNumber.to_s)
+				@king_era = Pitching.find_by_sql('SELECT PIT.player_id,
+														 MBR.name,
+														 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+														 CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+														 SUM(PIT.ER) AS ER,
+														 SUM(PIT.IPouts)/3.0 AS IP
+													FROM pitchings AS PIT,
+														 players AS PLY,
+														 members AS MBR
+												   WHERE PLY.player_id = PIT.player_id AND
+														 PLY.player_id = MBR.id AND
+														 PLY.member = 1 ' + @pit_year + 
+											   'GROUP BY PIT.player_id
+												  HAVING ( SUM(PIT.IPouts)/3.0 >= ' + @gameNumberInYear[@year.to_s].to_s + ' OR
+														   SUM(PIT.IPouts)/3.0 >= ' + @activePLAYER.to_s + ' )
+												ORDER BY SUM(PIT.ER)/SUM(PIT.IPouts+0.0000000000000000000000000000000000000001)
+												   LIMIT ' + @topNumber.to_s)
+				@king_w = Pitching.find_by_sql('SELECT PIT.player_id,
+													   MBR.name,
+													   SUM(PIT.W) AS W,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY,
+													   members AS MBR
+												 WHERE PLY.player_id = PIT.player_id AND
+													   PLY.player_id = MBR.id AND
+													   PLY.member = 1 ' + @pit_year + 
+											 'GROUP BY PIT.player_id
+												HAVING SUM(PIT.W) > 0
+											  ORDER BY SUM(PIT.W) DESC,
+													   SUM(PIT.W)/(SUM(PIT.W)+SUM(PIT.L)) DESC
+												 LIMIT ' + @topNumber.to_s)
+				@king_so = Pitching.find_by_sql('SELECT PIT.player_id,
+													   MBR.name,
+													   SUM(PIT.SO) AS SO,
+													   SUM(PIT.IPouts)/3.0 AS IP
+												  FROM pitchings AS PIT,
+													   players AS PLY,
+													   members AS MBR
+												 WHERE PLY.player_id = PIT.player_id AND
+													   PLY.player_id = MBR.id AND
+													   PLY.member = 1 ' + @pit_year + 
+											 'GROUP BY PIT.player_id
+												HAVING SUM(PIT.SO) > 0
+											  ORDER BY SUM(PIT.SO) DESC,
+													   SUM(PIT.IPouts)/3.0
+												 LIMIT ' + @topNumber.to_s)
+				@king_2b = Batting.find_by_sql('SELECT BAT.player_id,
+													   MBR.name,
+													   SUM(BAT.B2) AS B2,
+													   SUM(BAT.AB) AS AB
+												  FROM battings AS BAT,
+													   players AS PLY,
+													   members AS MBR
+												 WHERE BAT.player_id = PLY.player_id AND
+													   PLY.player_id = MBR.id AND
+													   PLY.member = 1 ' + @bat_year + 
+											 'GROUP BY BAT.player_id
+												HAVING SUM(BAT.B2) > 0
+											  ORDER BY SUM(BAT.B2) DESC,
+													   SUM(BAT.AB)
+											     LIMIT ' + @topNumber.to_s)
+				@king_3b = Batting.find_by_sql('SELECT BAT.player_id,
+													   MBR.name,
+													   SUM(BAT.B3) AS B3,
+													   SUM(BAT.AB) AS AB
+												  FROM battings AS BAT,
+													   players AS PLY,
+													   members AS MBR
+												 WHERE BAT.player_id = PLY.player_id AND
+													   PLY.player_id = MBR.id AND
+													   PLY.member = 1 ' + @bat_year + 
+											 'GROUP BY BAT.player_id
+												HAVING SUM(BAT.B3) > 0
+											  ORDER BY SUM(BAT.B3) DESC,
+													   SUM(BAT.AB)
+											     LIMIT ' + @topNumber.to_s)
+				@king_mvp = Game.find_by_sql('SELECT G.mvp AS player_id,
+													 MBR.name,
+													 COUNT(G.mvp) AS MVP
+												FROM games AS G,
+													 players AS PLY,
+													 members AS MBR
+											   WHERE G.mvp = PLY.player_id AND
+													 PLY.player_id = MBR.id AND
+													 PLY.member = 1 ' + @game_year +
+										   'GROUP BY G.mvp
+										    ORDER BY COUNT(G.mvp) DESC
+											   LIMIT ' + @topNumber.to_s)
+				@king_whip = Pitching.find_by_sql('SELECT PIT.player_id,
+														  MBR.name,
+														  (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+														  SUM(PIT.H) AS H,
+														  SUM(PIT.BB) AS BB,
+														  SUM(PIT.IBB) AS IBB,
+														  SUM(PIT.IPouts)/3.0 AS IP
+													 FROM pitchings AS PIT,
+														  players AS PLY,
+														  members AS MBR
+													WHERE PLY.player_id = PIT.player_id AND
+														  PLY.player_id = MBR.id AND
+														  PLY.member = 1 ' + @pit_year + 
+												'GROUP BY PIT.player_id
+												   HAVING ( SUM(PIT.IPouts)/3.0 >= ' + @gameNumberInYear[@year.to_s].to_s + ' OR
+														    SUM(PIT.IPouts)/3.0 >= ' + @activePLAYER.to_s + ' )
+												 ORDER BY (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3
+													LIMIT ' + @topNumber.to_s)
+				@king_tb = Batting.find_by_sql('SELECT BAT.player_id,
+													   MBR.name,
+													   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+													   SUM(BAT.AB) AS AB
+												  FROM battings AS BAT,
+													   players AS PLY,
+													   members AS MBR
+												 WHERE BAT.player_id = PLY.player_id AND
+													   PLY.player_id = MBR.id AND
+													   PLY.member = 1 ' + @bat_year + 
+											 'GROUP BY BAT.player_id
+												HAVING SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 > 0
+											  ORDER BY SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 DESC,
+													   SUM(BAT.AB)
+											     LIMIT ' + @topNumber.to_s)
+				@king_silver = Batting.find_by_sql('SELECT BAT.player_id,
+														   MBR.name,
+													       (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+													  FROM battings AS BAT,
+														   players AS PLY,
+														   members AS MBR
+													 WHERE BAT.player_id = PLY.player_id AND
+														   PLY.player_id = MBR.id AND
+														   PLY.member = 1 ' + @bat_year + 
+												 'GROUP BY BAT.player_id
+												  ORDER BY (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) DESC
+													 LIMIT ' + @topNumber.to_s)
+			end
+			
+		
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	
+	end
 end

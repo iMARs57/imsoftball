@@ -7,16 +7,19 @@
 	<ul class="nav nav-stacked">
 		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu">一般查詢 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse in" id="userMenu">
-				<li><%= link_to '<i class="glyphicon glyphicon-home"></i> 球賽查詢'.html_safe, {controller: "records", action: "game"} %></li>
-				<li><%= link_to '<i class="glyphicon glyphicon-envelope"></i> 打擊查詢'.html_safe, {controller: "records", action: "batting"} %></li>
-				<li><%= link_to '<i class="glyphicon glyphicon-cog"></i> 投球查詢'.html_safe, {controller: "records", action: "pitching"} %></li>
-				<li><a href="#"><i class="glyphicon glyphicon-comment"></i> 守備查詢</a></li>
+				<li><%= link_to "　#{fa_icon "newspaper-o 1x", class:"icon_sidebar"} 球賽查詢".html_safe, {controller: "records", action: "game"} %></li>
+				<li><%= link_to "　<i class='glyphicon glyphicon-fire icon_sidebar'></i> 打擊查詢".html_safe, {controller: "records", action: "batting"} %></li>
+				<li><%= link_to "　#{fa_icon "fire-extinguisher 1x", class:"icon_sidebar"} 投球查詢".html_safe, {controller: "records", action: "pitching"} %></li>
+				<li><%= link_to "　#{fa_icon "shield 1x", class:"icon_sidebar"} 守備查詢".html_safe, {controller: "records", action: "fielding"} %></li>
+				<!--
 				<li><a href="#"><i class="glyphicon glyphicon-user"></i> 對戰成績查詢</a></li>
 				<li><a href="#"><i class="glyphicon glyphicon-user"></i> 隊員查詢</a></li>
 				<li><a href="#"><i class="glyphicon glyphicon-user"></i> 其他球員查詢</a></li>
-				<li><a href="#"><i class="glyphicon glyphicon-user"></i> 年度攻守排行</a></li>
+				-->
+				<li><%= link_to "　#{fa_icon "trophy 1x", class:"icon_sidebar"} 年度攻守排行".html_safe, {controller: "records", action: "king"} %></li>
 			</ul>
 		</li>
+		<!--
 		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#menu2"> 盃賽查詢 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse" id="menu2">
 				<li><a href="#">新生盃</a>
@@ -44,8 +47,10 @@
 				<li><a href=""><i class="glyphicon glyphicon-circle"></i> Sabermetrics</a></li>
 			</ul>
 		</li>
+		-->
 	</ul>
 
+	<!--
 	<hr>
 
 	<strong><i class="glyphicon glyphicon-link"></i> 資料變更</strong>
@@ -61,7 +66,7 @@
 		<li><a href="#"><i class="glyphicon glyphicon-book"></i> Pages</a></li>
 		<li><a href="#"><i class="glyphicon glyphicon-star"></i> Social Media</a></li>
 	</ul>
-	
+	-->
 	<hr>
 	
 	<strong><i class="glyphicon glyphicon-link"></i> 相關連結</strong>

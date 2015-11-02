@@ -1,0 +1,817 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<h3>年度攻守排行</h3>
+			<hr>
+			<% if @year == nil %>
+				<%= form_tag("king" , method:"get") do %>
+					<%= select_tag(:year, options_for_select(@year_option,@year_option[@year_option.length-2][1])) %>
+					<%= submit_tag("查詢", name: nil) %>
+				<% end %>
+			<% else %>
+				<script>
+					function AdjustHeight(){
+						var maxDivHeight = 0;
+						$('div[id^="div_king_"]').each(function(){
+							if($(this).height() > maxDivHeight)
+								maxDivHeight = $(this).height();
+						});
+						//console.log(maxDivHeight);
+						$('div[id^="div_king_"]').height(maxDivHeight);
+					}
+					
+					$(window).on('load resize', function(){
+						if($(window).width() >= 768){
+							$('.king_thumbnail').width($(window).width() * 0.06);
+							$('.king_thumbnail').css('max-width',200);
+							//console.log($('.king_thumbnail').width());
+						}
+						else{
+							$('.king_thumbnail').width($(window).width() * 0.2);
+							//console.log($('.king_thumbnail').width());
+						}
+						
+						AdjustHeight();
+					});
+					
+					$(function(){
+						$("[name='Bat_ckeckbox']").bootstrapSwitch();
+						$("[name='Pit_ckeckbox']").bootstrapSwitch();
+						
+						$('input[name="Bat_ckeckbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+							if(state){
+								$('div.king_Bat').parent('div').show();
+								AdjustHeight();
+							}
+							else{
+								$('div.king_Bat').parent('div').hide();
+								AdjustHeight();
+							}
+						});
+						
+						$('input[name="Pit_ckeckbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+							if(state){
+								$('div.king_Pit').parent('div').show();
+								AdjustHeight();
+							}
+							else{
+								$('div.king_Pit').parent('div').hide();
+								AdjustHeight();
+							}
+						});
+					})
+				</script>
+				<h4>攻守排行榜 (<%= @year == 'Wildcard'? ("不分年度"):(@year.to_s) %>年度，目前已賽<%= @gameNumberInYear[@year.to_s] %>場)</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為每場1打席/局 -- 目前 <%= @gameNumberInYear[@year.to_s] %> 場；或總打席/總投球局數達<%= @activePLAYER %>以上者。</h5>
+				<form>
+					<h5>
+						<span style="white-space: nowrap;">打擊排行 <input type="checkbox" name="Bat_ckeckbox" data-on-text="ON" data-off-text="OFF" checked></span>
+						　
+						<span style="white-space: nowrap;">投球排行 <input type="checkbox" name="Pit_ckeckbox" data-on-text="ON" data-off-text="OFF" checked></span>
+					</h5>
+				</form>
+				<br/>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_avg">
+						<table class="table table-striped table-condensed" id="table_king_batting_avg">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">打擊王</th>
+									<th>打擊率</th>
+									<th>(安打/打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_avg.size != 0 %>
+									<% @king_avg.each_with_index do |kingAVG, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingAVG.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingAVG.player_id}.jpg", class:"king_thumbnail", alt: "#{kingAVG.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingAVG.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingAVG.name %></td>
+											<td><%= '%.3f' % kingAVG.AVG.round(3) %></td>
+											<td>(<%= kingAVG.H %>/<%= kingAVG.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_avg.size < 7 %>
+									<% for i in 1..(7 - @king_avg.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'AVG' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_hit">
+						<table class="table table-striped table-condensed" id="table_king_batting_hit">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">安打王</th>
+									<th>安打數</th>
+									<th>(打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_h.size != 0 %>
+									<% @king_h.each_with_index do |kingH, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingH.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingH.player_id}.jpg", class:"king_thumbnail", alt: "#{kingH.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingH.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingH.name %></td>
+											<td><%= kingH.H %></td>
+											<td>(<%= kingH.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_h.size < 7 %>
+									<% for i in 1..(7 - @king_h.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'H' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_hr">
+						<table class="table table-striped table-condensed" id="table_king_batting_hr">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">全壘打王</th>
+									<th>全壘打數</th>
+									<th>(打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_hr.size != 0 %>
+									<% @king_hr.each_with_index do |kingHR, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingHR.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingHR.player_id}.jpg", class:"king_thumbnail", alt: "#{kingHR.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingHR.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingHR.name %></td>
+											<td><%= kingHR.HR %></td>
+											<td>(<%= kingHR.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_hr.size < 7 %>
+									<% for i in 1..(7 - @king_hr.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'HR' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Pit" id="div_king_pitching_era">
+						<table class="table table-striped table-condensed" id="table_king_pitching_era">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">防禦率王</th>
+									<th>五局防禦率</th>
+									<th>七局防禦率</th>
+									<th>(自責分/局數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_era.size != 0 %>
+									<% @king_era.each_with_index do |kingERA, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingERA.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingERA.player_id}.jpg", class:"king_thumbnail", alt: "#{kingERA.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingERA.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingERA.name %></td>
+											<td><%= '%.2f' % kingERA.ERA5.round(2) %></td>
+											<td><%= '%.2f' % kingERA.ERA7.round(2) %></td>
+											<td>(<%= kingERA.ER %>/<%= '%.1f' % kingERA.IP.round(1) %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_era.size < 7 %>
+									<% for i in 1..(7 - @king_era.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="5">
+										<%= link_to "More...", controller: "records", action: "pitching", player: 'all', year: @year, sortBy: 'ERA5' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Pit" id="div_king_pitching_w">
+						<table class="table table-striped table-condensed" id="table_king_pitching_w">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">勝投王</th>
+									<th>勝場數</th>
+									<th>(出賽數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_w.size != 0 %>
+									<% @king_w.each_with_index do |kingW, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingW.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingW.player_id}.jpg", class:"king_thumbnail", alt: "#{kingW.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingW.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingW.name %></td>
+											<td><%= kingW.W %></td>
+											<td>(<%= kingW.G %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_w.size < 7 %>
+									<% for i in 1..(7 - @king_w.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "pitching", player: 'all', year: @year, sortBy: 'W' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Pit" id="div_king_pitching_so">
+						<table class="table table-striped table-condensed" id="table_king_pitching_so">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">三振王</th>
+									<th>三振數</th>
+									<th>(局數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_so.size != 0 %>
+									<% @king_so.each_with_index do |kingSO, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingSO.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingSO.player_id}.jpg", class:"king_thumbnail", alt: "#{kingSO.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingSO.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingSO.name %></td>
+											<td><%= kingSO.SO %></td>
+											<td>(<%= '%.1f' % kingSO.IP.round(1) %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_so.size < 7 %>
+									<% for i in 1..(7 - @king_so.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "pitching", player: 'all', year: @year, sortBy: 'SO' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_rbi">
+						<table class="table table-striped table-condensed" id="table_king_batting_rbi">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">打點王</th>
+									<th>打點</th>
+									<th>(打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_rbi.size != 0 %>
+									<% @king_rbi.each_with_index do |kingRBI, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingRBI.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingRBI.player_id}.jpg", class:"king_thumbnail", alt: "#{kingRBI.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingRBI.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingRBI.name %></td>
+											<td><%= kingRBI.RBI %></td>
+											<td>(<%= kingRBI.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_rbi.size < 7 %>
+									<% for i in 1..(7 - @king_rbi.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'RBI' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_r">
+						<table class="table table-striped table-condensed" id="table_king_batting_r">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">得分王</th>
+									<th>得分</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_r.size != 0 %>
+									<% @king_r.each_with_index do |kingR, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingR.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingR.player_id}.jpg", class:"king_thumbnail", alt: "#{kingR.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingR.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingR.name %></td>
+											<td><%= kingR.R %></td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_r.size < 7 %>
+									<% for i in 1..(7 - @king_r.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="3">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'R' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_sliver">
+						<table class="table table-striped table-condensed" id="table_king_batting_sliver">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">銀棒王</th>
+									<th>銀棒指數</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_silver.size != 0 %>
+									<% @king_silver.each_with_index do |kingSILVER, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingSILVER.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingSILVER.player_id}.jpg", class:"king_thumbnail", alt: "#{kingSILVER.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingSILVER.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingSILVER.name %></td>
+											<td><%= '%.1f' % kingSILVER.SILVER.round(1) %></td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_silver.size < 7 %>
+									<% for i in 1..(7 - @king_silver.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_2b">
+						<table class="table table-striped table-condensed" id="table_king_batting_2b">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">二安王</th>
+									<th>二壘安打</th>
+									<th>(打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_2b.size != 0 %>
+									<% @king_2b.each_with_index do |king2B, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{king2B.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{king2B.player_id}.jpg", class:"king_thumbnail", alt: "#{king2B.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{king2B.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= king2B.name %></td>
+											<td><%= king2B.B2 %></td>
+											<td>(<%= king2B.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_2b.size < 7 %>
+									<% for i in 1..(7 - @king_2b.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'B2' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_3b">
+						<table class="table table-striped table-condensed" id="table_king_batting_3b">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">三安王</th>
+									<th>三壘安打</th>
+									<th>(打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_3b.size != 0 %>
+									<% @king_3b.each_with_index do |king3B, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{king3B.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{king3B.player_id}.jpg", class:"king_thumbnail", alt: "#{king3B.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{king3B.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= king3B.name %></td>
+											<td><%= king3B.B3 %></td>
+											<td>(<%= king3B.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_3b.size < 7 %>
+									<% for i in 1..(7 - @king_3b.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'B3' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive" id="div_king_mvp">
+						<table class="table table-striped table-condensed" id="table_king_mvp">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">MVP王</th>
+									<th>MVP次數</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_mvp.size != 0 %>
+									<% @king_mvp.each_with_index do |kingMVP, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingMVP.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingMVP.player_id}.jpg", class:"king_thumbnail", alt: "#{kingMVP.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingMVP.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingMVP.name %></td>
+											<td><%= kingMVP.MVP %></td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_mvp.size < 7 %>
+									<% for i in 1..(7 - @king_mvp.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Pit" id="div_king_pitching_whip">
+						<table class="table table-striped table-condensed" id="table_king_pitching_whip">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">WHIP王</th>
+									<th>WHIP</th>
+									<th>(被安打數+保送數/局數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_whip.size != 0 %>
+									<% @king_whip.each_with_index do |kingWHIP, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingWHIP.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingWHIP.player_id}.jpg", class:"king_thumbnail", alt: "#{kingWHIP.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingWHIP.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingWHIP.name %></td>
+											<td><%= '%.2f' % kingWHIP.WHIP.round(2) %></td>
+											<td>(<%= kingWHIP.H + kingWHIP.BB + kingWHIP.IBB %>/<%= '%.1f' % kingWHIP.IP.round(1) %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_whip.size < 7 %>
+									<% for i in 1..(7 - @king_whip.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "pitching", player: 'all', year: @year, sortBy: 'WHIP' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_tb">
+						<table class="table table-striped table-condensed" id="table_king_batting_tb">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">壘打數王</th>
+									<th>壘打數</th>
+									<th>(打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @king_tb.size != 0 %>
+									<% @king_tb.each_with_index do |kingTB, index| %>
+										<tr>
+											<td>
+												<% if index + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{kingTB.player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{kingTB.player_id}.jpg", class:"king_thumbnail", alt: "#{kingTB.player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{kingTB.player_id}") %>
+													<% end %>
+												<% else %>
+													<%= index + 1 %>
+												<% end %>
+											</td>
+											<td><%= kingTB.name %></td>
+											<td><%= kingTB.TB %></td>
+											<td>(<%= kingTB.AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @king_tb.size < 7 %>
+									<% for i in 1..(7 - @king_tb.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<%= link_to "More...", controller: "records", action: "batting", player: 'all', year: @year, sortBy: 'TB' %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="table-responsive king_Bat" id="div_king_batting_avgs">
+						<table class="table table-striped table-condensed" id="table_king_batting_avgs">
+							<thead>
+								<tr>
+									<th colspan="2" class="col_Thunbnail">打擊王(補足打席)</th>
+									<th>原打擊率</th>
+									<th>補足打席後打擊率</th>
+									<th>(原安打/原打數)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if @Array_king_avgs.size != 0 %>
+									<% for i in 0..(@topNumber-1) %>
+										<tr>
+											<td>
+												<% if i + 1 == 1 %>
+													<% if !Imsoftball::Application.assets.find_asset("portrait/#{@Array_king_avgs[i].player_id}.jpg").nil? %>
+														<%= image_tag("portrait/#{@Array_king_avgs[i].player_id}.jpg", class:"king_thumbnail", alt: "#{@Array_king_avgs[i].player_id}") %>
+													<% else %>
+														<%= image_tag("portrait/no_portrait.jpg", class:"king_thumbnail", alt: "#{@Array_king_avgs[i].player_id}") %>
+													<% end %>
+												<% else %>
+													<%= i + 1 %>
+												<% end %>
+											</td>
+											<td><%= @Array_king_avgs[i].name %></td>
+											<td><%= '%.3f' % @Array_king_avgs[i].AVG.round(3) %></td>
+											<td><%= '%.3f' % @Array_king_avgs[i].AVGS.round(3) %></td>
+											<td>(<%= @Array_king_avgs[i].H %>/<%= @Array_king_avgs[i].AB %>)</td>
+										</tr>
+									<% end %>
+								<% end %>
+								<% if @Array_king_avgs.size < 7 %>
+									<% for i in 1..(7 - @Array_king_avgs.size) do %>
+										<tr>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+											<td>　</td>
+										</tr>
+									<% end %>
+								<% end %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			<% end %>
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

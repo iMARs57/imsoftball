@@ -34,6 +34,7 @@ module Imsoftball
 	
 	config.assets.precompile += %w( home.js )
 	config.assets.precompile += %w( records.js )
+	config.assets.paths << Rails.root.join("app", "assets", "fonts")
 	
   end
 end

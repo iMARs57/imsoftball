@@ -61,7 +61,7 @@
 				<%= image_tag("player/infoman.png", class:"cover_image") %>
 			<% end %>
 			<span id="span_title">
-				<%= image_tag("logo.png", height: '35', class:'name_logo') %> #<%= @member.number %> <%= @member.id %> <%= @member.name %> | <%= (@member.position==nil)? "Undecided" : @member.position %>
+				<%= image_tag("logo.png", height: '35', class:'name_logo') %> #<%= (@member.number == nil)?('??'):(@member.number) %> <%= (@member.id == @member.name)?(''):(@member.id) %> <%= @member.name %> | <%= (@member.position==nil)? "Undecided" : @member.position %>
 			</span>
 		</div>
 		<div class="col-sm-12 player_content">
@@ -72,7 +72,7 @@
 					<%= image_tag("portrait/no_portrait.jpg", id:"thumbnail", class:"img-thumbnail center-block") %>
 				<% end %>
 			</span>
-			<h3 id="title_smaller_screen"><%= image_tag("logo.png", height: '35', class:'name_logo') %> #<%= @member.number %> <%= @member.id %> <%= @member.name %> | <%= (@member.position==nil)? "Undecided" : @member.position %></h3>
+			<h3 id="title_smaller_screen"><%= image_tag("logo.png", height: '35', class:'name_logo') %> #<%= (@member.number == nil)?('??'):(@member.number) %> <%= (@member.id == @member.name)?(''):(@member.id) %> <%= @member.name %> | <%= (@member.position==nil)? "Undecided" : @member.position %></h3>
 			
 			<ul class="nav nav-tabs" role="tablist" id="personalTab">
 				<li class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">個人資料</a></li>
@@ -277,7 +277,7 @@
 											<tr>
 												<td><%= acdmicPit.game_id %></td>
 												<td>
-													<% game_time = Time.strptime(acdmicPit.time,"%m/%d/%Y %H:%M:%S") %>
+													<% game_time = acdmicPit.time %>
 													<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
 												</td>
 												<td>1</td>
@@ -480,7 +480,7 @@
 											<tr>
 												<td><%= acdmicBat.game_id %></td>
 												<td>
-													<% game_time = Time.strptime(acdmicBat.time,"%m/%d/%Y %H:%M:%S") %>
+													<% game_time = acdmicBat.time %>
 													<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
 												</td>
 												<td>1</td>
@@ -658,7 +658,7 @@
 											<tr>
 												<td><%= acdmicFld.game_id %></td>
 												<td>
-													<% game_time = Time.strptime(acdmicFld.time,"%m/%d/%Y %H:%M:%S") %>
+													<% game_time = acdmicFld.time %>
 													<%= game_time.strftime("%Y.%m.%d %p%I:%M") %>
 												</td>
 												<td>1</td>

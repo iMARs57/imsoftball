@@ -27,7 +27,9 @@
             		<% end %>
 				<% end %>
 				<td class="withTieName" title="<%= tieName %>">Tie With <%= tieList.length %></td>
-				<td><%= format % (panel_top5[orderNow].Data) %></td>
+				<td>
+					<%= (digit != 0)? (format % (panel_top5[orderNow].Data.round(digit))):(format % (panel_top5[orderNow].Data)) %>
+				</td>
 			</tr>			
 			<% totalItem = totalItem - tieList.length %>
 			<% orderNow = orderNow + tieList.length %>	
@@ -48,7 +50,9 @@
         		<% else %>
         			<td><%= panel_top5[orderNow].ID %></td>
         		<% end %>
-				<td><%= format % (panel_top5[orderNow].Data) %></td>
+				<td>
+					<%= (digit != 0)? (format % (panel_top5[orderNow].Data.round(digit))):(format % (panel_top5[orderNow].Data)) %>
+				</td>
 			</tr>
 			<% totalItem = totalItem - 1 %>
 			<% orderNow = orderNow + 1 %>
@@ -56,6 +60,9 @@
 		<% counter = counter + 1 %>			
 		<% tieList.clear %>
 		<% tieName = '' %>
+		<% if counter == 5 %>
+			<% break %>
+		<% end %>
 	<% end %>
 	<% if counter < 5 %>
 		<% for leftover in 1..(5 - counter) %>

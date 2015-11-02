@@ -16,6 +16,11 @@
 	text-transform: none;
 }
 
+.icon_sidebar{
+	
+	width: 1em;
+}
+
 #records * div.table-responsive{
 	border-radius: 5px;
 }
@@ -48,7 +53,14 @@
 #table_pitching_player > thead > tr > th,
 #table_pitching_playerIP > thead > tr > th,
 #table_pitching_playerDetail > thead > tr > th,
-#table_pitching_playerEachYear > thead > tr > th{
+#table_pitching_playerEachYear > thead > tr > th,
+#table_fielding_all_summary > thead > tr > th,
+#table_fielding_playerByYearAndPos > thead > tr > th,
+#table_fielding_playerByYear > thead > tr > th,
+#table_fielding_playerByPOS > thead > tr > th,
+#table_fielding_playerByYearAndIO > thead > tr > th,
+#table_fielding_player > thead > tr > th,
+#table_fielding_playerDetail > thead > tr > th,{
 	
 	background:rgba(192,192,192,0.7);
 }
@@ -102,7 +114,14 @@ img.teamLogo{
 #table_pitching_player > thead > tr > th, #table_pitching_player > tbody > tr > td,
 #table_pitching_playerIP > thead > tr > th, #table_pitching_playerIP > tbody > tr > td,
 #table_pitching_playerDetail > thead > tr > th, #table_pitching_playerDetail > tbody > tr > td,
-#table_pitching_playerEachYear > thead > tr > th, #table_pitching_playerEachYear > tbody > tr > td{
+#table_pitching_playerEachYear > thead > tr > th, #table_pitching_playerEachYear > tbody > tr > td,
+#table_fielding_all_summary > thead > tr > th, #table_fielding_all_summary > tbody > tr > td, #table_fielding_all_summary > tfoot > tr > td,
+#table_fielding_playerByYearAndPos > thead > tr > th, #table_fielding_playerByYearAndPos > tbody > tr > td,
+#table_fielding_playerByYear > thead > tr > th, #table_fielding_playerByYear > tbody > tr > td,
+#table_fielding_playerByPOS > thead > tr > th, #table_fielding_playerByPOS > tbody > tr > td,
+#table_fielding_playerByYearAndIO > thead > tr > th, #table_fielding_playerByYearAndIO > tbody > tr > td,
+#table_fielding_player > thead > tr > th, #table_fielding_player > tbody > tr > td, #table_fielding_player > tfoot > tr > td,
+#table_fielding_playerDetail > thead > tr > th, #table_fielding_playerDetail > tbody > tr > td{
 	
 	text-align: center;
 	vertical-align: middle;
@@ -114,7 +133,9 @@ img.teamLogo{
 #table_game_pitchingHome > tfoot > tr > td,
 #table_game_fieldingAway > tfoot > tr > td,
 #table_game_fieldingHome > tfoot > tr > td,
-#table_batting_all_summary > tfoot > tr > td{
+#table_batting_all_summary > tfoot > tr > td,
+#table_fielding_all_summary > tfoot > tr > td,
+#table_fielding_player > tfoot > tr > td{
 	
 	background:rgb(149,149,149);
 	color:white;
@@ -160,6 +181,17 @@ img.teamLogo{
 	background-color:rgba(173,216,230,0.7) !important;
 }
 
+#records * div.recordsContent * a{
+	
+	color: blue;
+}
+
+#records * div.recordsContent * a:hover{
+	
+	color: #1D9B6C;
+}
+
+/*
 #table_batting_all * a, #table_pitching_all * a, #table_pitching_allInYear * a{
 	
 	color: blue;
@@ -169,10 +201,22 @@ img.teamLogo{
 	
 	color: #1D9B6C;
 }
+*/
 
 #table_batting_all tbody tr:hover td, #table_batting_all tbody tr:hover th,
 #table_pitching_all tbody tr:hover td, #table_pitching_all tbody tr:hover th,
-#table_pitching_allInYear tbody tr:hover td, #table_pitching_allInYear tbody tr:hover th{
+#table_pitching_allInYear tbody tr:hover td, #table_pitching_allInYear tbody tr:hover th,
+#table_fielding_allPOS_P tbody tr:hover td, #table_fielding_allPOS_P tbody tr:hover th,
+#table_fielding_allPOS_C tbody tr:hover td, #table_fielding_allPOS_C tbody tr:hover th,
+#table_fielding_allPOS_1B tbody tr:hover td, #table_fielding_allPOS_1B tbody tr:hover th,
+#table_fielding_allPOS_2B tbody tr:hover td, #table_fielding_allPOS_2B tbody tr:hover th,
+#table_fielding_allPOS_3B tbody tr:hover td, #table_fielding_allPOS_3B tbody tr:hover th,
+#table_fielding_allPOS_SS tbody tr:hover td, #table_fielding_allPOS_SS tbody tr:hover th,
+#table_fielding_allPOS_LF tbody tr:hover td, #table_fielding_allPOS_LF tbody tr:hover th,
+#table_fielding_allPOS_CF tbody tr:hover td, #table_fielding_allPOS_CF tbody tr:hover th,
+#table_fielding_allPOS_RF tbody tr:hover td, #table_fielding_allPOS_RF tbody tr:hover th,
+#table_fielding_allPOS_SF tbody tr:hover td, #table_fielding_allPOS_SF tbody tr:hover th,
+#table_fielding_all tbody tr:hover td, #table_fielding_all tbody tr:hover th,{
   background-color: #FFB732;
   //color:white;
 }
@@ -205,6 +249,11 @@ td.win{
 #table_pitching_all_IP > tbody > tr > td,
 #table_pitching_playerIP > tbody > tr > td{	
 	white-space: nowrap;
+}
+
+.borderline{
+	
+	border-top: 5px #bbb solid;
 }
 
 /*/////////// Bar Chart /////////////*/
@@ -400,4 +449,26 @@ $graph-height: 303px;
 #div_batting_Graph{
 	
 	height: 450px;
+}
+
+table[id^="table_king"] > thead > tr > th, table[id^="table_king"] > tbody > tr > td{
+	
+	text-align: center;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+table[id^="table_king"] > thead > tr > th{
+	
+	background:rgba(192,192,192,0.7);	
+}
+
+div[id^="div_king_"]{
+	
+	margin-bottom: 10px;
+}
+
+.col_Thunbnail{
+	
+	width: 50%;
 }

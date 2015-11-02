@@ -1,0 +1,1086 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<h3>守備查詢</h3>
+			<hr>
+			<% if @player == nil && @year == nil %>
+				<script>
+					function select_year(){
+						year = document.getElementById('year').value;
+						obj = eval('playerIn'+year);
+						for(i=0;i<obj.length;i++) document.getElementById('player').options[i] = new Option(obj[i], obj[i]);
+						document.getElementById('player').length = i;
+						document.getElementById('player').selectedIndex = i - 1;
+						i = document.getElementById('player').length;
+						document.getElementById('player').options[i] = new Option("all", "all");
+						document.getElementById('player').length = i + 1;
+						document.getElementById('player').selectedIndex = i;
+					
+					}
+					
+					$(window).on('load', function(){
+						select_year();
+					});
+					
+					<% @year_option.each do |yearOption| %>
+						var <%= 'playerIn' + yearOption[1].to_s %> = new Array();
+						<% @playerInThisYear = playersInYear(yearOption[1],'Fielding') %>
+						<% @playerInThisYear.each do |playerITY| %>
+							<%= 'playerIn' + yearOption[1].to_s %>.push("<%= playerITY.player_id %>");
+						<% end %>
+					<% end %>
+				</script>
+				<%= form_tag("fielding" , method:"get") do %>
+					<table>
+						<tr>
+							<td><%= select_tag(:year, options_for_select(@year_option,@year_option[@year_option.length-2][1]), onchange:"select_year();") %></td>
+							<td><%= select_tag(:player) %></td>
+						</tr>
+						<tr>
+							<td colspan="2"><%= submit_tag("查詢", name: nil) %></td>
+						</tr>
+					</table>
+				<% end %>
+			<% elsif @player == 'all' %>
+				<script>
+					var v = new Array(11);
+					v[0] = 0;
+					v[1] = 0;
+					v[2] = 0;
+					v[3] = 0;
+					v[4] = 0;
+					v[5] = 0;
+					v[6] = 0;
+					v[7] = 0;
+					v[8] = 0;
+					v[9] = 0;
+					v[10] = 0;
+					function visible(name, __pos)
+					{
+						container = $('#div_fielding_container_'+name);
+						console.log(container.attr('id'));
+						
+						if(container){
+							if(v[__pos] == 1){
+								container.hide();
+							}
+							else{
+								container.show();
+							}
+							
+							v[__pos] = (v[__pos]+1)%2;
+						}
+						TopScrollBarAdjust(); // 要呼叫調整函式，才會一顯示表格就出現top scroll bar
+					}
+				</script>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 守備成績 - 依守位分組</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為每場<%= '%.1f' % @activePOS_rate %>局 -- 目前 <%= @gameNumberInYear[@year.to_s] %> 場(需<%= '%.1f' % (@gameNumberInYear[@year.to_s] * @activePOS_rate.to_f) %>局以上)；或守備達<%= '%.1f' % @activePOS %>局以上。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">捕手紀錄不含三振刺殺。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none"><點選各項目表頭以進行排序></h5>
+				<h5 style="margin:0 0 10px; text-transform:none">
+					顯示/隱藏:
+					<span>
+						<a href="javascript:visible('P',1);">P</a>
+						<a href="javascript:visible('C',2);">C</a>
+						<a href="javascript:visible('1B',3);">1B</a>
+						<a href="javascript:visible('2B',4);">2B</a>
+						<a href="javascript:visible('3B',5);">3B</a>
+						<a href="javascript:visible('SS',6);">SS</a>
+						<a href="javascript:visible('LF',7);">LF</a>
+						<a href="javascript:visible('CF',8);">CF</a>
+						<a href="javascript:visible('RF',9);">RF</a>
+						<a href="javascript:visible('SF',10);">SF</a>
+					</span>
+				</h5>
+				<script>
+					var posArray = ['P','C','1B','2B','3B','SS','LF','CF','RF','SF'];
+					$(function(){
+						<% for i in 0..9 do %>
+							var SortedName = '';
+							$('#table_fielding_allPOS_'+posArray[<%= i %>]).on('sort.bs.table', function (e, name, order) {
+								SortedName = name;
+							});
+							$('#table_fielding_allPOS_'+posArray[<%= i %>]).on('post-body.bs.table', function () {
+								$('#table_fielding_allPOS_'+posArray[<%= i %>]).find('tbody tr td').each(function(){
+									if($(this).hasClass('sorting')){
+										$(this).removeClass('sorting');
+									}
+								});
+								SortedItem = $('#table_fielding_allPOS_'+posArray[<%= i %>]).find('tbody tr td.col'+SortedName);
+								SortedItem.each(function(){
+									$(this).addClass('sorting');
+								});
+							});
+						<% end %>
+						var SortedName = '';
+						$('#table_fielding_all').on('sort.bs.table', function (e, name, order) {
+							SortedName = name;
+						});
+						$('#table_fielding_all').on('post-body.bs.table', function () {
+							$('#table_fielding_all').find('tbody tr td').each(function(){
+								if($(this).hasClass('sorting')){
+									$(this).removeClass('sorting');
+								}
+							});
+							SortedItem = $('#table_fielding_all').find('tbody tr td.col'+SortedName);
+							SortedItem.each(function(){
+								$(this).addClass('sorting');
+							});
+						});
+					});
+					function TopScrollBarAdjust(){
+						for(var i = 0 ; i < 10 ; i++){
+							$('#wrapper_fielding_allPOS_'+posArray[i]).width($('#div_fielding_allPOS_'+posArray[i]).width());
+							$('#content_fielding_allPOS_'+posArray[i]).width($('#table_fielding_allPOS_'+posArray[i]).width());
+						}
+					}
+					$(window).on('load resize', function(){
+						TopScrollBarAdjust();
+						$('#wrapper_fielding_all').width($('#div_fielding_all').width());
+						$('#content_fielding_all').width($('#table_fielding_all').width());
+					});
+					$(function(){
+					
+						<% for i in 0..9 do %>
+							wrapperForTable_pos<%= i %> = $('#table_fielding_allPOS_'+posArray[<%= i %>]).parent('div');
+							$('#wrapper_fielding_allPOS_'+posArray[<%= i %>]).scroll(function(){
+								wrapperForTable_pos<%= i %>.scrollLeft($('#wrapper_fielding_allPOS_'+posArray[<%= i %>]).scrollLeft());
+							});
+							wrapperForTable_pos<%= i %>.scroll(function(){
+								$('#wrapper_fielding_allPOS_'+posArray[<%= i %>]).scrollLeft(wrapperForTable_pos<%= i %>.scrollLeft());
+							});
+						<% end %>
+						
+						wrapperForTable = $('#table_fielding_all').parent('div');
+						$('#wrapper_fielding_all').scroll(function(){
+							wrapperForTable.scrollLeft($('#wrapper_fielding_all').scrollLeft());
+						});
+						wrapperForTable.scroll(function(){
+							$('#wrapper_fielding_all').scrollLeft(wrapperForTable.scrollLeft());
+						});
+					});
+					function NameSorter(a, b) {
+						if (a.toLowerCase() > b.toLowerCase()) return 1;
+						if (a.toLowerCase() < b.toLowerCase()) return -1;
+						return 0;
+					}
+					function normalSorter(a, b) {
+						if (parseFloat(a) > parseFloat(b)) return 1;
+						if (parseFloat(a) < parseFloat(b)) return -1;
+						return 0;
+					}
+					function FPCT_POSSorter(a, b) {
+						// 兩階段sorting - 先過濾局數是否足額
+						threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePOS_rate %>), <%= @activePOS %>);
+						if(a.inn >= threshold && b.inn < threshold)
+							return 1;
+						else if(a.inn < threshold && b.inn >= threshold)
+							return -1;
+						// 再相比實際數值
+						else{
+							if (a.fpct != "-.---" && b.fpct == "-.---") return 1;
+							if (a.fpct == "-.---" && b.fpct != "-.---") return -1;
+							if (a.fpct == "-.---" && b.fpct == "-.---") return 0;
+							if (a.fpct == "∞" && b.fpct != "∞") return -1;
+							if (a.fpct != "∞" && b.fpct == "∞") return 1;
+							if (a.fpct == "∞" && b.fpct == "∞") return 0;
+							if (a.fpct > b.fpct) return 1;
+							if (a.fpct < b.fpct) return -1;
+							return 0;
+						}
+					}
+					function Factor5_POSSorter(a, b) {
+						// 兩階段sorting - 先過濾局數是否足額
+						threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePOS_rate %>), <%= @activePOS %>);
+						if(a.inn >= threshold && b.inn < threshold)
+							return 1;
+						else if(a.inn < threshold && b.inn >= threshold)
+							return -1;
+						// 再相比實際數值
+						else{
+							if (a.factor5 != "-.--" && b.factor5 == "-.--") return 1;
+							if (a.factor5 == "-.--" && b.factor5 != "-.--") return -1;
+							if (a.factor5 == "-.--" && b.factor5 == "-.--") return 0;
+							if (a.factor5 == "∞" && b.factor5 != "∞") return -1;
+							if (a.factor5 != "∞" && b.factor5 == "∞") return 1;
+							if (a.factor5 == "∞" && b.factor5 == "∞") return 0;
+							if (a.factor5 > b.factor5) return 1;
+							if (a.factor5 < b.factor5) return -1;
+							return 0;
+						}
+					}
+					function Factor7_POSSorter(a, b) {
+						// 兩階段sorting - 先過濾局數是否足額
+						threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePOS_rate %>), <%= @activePOS %>);
+						if(a.inn >= threshold && b.inn < threshold)
+							return 1;
+						else if(a.inn < threshold && b.inn >= threshold)
+							return -1;
+						// 再相比實際數值
+						else{
+							if (a.factor7 != "-.--" && b.factor7 == "-.--") return 1;
+							if (a.factor7 == "-.--" && b.factor7 != "-.--") return -1;
+							if (a.factor7 == "-.--" && b.factor7 == "-.--") return 0;
+							if (a.factor7 == "∞" && b.factor7 != "∞") return -1;
+							if (a.factor7 != "∞" && b.factor7 == "∞") return 1;
+							if (a.factor7 == "∞" && b.factor7 == "∞") return 0;
+							if (a.factor7 > b.factor7) return 1;
+							if (a.factor7 < b.factor7) return -1;
+							return 0;
+						}
+					}
+					function FPCTSorter(a, b) {
+						// 兩階段sorting - 先過濾局數是否足額
+						threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
+						if(a.inn >= threshold && b.inn < threshold)
+							return 1;
+						else if(a.inn < threshold && b.inn >= threshold)
+							return -1;
+						// 再相比實際數值
+						else{
+							if (a.fpct != "-.---" && b.fpct == "-.---") return 1;
+							if (a.fpct == "-.---" && b.fpct != "-.---") return -1;
+							if (a.fpct == "-.---" && b.fpct == "-.---") return 0;
+							if (a.fpct == "∞" && b.fpct != "∞") return -1;
+							if (a.fpct != "∞" && b.fpct == "∞") return 1;
+							if (a.fpct == "∞" && b.fpct == "∞") return 0;
+							if (a.fpct > b.fpct) return 1;
+							if (a.fpct < b.fpct) return -1;
+							return 0;
+						}
+					}
+					function Factor5Sorter(a, b) {
+						// 兩階段sorting - 先過濾局數是否足額
+						threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
+						if(a.inn >= threshold && b.inn < threshold)
+							return 1;
+						else if(a.inn < threshold && b.inn >= threshold)
+							return -1;
+						// 再相比實際數值
+						else{
+							if (a.factor5 != "-.--" && b.factor5 == "-.--") return 1;
+							if (a.factor5 == "-.--" && b.factor5 != "-.--") return -1;
+							if (a.factor5 == "-.--" && b.factor5 == "-.--") return 0;
+							if (a.factor5 == "∞" && b.factor5 != "∞") return -1;
+							if (a.factor5 != "∞" && b.factor5 == "∞") return 1;
+							if (a.factor5 == "∞" && b.factor5 == "∞") return 0;
+							if (a.factor5 > b.factor5) return 1;
+							if (a.factor5 < b.factor5) return -1;
+							return 0;
+						}
+					}
+					function Factor7Sorter(a, b) {
+						// 兩階段sorting - 先過濾局數是否足額
+						threshold = Math.min((<%= @gameNumberInYear[@year.to_s] * @activePLAYER_rate %>), <%= @activePLAYER %>);
+						if(a.inn >= threshold && b.inn < threshold)
+							return 1;
+						else if(a.inn < threshold && b.inn >= threshold)
+							return -1;
+						// 再相比實際數值
+						else{
+							if (a.factor7 != "-.--" && b.factor7 == "-.--") return 1;
+							if (a.factor7 == "-.--" && b.factor7 != "-.--") return -1;
+							if (a.factor7 == "-.--" && b.factor7 == "-.--") return 0;
+							if (a.factor7 == "∞" && b.factor7 != "∞") return -1;
+							if (a.factor7 != "∞" && b.factor7 == "∞") return 1;
+							if (a.factor7 == "∞" && b.factor7 == "∞") return 0;
+							if (a.factor7 > b.factor7) return 1;
+							if (a.factor7 < b.factor7) return -1;
+							return 0;
+						}
+					}
+				</script>
+				<% @current_pos = nil %>
+				<% @allFieldingPOS.each do |allFldPOS| %>
+					<% if @current_pos != allFldPOS.POS %>
+						<% if @current_pos != nil %>
+										</tbody>
+									</table>
+								</div>
+							<br/>
+							</div>
+						<% end %>
+						<div style="display:none;" id="div_fielding_container_<%= allFldPOS.POS %>">
+							<div class="wrapperForScrollbar" id="wrapper_fielding_allPOS_<%= allFldPOS.POS %>">
+								<div class="fakeContentForScrollBar" id="content_fielding_allPOS_<%= allFldPOS.POS %>"></div>
+							</div>
+							<div class="table-responsive" id="div_fielding_allPOS_<%= allFldPOS.POS %>">
+								<table class="table table-striped table-condensed" id="table_fielding_allPOS_<%= allFldPOS.POS %>" data-toggle="table" data-sort-name="FPCT" data-sort-order="desc">
+									<thead>
+										<tr>
+											<th class= "colName" data-field="Name" data-sortable="true" data-sorter="NameSorter" data-align="center">Player<br/>守備員</th>
+											<th class= "colPOS" data-field="POS" data-align="center">POS<br/>守位</th>
+											<th class= "colG" data-field="G" data-sortable="true" data-sorter="normalSorter" data-align="center">G<br/>出賽</th>
+											<th class= "colINN" data-field="INN" data-sortable="true" data-sorter="normalSorter" data-align="center">INN<br/>守備局數</th>
+											<th class= "colTC" data-field="TC" data-sortable="true" data-sorter="normalSorter" data-align="center">TC<br/>守備機會</th>
+											<th class= "colPO" data-field="PO" data-sortable="true" data-sorter="normalSorter" data-align="center">PO<br/>刺殺</th>
+											<th class= "colA" data-field="A" data-sortable="true" data-sorter="normalSorter" data-align="center">A<br/>助殺</th>
+											<th class= "colE" data-field="E" data-sortable="true" data-sorter="normalSorter" data-align="center">E<br/>失誤</th>
+											<th class= "colFPCT" data-field="FPCT" data-sortable="true" data-sort-name="_FPCT_data" data-sorter="FPCT_POSSorter" data-align="center">FPCT<br/>守備率</th>
+											<th class= "colFactor5" data-field="Factor5" data-sortable="true" data-sort-name="_Factor5_data" data-sorter="Factor5_POSSorter" data-align="center">Range Factor5</th>
+											<th class= "colFactor7" data-field="Factor7" data-sortable="true" data-sort-name="_Factor7_data" data-sorter="Factor7_POSSorter" data-align="center">Range Factor7</th>
+										</tr>
+									</thead>
+									<tbody>
+						<% @current_pos = allFldPOS.POS %>
+					<% end %>
+					<% if allFldPOS.INN >= @gameNumberInYear[@year.to_s] * @activePOS_rate || allFldPOS.INN >= @activePOS %>
+						<tr>
+					<% else %>
+						<tr class="nonActive">
+					<% end %>
+							<td class="colName">
+								<%= link_to allFldPOS.player_id, controller: "records", action: "fielding", player: allFldPOS.player_id, year: @year %>
+							</td>
+							<td class="colPOS"><%= allFldPOS.POS %></td>
+							<td class="colG"><%= allFldPOS.G %></td>
+							<td class="colINN"><%= '%.1f' % allFldPOS.INN.round(1) %></td>
+							<td class="colTC"><%= allFldPOS.TC %></td>
+							<td class="colPO"><%= allFldPOS.PO %></td>
+							<td class="colA"><%= allFldPOS.A %></td>
+							<td class="colE"><%= allFldPOS.E %></td>
+							<td class="colFPCT sorting" data-INN="<%= allFldPOS.INN %>" data-FPCT="<%= sortHelper(allFldPOS.TC,(allFldPOS.PO + allFldPOS.A),allFldPOS.FPCT,3) %>">
+								<% if allFldPOS.TC == 0 %>
+									<% if allFldPOS.PO + allFldPOS.A == 0 %>
+										-.---
+									<% else %>
+										∞
+									<% end %>
+								<% else %>
+									<%= '%.3f' % allFldPOS.FPCT.round(3) %>
+								<% end %>
+							</td>
+							<td class="colFactor5" data-INN="<%= allFldPOS.INN %>" data-Factor5="<%= sortHelper(allFldPOS.INN,(allFldPOS.PO + allFldPOS.A - allFldPOS.E),allFldPOS.Factor5,2) %>">
+								<% if allFldPOS.INN == 0 %>
+									<% if allFldPOS.PO + allFldPOS.A - allFldPOS.E == 0 %>
+										-.--
+									<% else %>
+										∞
+									<% end %>
+								<% else %>
+									<%= '%.2f' % allFldPOS.Factor5.round(2) %>
+								<% end %>
+							</td>
+							<td class="colFactor7" data-INN="<%= allFldPOS.INN %>" data-Factor7="<%= sortHelper(allFldPOS.INN,(allFldPOS.PO + allFldPOS.A - allFldPOS.E),allFldPOS.Factor7,2) %>">
+								<% if allFldPOS.INN == 0 %>
+									<% if allFldPOS.PO + allFldPOS.A - allFldPOS.E == 0 %>
+										-.--
+									<% else %>
+										∞
+									<% end %>
+								<% else %>
+									<%= '%.2f' % allFldPOS.Factor7.round(2) %>
+								<% end %>
+							</td>
+						</tr>
+				<% end %>
+							</tbody>
+						</table>
+					</div>
+					<br/>
+				</div>
+				<br/>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 守備成績</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為每場<%= '%.1f' % @activePLAYER_rate %>局 -- 目前 <%= @gameNumberInYear[@year.to_s] %> 場(需<%= '%.1f' % (@gameNumberInYear[@year.to_s] * @activePLAYER_rate.to_f) %>局以上)；或守備達<%= '%.1f' % @activePLAYER %>局以上。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none"><點選各項目表頭以進行排序></h5>
+				<div class="wrapperForScrollbar" id="wrapper_fielding_all">
+					<div class="fakeContentForScrollBar" id="content_fielding_all"></div>
+				</div>
+				<div class="table-responsive" id="div_fielding_all">
+					<table class="table table-striped table-condensed" id="table_fielding_all" data-toggle="table" data-sort-name="FPCT" data-sort-order="desc">
+						<thead>
+							<tr>
+								<th class= "colName" data-field="Name" data-sortable="true" data-sorter="NameSorter" data-align="center">Player<br/>守備員</th>
+								<th class= "colG" data-field="G" data-sortable="true" data-sorter="normalSorter" data-align="center">G<br/>出賽</th>
+								<th class= "colINN" data-field="INN" data-sortable="true" data-sorter="normalSorter" data-align="center">INN<br/>守備局數</th>
+								<th class= "colTC" data-field="TC" data-sortable="true" data-sorter="normalSorter" data-align="center">TC<br/>守備機會</th>
+								<th class= "colPO" data-field="PO" data-sortable="true" data-sorter="normalSorter" data-align="center">PO<br/>刺殺</th>
+								<th class= "colA" data-field="A" data-sortable="true" data-sorter="normalSorter" data-align="center">A<br/>助殺</th>
+								<th class= "colE" data-field="E" data-sortable="true" data-sorter="normalSorter" data-align="center">E<br/>失誤</th>
+								<th class= "colFPCT" data-field="FPCT" data-sortable="true" data-sort-name="_FPCT_data" data-sorter="FPCTSorter" data-align="center">FPCT<br/>守備率</th>
+								<th class= "colFactor5" data-field="Factor5" data-sortable="true" data-sort-name="_Factor5_data" data-sorter="Factor5Sorter" data-align="center">Range Factor5</th>
+								<th class= "colFactor7" data-field="Factor7" data-sortable="true" data-sort-name="_Factor7_data" data-sorter="Factor7Sorter" data-align="center">Range Factor7</th>
+							</tr>
+						</thead>
+						<% if @allFielding.size != 0 %>
+							<tbody>
+								<% @allFielding.each do |allFld| %>
+									<% if allFld.INN >= @gameNumberInYear[@year.to_s] * @activePLAYER_rate || allFld.INN >= @activePLAYER %>
+										<tr>
+									<% else %>
+										<tr class="nonActive">
+									<% end %>
+											<td class="colName">
+												<%= link_to allFld.player_id, controller: "records", action: "fielding", player: allFld.player_id, year: @year %>
+											</td>
+											<td class="colG"><%= allFld.G %></td>
+											<td class="colINN"><%= '%.1f' % allFld.INN.round(1) %></td>
+											<td class="colTC"><%= allFld.TC %></td>
+											<td class="colPO"><%= allFld.PO %></td>
+											<td class="colA"><%= allFld.A %></td>
+											<td class="colE"><%= allFld.E %></td>
+											<td class="colFPCT sorting" data-INN="<%= allFld.INN %>" data-FPCT="<%= sortHelper(allFld.TC,(allFld.PO + allFld.A),allFld.FPCT,3) %>">
+												<% if allFld.TC == 0 %>
+													<% if allFld.PO + allFld.A == 0 %>
+														-.---
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.3f' % allFld.FPCT.round(3) %>
+												<% end %>
+											</td>
+											<td class="colFactor5" data-INN="<%= allFld.INN %>" data-Factor5="<%= sortHelper(allFld.INN,(allFld.PO + allFld.A - allFld.E),allFld.Factor5,2) %>">
+												<% if allFld.INN == 0 %>
+													<% if allFld.PO + allFld.A - allFld.E == 0 %>
+														-.--
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.2f' % allFld.Factor5.round(2) %>
+												<% end %>
+											</td>
+											<td class="colFactor7" data-INN="<%= allFld.INN %>" data-Factor7="<%= sortHelper(allFld.INN,(allFld.PO + allFld.A - allFld.E),allFld.Factor7,2) %>">
+												<% if allFld.INN == 0 %>
+													<% if allFld.PO + allFld.A - allFld.E == 0 %>
+														-.--
+													<% else %>
+														∞
+													<% end %>
+												<% else %>
+													<%= '%.2f' % allFld.Factor7.round(2) %>
+												<% end %>
+											</td>
+										</tr>
+								<% end %>
+							</tbody>	
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>各守備位置成績總結</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為系壘隊員。</h5>
+				<div class="table-responsive" id="div_fielding_all_summary">
+					<table class="table table-striped table-condensed" id="table_fielding_all_summary">
+						<thead>
+							<tr>
+								<th>POS<br/>守位</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+								<th>Range Factor5</th>
+								<th>Range Factor7</th>
+							</tr>
+						</thead>
+						<% if @allFieldingSummary.size != 0 %>
+							<tbody>
+								<% @allFieldingSummary.each do |allFldSummary| %>
+									<tr>
+										<td><%= allFldSummary.POS %></td>
+										<td><%= '%.1f' % allFldSummary.INN.round(1) %></td>
+										<td><%= allFldSummary.TC %></td>
+										<td><%= allFldSummary.PO %></td>
+										<td><%= allFldSummary.A %></td>
+										<td><%= allFldSummary.E %></td>
+										<td>
+											<% if allFldSummary.TC == 0 %>
+												<% if allFldSummary.PO + allFldSummary.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % allFldSummary.FPCT.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if allFldSummary.INN == 0 %>
+												<% if allFldSummary.PO + allFldSummary.A - allFldSummary.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % allFldSummary.Factor5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if allFldSummary.INN == 0 %>
+												<% if allFldSummary.PO + allFldSummary.A - allFldSummary.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % allFldSummary.Factor7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							</tbody>
+							<% if @allFieldingSummaryTotal.INN != 0 %>
+								<tfoot>
+									<tr>
+										<td>Total</td>
+										<td><%= '%.1f' % @allFieldingSummaryTotal.INN.round(1) %></td>
+										<td><%= @allFieldingSummaryTotal.TC %></td>
+										<td><%= @allFieldingSummaryTotal.PO %></td>
+										<td><%= @allFieldingSummaryTotal.A %></td>
+										<td><%= @allFieldingSummaryTotal.E %></td>
+										<td>
+											<% if @allFieldingSummaryTotal.TC == 0 %>
+												<% if @allFieldingSummaryTotal.PO + @allFieldingSummaryTotal.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % @allFieldingSummaryTotal.FPCT.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if @allFieldingSummaryTotal.INN == 0 %>
+												<% if @allFieldingSummaryTotal.PO + @allFieldingSummaryTotal.A - @allFieldingSummaryTotal.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % @allFieldingSummaryTotal.Factor5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if @allFieldingSummaryTotal.INN == 0 %>
+												<% if @allFieldingSummaryTotal.PO + @allFieldingSummaryTotal.A - @allFieldingSummaryTotal.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % @allFieldingSummaryTotal.Factor7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								</tfoot>
+							<% end %>
+						<% end %>
+					</table>
+				</div>
+				<h5 style="margin:0 0 10px; text-transform:none">Range Factor = ((刺殺 + 助殺 - 失誤) / (守備局數)) * 5(或 7)</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">表示平均每5(或7)局該球員製造的淨出局數。</h5>
+			<% elsif @year == 'Wildcard' && @player != 'all' %>
+				<h4><%= @player %></h4>
+				<br/>
+				<h4><%= @year == "Wildcard"? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> <%= @cup %> 守備成績 - 依年度與守位分組</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">捕手紀錄不含三振刺殺。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">Range Factor = ((刺殺 + 助殺 - 失誤) / (守備局數)) * 5(或 7), 表示平均每5(或7)局該球員製造的淨出局數。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">此處場次之總和可能因比賽中更換球員或守備位置,或該球員為增額球員(EP)等因素,而與該球員實際出賽場次不盡相同。</h5>
+				<div class="table-responsive" id="div_fielding_playerByYearAndPos">
+					<table class="table table-striped table-condensed" id="table_fielding_playerByYearAndPos">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>POS<br/>守位</th>
+								<th>G<br/>場次</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+								<th>Range Factor5</th>
+								<th>Range Factor7</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% @pos = -1 %>
+							<% if @playerFieldingByYearAndPos.size != 0 %>
+								<% @playerFieldingByYearAndPos.each do |yandp| %>
+									<% @line = '' %>
+									<% if @pos != yandp.POS && @pos != -1 %>
+										<% @line = 'class=borderline' %>
+									<% end %>
+									<% @pos = yandp.POS %>
+									<tr <%=@line%>>
+										<td><%= yandp.year %></td>
+										<td><%= yandp.POS %></td>
+										<td><%= yandp.G %></td>
+										<td><%= '%.1f' % yandp.INN.round(1) %></td>
+										<td><%= yandp.TC %></td>
+										<td><%= yandp.PO %></td>
+										<td><%= yandp.A %></td>
+										<td><%= yandp.E %></td>
+										<td>
+											<% if yandp.TC == 0 %>
+												<% if yandp.PO + yandp.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % yandp.FPCT.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if yandp.INN == 0 %>
+												<% if yandp.PO + yandp.A - yandp.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % yandp.Factor5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if yandp.INN == 0 %>
+												<% if yandp.PO + yandp.A - yandp.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % yandp.Factor7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				</br/>
+				<h4><%= @year == "Wildcard"? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> <%= @cup %> 守備成績 - 依年度分組</h4>
+				</br/>
+				<div class="table-responsive" id="div_fielding_playerByYear">
+					<table class="table table-striped table-condensed" id="table_fielding_playerByYear">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>G<br/>場次</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+								<th>Range Factor5</th>
+								<th>Range Factor7</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerFieldingByYear.size != 0 %>
+								<% @playerFieldingByYear.each do |yonly| %>
+									<tr>
+										<td><%= link_to yonly.year, controller: "records", action: "fielding", player: @player, year: yonly.year %></td>
+										<td><%= yonly.G %></td>
+										<td><%= '%.1f' % yonly.INN.round(1) %></td>
+										<td><%= yonly.TC %></td>
+										<td><%= yonly.PO %></td>
+										<td><%= yonly.A %></td>
+										<td><%= yonly.E %></td>
+										<td>
+											<% if yonly.TC == 0 %>
+												<% if yonly.PO + yonly.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % yonly.FPCT.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if yonly.INN == 0 %>
+												<% if yonly.PO + yonly.A - yonly.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % yonly.Factor5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if yonly.INN == 0 %>
+												<% if yonly.PO + yonly.A - yonly.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % yonly.Factor7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				<br/>
+				<h4><%= @year == "Wildcard"? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> <%= @cup %> 守備成績 - 依守位分組</h4>
+				<br/>
+				<div class="table-responsive" id="div_fielding_playerByPOS">
+					<table class="table table-striped table-condensed" id="table_fielding_playerByPOS">
+						<thead>
+							<tr>
+								<th>POS<br/>守位</th>
+								<th>G<br/>場次</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+								<th>Range Factor5</th>
+								<th>Range Factor7</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerFieldingByPOS.size != 0 %>
+								<% @playerFieldingByPOS.each do |posonly| %>
+									<tr>
+										<td><%= posonly.POS %></td>
+										<td><%= posonly.G %></td>
+										<td><%= '%.1f' % posonly.INN.round(1) %></td>
+										<td><%= posonly.TC %></td>
+										<td><%= posonly.PO %></td>
+										<td><%= posonly.A %></td>
+										<td><%= posonly.E %></td>
+										<td>
+											<% if posonly.TC == 0 %>
+												<% if posonly.PO + posonly.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % posonly.FPCT.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if posonly.INN == 0 %>
+												<% if posonly.PO + posonly.A - posonly.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % posonly.Factor5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if posonly.INN == 0 %>
+												<% if posonly.PO + posonly.A - posonly.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % posonly.Factor7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				<br/>
+				<h4><%= @year == "Wildcard"? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> <%= @cup %> 守備成績 - 依年度與內外野分組</h4>
+				<br/>
+				<div class="table-responsive" id="div_fielding_playerByYearAndIO">
+					<table class="table table-striped table-condensed" id="table_fielding_playerByYearAndIO">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>POS<br/>守位</th>
+								<th>G<br/>場次</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+								<th>Range Factor5</th>
+								<th>Range Factor7</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% @yearborder = -1 %>
+							<% if @playerFieldingByYearAndIO.size != 0 %>
+								<% @playerFieldingByYearAndIO.each do |yandio| %>
+									<% @line = '' %>
+									<% if @yearborder != yandio.year && @yearborder != -1 %>
+										<% @line = 'class=borderline' %>
+									<% end %>
+									<% @yearborder = yandio.year %>
+									<tr <%=@line%>>
+										<td><%= yandio.year %></td>
+										<td><%= yandio.field %></td>
+										<td><%= yandio.G %></td>
+										<td><%= '%.1f' % yandio.INN.round(1) %></td>
+										<td><%= yandio.TC %></td>
+										<td><%= yandio.PO %></td>
+										<td><%= yandio.A %></td>
+										<td><%= yandio.E %></td>
+										<td>
+											<% if yandio.TC == 0 %>
+												<% if yandio.PO + yandio.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % yandio.FPCT.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if yandio.INN == 0 %>
+												<% if yandio.PO + yandio.A - yandio.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % yandio.Factor5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if yandio.INN == 0 %>
+												<% if yandio.PO + yandio.A - yandio.E == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % yandio.Factor7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			<% elsif @year != 'Wildcard' && @player != 'all' %>
+				<h4><%= @player %></h4>
+				<br/>
+				<h4><%= @year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)' %> <%= @cup %> 守備成績</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">捕手紀錄不含三振刺殺。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">(g) for grass field and (c) for clay field.</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">此處場次之總和可能因比賽中更換球員或守備位置,或該球員為增額球員(EP)等因素,而與該球員實際出賽場次不盡相同。</h5>
+				<div class="table-responsive" id="div_fielding_player">
+					<table class="table table-striped table-condensed" id="table_fielding_player">
+						<thead>
+							<tr>
+								<th>POS<br/>守位</th>
+								<th>G<br/>場次</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerFielding.size != 0 %>
+								<% @playerFielding.each do |playerFld| %>
+									<tr>
+										<td style="//text-align:right;"><%= playerFld.POS %></td>
+										<td><%= playerFld.G %></td>
+										<td><%= '%.1f' % playerFld.INN.round(1) %></td>
+										<td><%= playerFld.TC %></td>
+										<td><%= playerFld.PO %></td>
+										<td><%= playerFld.A %></td>
+										<td><%= playerFld.E %></td>
+										<td>
+											<% if playerFld.TC == 0 %>
+												<% if playerFld.PO + playerFld.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % playerFld.FPCT.round(3) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+							<tr class="borderline">
+								<td style="//text-align:right;">Infielder(g)</td>
+								<td><%= @playerFieldingGrass.G %></td>
+								<td><%= '%.1f' % @playerFieldingGrass.INN.round(1) %></td>
+								<td><%= @playerFieldingGrass.TC %></td>
+								<td><%= @playerFieldingGrass.PO %></td>
+								<td><%= @playerFieldingGrass.A %></td>
+								<td><%= @playerFieldingGrass.E %></td>
+								<td>
+									<% if @playerFieldingGrass.TC == 0 %>
+										<% if @playerFieldingGrass.PO + @playerFieldingGrass.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingGrass.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+							<tr>
+								<td style="//text-align:right;">Infielder(c)</td>
+								<td><%= @playerFieldingClay.G %></td>
+								<td><%= '%.1f' % @playerFieldingClay.INN.round(1) %></td>
+								<td><%= @playerFieldingClay.TC %></td>
+								<td><%= @playerFieldingClay.PO %></td>
+								<td><%= @playerFieldingClay.A %></td>
+								<td><%= @playerFieldingClay.E %></td>
+								<td>
+									<% if @playerFieldingClay.TC == 0 %>
+										<% if @playerFieldingClay.PO + @playerFieldingClay.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingClay.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+							<tr class="borderline">
+								<td style="//text-align:right;">Infielder</td>
+								<td><%= @playerFieldingIn.G %></td>
+								<td><%= '%.1f' % @playerFieldingIn.INN.round(1) %></td>
+								<td><%= @playerFieldingIn.TC %></td>
+								<td><%= @playerFieldingIn.PO %></td>
+								<td><%= @playerFieldingIn.A %></td>
+								<td><%= @playerFieldingIn.E %></td>
+								<td>
+									<% if @playerFieldingIn.TC == 0 %>
+										<% if @playerFieldingIn.PO + @playerFieldingIn.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingIn.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+							<tr>
+								<td style="//text-align:right;">Outfielder</td>
+								<td><%= @playerFieldingOut.G %></td>
+								<td><%= '%.1f' % @playerFieldingOut.INN.round(1) %></td>
+								<td><%= @playerFieldingOut.TC %></td>
+								<td><%= @playerFieldingOut.PO %></td>
+								<td><%= @playerFieldingOut.A %></td>
+								<td><%= @playerFieldingOut.E %></td>
+								<td>
+									<% if @playerFieldingOut.TC == 0 %>
+										<% if @playerFieldingOut.PO + @playerFieldingOut.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingOut.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<% if @playerFieldingTotal.G != nil %>
+								<tr>
+									<td style="//text-align:right;">Total</td>
+									<td><%= @playerFieldingTotal.G %></td>
+									<td><%= '%.1f' % @playerFieldingTotal.INN.round(1) %></td>
+									<td><%= @playerFieldingTotal.TC %></td>
+									<td><%= @playerFieldingTotal.PO %></td>
+									<td><%= @playerFieldingTotal.A %></td>
+									<td><%= @playerFieldingTotal.E %></td>
+									<td>
+										<% if @playerFieldingTotal.TC == 0 %>
+											<% if @playerFieldingTotal.PO + @playerFieldingTotal.A == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerFieldingTotal.FPCT.round(3) %>
+										<% end %>
+									</td>
+								</tr>
+							<% end %>
+						</tfoot>
+					</table>
+				</div>
+				<br/>
+				<h4><%= @year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)' %> <%= @cup %> 詳細資料</h4>
+				<br/>
+				<div class="table-responsive" id="div_fielding_playerDetail">
+					<table class="table table-striped table-condensed" id="table_fielding_playerDetail">
+						<thead>
+							<tr>
+								<th>G<br/>場次</th>
+								<th>POS<br/>守位</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerFieldingDetail.size != 0 %>
+								<% @playerFieldingDetail.each do |detail| %>
+									<tr>
+										<td>
+											<%= link_to detail.game_id, controller: "records", action: "game", game_id: detail.game_id %>
+										</td>
+										<td><%= detail.POS %></td>
+										<td><%= '%.1f' % detail.INN.round(1) %></td>
+										<td><%= detail.TC %></td>
+										<td><%= detail.PO %></td>
+										<td><%= detail.A %></td>
+										<td><%= detail.E %></td>
+										<td>
+											<% if detail.TC == 0 %>
+												<% if detail.PO + detail.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % detail.FPCT.round(3) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			<% end %>
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

@@ -33,7 +33,7 @@
 				<%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
 			</a>
 		<% else %>
-			<%= link_to({anchor: "all-top", controller: "home", action: "index"}, class: "navbar-brand page-scroll", style:"color:#F1772E") do %> 
+			<%= link_to({controller: "home", action: "index"}, class: "navbar-brand page-scroll", style:"color:#F1772E") do %> 
 				<%= image_tag("logo.png", class: "menu_icon", height: '35') %> <span class="light">NTUIM</span> SOFTBALL
 			<% end %>
 		<% end %>
@@ -100,7 +100,8 @@
 				<%= link_to "成績紀錄", {controller: "records", action: "index"}, class: "page-scroll menuLink", id: "a_Record", onMouseOver: "this.innerHTML = 'Record'", onMouseOut: "this.innerHTML = '成績紀錄'" %>
 			</li>
 		  <% end %>
-          <% if logged_in? %>
+          <!--
+		  <% if logged_in? %>
 			<li>
 				<% if action_name == "index" && controller_name == "home" %>
 					<a class="page-scroll menuLink" href="#recApp" id='a_RecApp' onMouseOver="this.innerHTML = 'Rec-App'" onMouseOut="this.innerHTML = '紀錄系統'">紀錄系統</a>
@@ -117,6 +118,7 @@
 				<% end %>
 			</li>
 		  <% end %>
+		  -->
 		  <% if logged_in? %>
 			<li title="目前以帳號 <%=@current_user.name%> 登入">
 				<%= link_to "登出", logout_path, method: "delete", id: "btn_login", class: "page-scroll menuLink" %>
