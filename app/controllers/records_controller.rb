@@ -1803,4 +1803,219 @@ class RecordsController < ApplicationController
 		end
 	
 	end
+	
+	def team
+		
+		if logged_in?
+			
+			@team = params[:team]
+			@activePLAYER_Batting = 1
+			@activePLAYER_Fielding = 1.5
+			
+			if @team == nil
+				
+				@team_option = Array.new
+				@allteam = Team.find_by_sql('SELECT T.team_id,
+													T.team_name,
+													COUNT(T.team_id) AS NUM
+											   FROM teams AS T,
+													games AS G
+											  WHERE (T.team_id = G.home_team_id OR
+													T.team_id = G.away_team_id) AND
+													T.team_id NOT IN (SELECT team_id
+																		FROM teams 
+																	   WHERE team_id LIKE "IM%")
+										   GROUP BY T.team_id,
+													T.team_name
+										   ORDER BY T.team_name')
+				@allteam.each do |eachteam|
+					@team_option.push([eachteam.team_name + " (" + eachteam.NUM.to_s + "場)",eachteam.team_id])
+				end
+				
+			else
+			
+				@team_info = Team.find_by_sql('SELECT COUNT(*) AS gameNum,
+													  T.team_name
+												 FROM games AS G,
+													  teams AS T 
+												WHERE (G.home_team_id = "' + @team + '" AND T.team_id = G.home_team_id) OR
+													  (G.away_team_id = "' + @team + '" AND T.team_id = G.away_team_id)
+											 GROUP BY T.team_name')[0]
+				@team_gamelist = Game.find_by_sql('SELECT G.game_id,
+														  C.year,
+														  C.cup_name,
+														  teamAway.team_name AS teamAwayName,
+														  G.away_score,
+														  G.home_score,
+														  teamHome.team_name AS teamHomeName,
+														  G.time,
+														  G.mvp
+													 FROM games AS G,
+														  cups AS C,
+														  teams AS teamHome,
+														  teams AS teamAway
+													WHERE G.cup_id = C.cup_id AND
+														  teamHome.team_id = G.home_team_id AND
+														  teamAway.team_id = G.away_team_id AND
+														  (G.home_team_id = "' + @team + '" or G.away_team_id = "' + @team + '")
+												 ORDER BY G.game_id')
+				@team_batting = Batting.find_by_sql('SELECT BAT.player_id,
+															COUNT(*) AS G,
+															SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+															SUM(BAT.AB) AS AB,
+															SUM(BAT.H) AS H,
+															SUM(BAT.B2) AS B2,
+															SUM(BAT.B3) AS B3,
+															SUM(BAT.HR) AS HR,
+															SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+															SUM(BAT.RBI) AS RBI,
+															SUM(BAT.R) AS R,
+															SUM(BAT.SO) AS SO,
+															SUM(BAT.BB) AS BB,
+															SUM(BAT.IBB) AS IBB,
+															SUM(BAT.SF) AS SF,
+															SUM(BAT.E) AS E,
+															CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															(CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+													   FROM battings AS BAT,
+															players AS PLY
+													  WHERE BAT.player_id = PLY.player_id AND
+															PLY.active = 1 AND
+															BAT.game_id IN (SELECT G.game_id
+																			  FROM games AS G
+																			 WHERE G.home_team_id = "' + @team + '" OR
+																				   G.away_team_id = "' + @team + '" )
+																		  GROUP BY BAT.player_id
+																		  ORDER BY (SUM(BAT.H)/(SUM(BAT.AB)+0.00000000000000000000000000000000000001)) DESC,
+																				   ((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.00000000000000001)) DESC')
+				@team_batting_summary = Batting.find_by_sql('SELECT SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																	SUM(BAT.AB) AS AB,
+																	SUM(BAT.H) AS H,
+																	SUM(BAT.B2) AS B2,
+																	SUM(BAT.B3) AS B3,
+																	SUM(BAT.HR) AS HR,
+																	SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																	SUM(BAT.RBI) AS RBI,
+																	SUM(BAT.R) AS R,
+																	SUM(BAT.SO) AS SO,
+																	SUM(BAT.BB) AS BB,
+																	SUM(BAT.IBB) AS IBB,
+																	SUM(BAT.SF) AS SF,
+																	SUM(BAT.E) AS E,
+																	CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																	CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																	CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																	(CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																	CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+															   FROM battings AS BAT,
+																	players AS PLY
+															  WHERE BAT.player_id = PLY.player_id AND
+																	PLY.active = 1 AND
+																	BAT.game_id IN (SELECT G.game_id
+																					  FROM games AS G
+																					 WHERE G.home_team_id = "' + @team + '" OR
+																						   G.away_team_id = "' + @team + '" )')[0]
+				@team_pitching = Pitching.find_by_sql('SELECT PIT.player_id,
+															  COUNT(PIT.game_id) AS G,
+															  SUM(PIT.W) AS W,
+															  SUM(PIT.L) AS L,
+															  SUM(PIT.IPouts/3.0) AS IP,
+															  SUM(PIT.BAOpp) AS TBF,
+															  SUM(PIT.H) AS H,
+															  SUM(PIT.HR) AS HR,
+															  SUM(PIT.SO) AS SO,
+															  SUM(PIT.BB) AS BB,
+															  SUM(PIT.IBB) AS IBB,
+															  SUM(PIT.R) AS R,
+															  SUM(PIT.ER) AS ER,
+															  CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+														      (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+														      CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+														      CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+														      CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+														      CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+														 FROM pitchings AS PIT,
+															  players AS PLY
+														WHERE PLY.player_id = PIT.player_id AND
+															  PLY.active = 1 AND
+															  PIT.game_id IN (SELECT G.game_id
+																				FROM games AS G
+																			   WHERE G.home_team_id = "' + @team + '" OR
+																					 G.away_team_id = "' + @team + '" )
+																			GROUP BY PIT.player_id
+																			ORDER BY SUM(PIT.ER)/SUM(PIT.IPouts+0.0000000000000000000000000000000000000001)')
+				@team_pitching_summary = Pitching.find_by_sql('SELECT SUM(PIT.W) AS W,
+																	  SUM(PIT.L) AS L,
+																	  SUM(PIT.IPouts/3.0) AS IP,
+																	  SUM(PIT.BAOpp) AS TBF,
+																	  SUM(PIT.H) AS H,
+																	  SUM(PIT.HR) AS HR,
+																	  SUM(PIT.SO) AS SO,
+																	  SUM(PIT.BB) AS BB,
+																	  SUM(PIT.IBB) AS IBB,
+																	  SUM(PIT.R) AS R,
+																	  SUM(PIT.ER) AS ER,
+																	  CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																	  (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+																 FROM pitchings AS PIT,
+																	  players AS PLY
+																WHERE PLY.player_id = PIT.player_id AND
+																	  PLY.active = 1 AND
+																	  PIT.game_id IN (SELECT G.game_id
+																						FROM games AS G
+																					   WHERE G.home_team_id = "' + @team + '" OR
+																							 G.away_team_id = "' + @team + '" )')[0]
+				@team_fielding = Fielding.find_by_sql('SELECT FIELD.player_id,
+															  COUNT(FIELD.game_id) AS G,
+															  SUM(FIELD.Innouts/3.0) AS INN,
+															  SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															  SUM(FIELD.PO) AS PO,
+															  SUM(FIELD.A) AS A,
+															  SUM(FIELD.E) AS E,
+															  CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+															  (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+															  (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+														 FROM fieldings AS FIELD,
+															  players AS PLY
+														WHERE FIELD.player_id = PLY.player_id AND
+															  PLY.active = 1 AND
+															  FIELD.game_id IN ( SELECT G.game_id
+																				   FROM games AS G
+																				  WHERE G.home_team_id = "' + @team + '" OR
+																						G.away_team_id = "' + @team + '" )
+																			   GROUP BY FIELD.player_id
+																			   ORDER BY CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 DESC,
+																						SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')
+				@team_fielding_summary = Fielding.find_by_sql('SELECT FIELD.player_id,
+																	  COUNT(FIELD.game_id) AS G,
+																	  SUM(FIELD.Innouts/3.0) AS INN,
+																	  SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																	  SUM(FIELD.PO) AS PO,
+																	  SUM(FIELD.A) AS A,
+																	  SUM(FIELD.E) AS E,
+																	  CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																	  (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																	  (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+																 FROM fieldings AS FIELD,
+																	  players AS PLY
+																WHERE FIELD.player_id = PLY.player_id AND
+																	  PLY.active = 1 AND
+																	  FIELD.game_id IN ( SELECT G.game_id
+																						   FROM games AS G
+																						  WHERE G.home_team_id = "' + @team + '" OR
+																								G.away_team_id = "' + @team + '" )')[0]
+			end
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
 end

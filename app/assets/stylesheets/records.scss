@@ -60,7 +60,11 @@
 #table_fielding_playerByPOS > thead > tr > th,
 #table_fielding_playerByYearAndIO > thead > tr > th,
 #table_fielding_player > thead > tr > th,
-#table_fielding_playerDetail > thead > tr > th,{
+#table_fielding_playerDetail > thead > tr > th,
+#table_team_gamelist > thead > tr > th,
+#table_team_batting_summary > thead > tr > th,
+#table_team_pitching_summary > thead > tr > th,
+#table_team_fielding_summary > thead > tr > th{
 	
 	background:rgba(192,192,192,0.7);
 }
@@ -68,7 +72,8 @@
 #div_game_oneyear,
 #div_batting_playerDetail,
 #div_pitching_playerDetail,
-#div_pitching_playerEachYear{
+#div_pitching_playerEachYear,
+#div_team_gamelist{
 	
 	border: 1px solid #e3e3e3;
 	border-radius: 5px;
@@ -121,7 +126,12 @@ img.teamLogo{
 #table_fielding_playerByPOS > thead > tr > th, #table_fielding_playerByPOS > tbody > tr > td,
 #table_fielding_playerByYearAndIO > thead > tr > th, #table_fielding_playerByYearAndIO > tbody > tr > td,
 #table_fielding_player > thead > tr > th, #table_fielding_player > tbody > tr > td, #table_fielding_player > tfoot > tr > td,
-#table_fielding_playerDetail > thead > tr > th, #table_fielding_playerDetail > tbody > tr > td{
+#table_fielding_playerDetail > thead > tr > th, #table_fielding_playerDetail > tbody > tr > td,
+#table_team_gamelist > thead > tr > th, #table_team_gamelist > tbody > tr > td,
+#table_team_batting_summary > thead > tr > th, #table_team_batting_summary > tbody > tr > td,
+#table_team_pitching_summary > thead > tr > th, #table_team_pitching_summary > tbody > tr > td,
+#table_team_fielding_summary > thead > tr > th, #table_team_fielding_summary > tbody > tr > td,
+{
 	
 	text-align: center;
 	vertical-align: middle;
@@ -242,7 +252,10 @@ td.win{
 #table_batting_player3PA > tbody > tr > td,
 #table_pitching_all_summary > tbody > tr > td,
 #table_pitching_player > tbody > tr > td,
-#table_pitching_playerIP > tbody > tr > td{	
+#table_pitching_playerIP > tbody > tr > td,
+#table_team_batting_summary > tbody > tr > td,
+#table_team_pitching_summary > tbody > tr > td,
+#table_team_fielding_summary > tbody > tr > td{	
 	background:rgba(235,235,235,0.7);
 }
 
