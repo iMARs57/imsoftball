@@ -5,18 +5,35 @@
     <div class="row">
         <%= render :partial => "sidebar" %>
 		<div class="recordsContent col-sm-9">
-			<h3>對戰成績查詢</h3>
+			<h3>所有盃賽成績查詢</h3>
 			<hr>
-			<% if @team == nil %>
-				<%= form_tag("team" , method:"get") do %>
-					<%= select_tag(:team, options_for_select(@team_option,@team_option[0][1])) %>
-					<%= submit_tag("查詢", name: nil) %>
+			<% if @year == nil || @cup == nil %>
+				<script>
+					function click_go(){
+						year_cup = $('#year :selected').text();
+						if($('#year :selected').val().toString() == "Wildcard") {
+							$('#cup').val(year_cup.substring(5));
+						}
+						else {
+							$('#cup').val(year_cup.substring(7));
+						}
+						$('form').submit();
+					}
+				</script>
+				<%= form_tag("cup", method:"get") do %>
+					<%= select_tag(:year, options_for_select(@year_option,@year_option[0][1])) %>
+					<%= hidden_field_tag 'cup' %>
+					<%= button_tag(type: 'button', onclick:'javascript:click_go()') do
+						"查詢"
+					end %>
 				<% end %>
-			<% else %>
-				<h4>與 <%= @team_info.team_name %> 賽事共 <%= @team_info.gameNum %> 場</h4>
 				<br/>
-				<div class="table-responsive" id="div_team_gamelist">
-					<table class="table table-striped table-condensed" id="table_team_gamelist">
+				<h5>官方賽為：<%= @listOfficial %><br/>正式賽為：<%= @listFormal %></h5>
+			<% else %>
+				<h4><%= (@year == 'Wildcard')?('不分'):(@year) %>年度 <%= @cup %> 賽事 ( 目前共 <%= @num_of_game %> 場 )</h4>
+				<br/>
+				<div class="table-responsive" id="div_cup_gamelist">
+					<table class="table table-striped table-condensed" id="table_cup_gamelist">
 						<thead>
 							<tr>
 								<th>編號</th>
@@ -31,7 +48,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<% @team_gamelist.each do |onegame| %>
+							<% @cup_gamelist.each do |onegame| %>
 								<tr>
 									<td>
 										<%= link_to onegame.game_id, controller: "records", action: "game", game_id: onegame.game_id %>
@@ -54,14 +71,14 @@
 				<br/>
 				<h4>打擊成績</h4>
 				<br/>
-				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為現役球員，且每場<%= @activePLAYER_Batting %>打席 -- 目前 <%= @team_info.gameNum %> 場。</h5>
-				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionTeamBat"></h5>
+				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為現役球員，且每場<%= @activePLAYER_Batting %>打席 -- 目前 <%= @num_of_game %> 場。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionCupBat"></h5>
 				<h5 style="margin:0 0 10px; text-transform:none"><點選各項目表頭以進行排序></h5>
-				<div class="wrapperForScrollbar" id="wrapper_team_batting_all">
-					<div class="fakeContentForScrollBar" id="content_team_batting_all"></div>
+				<div class="wrapperForScrollbar" id="wrapper_cup_batting_all">
+					<div class="fakeContentForScrollBar" id="content_cup_batting_all"></div>
 				</div>
-				<div class="table-responsive" id="div_team_batting_all">
-					<table class="table table-striped table-condensed" id="table_team_batting_all" data-toggle="table" data-sort-name="AVG" data-sort-order="desc">
+				<div class="table-responsive" id="div_cup_batting_all">
+					<table class="table table-striped table-condensed" id="table_cup_batting_all" data-toggle="table" data-sort-name="AVG" data-sort-order="desc">
 						<thead>
 							<tr>
 								<th class= "colName" data-field="Name" data-sortable="true" data-sorter="NameSorterBat" data-align="center">Name<br/>姓名</th>
@@ -90,36 +107,36 @@
 						<script>
 							$(function(){
 								var SortedName = '';
-								$('#table_team_batting_all').on('sort.bs.table', function (e, name, order) {
+								$('#table_cup_batting_all').on('sort.bs.table', function (e, name, order) {
 									SortedName = name;
 								});
-								$('#table_team_batting_all').on('post-body.bs.table', function () {
-									$('#table_team_batting_all').find('tbody tr td').each(function(){
+								$('#table_cup_batting_all').on('post-body.bs.table', function () {
+									$('#table_cup_batting_all').find('tbody tr td').each(function(){
 										if($(this).hasClass('sorting')){
 											$(this).removeClass('sorting');
 										}
 									});
-									SortedItem = $('#table_team_batting_all').find('tbody tr td.col'+SortedName);
+									SortedItem = $('#table_cup_batting_all').find('tbody tr td.col'+SortedName);
 									SortedItem.each(function(){
 										$(this).addClass('sorting');
 									});
 								});
 							});
 							$(window).on('load resize', function(){
-								$('#wrapper_team_batting_all').width($('#div_team_batting_all').width());
-								$('#content_team_batting_all').width($('#table_team_batting_all').width());
+								$('#wrapper_cup_batting_all').width($('#div_cup_batting_all').width());
+								$('#content_cup_batting_all').width($('#table_cup_batting_all').width());
 							});
 							$(function(){
-								wrapperForTableBat = $("#table_team_batting_all").parent('div')
-								$("#wrapper_team_batting_all").scroll(function(){
-									wrapperForTableBat.scrollLeft($("#wrapper_team_batting_all").scrollLeft());
+								wrapperForTableBat = $("#table_cup_batting_all").parent('div')
+								$("#wrapper_cup_batting_all").scroll(function(){
+									wrapperForTableBat.scrollLeft($("#wrapper_cup_batting_all").scrollLeft());
 								});
 								wrapperForTableBat.scroll(function(){
-									$("#wrapper_team_batting_all").scrollLeft(wrapperForTableBat.scrollLeft());
+									$("#wrapper_cup_batting_all").scrollLeft(wrapperForTableBat.scrollLeft());
 								});
 							});
 							function clearDescriptionBat(){
-								$('#descriptionTeamBat').text('');
+								$('#descriptionCupBat').text('');
 							}
 							function NameSorterBat(a, b) {
 								clearDescriptionBat();
@@ -134,9 +151,9 @@
 								return 0;
 							}
 							function AVGSorter_Bat(a, b) {
-								$('#descriptionTeamBat').text('打擊率 = 安打數 / 打數');
+								$('#descriptionCupBat').text('打擊率 = 安打數 / 打數');
 								// 兩階段sorting - 先過濾打席是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Batting %>;
+								threshold = <%= @num_of_game * @activePLAYER_Batting %>;
 								if(a.pa >= threshold && b.pa < threshold)
 									return 1;
 								else if(a.pa < threshold && b.pa >= threshold)
@@ -152,9 +169,9 @@
 								}
 							}
 							function OBPSorter(a, b) {
-								$('#descriptionTeamBat').text('上壘率 = 安打數 + 四死球 / 打席');
+								$('#descriptionCupBat').text('上壘率 = 安打數 + 四死球 / 打席');
 								// 兩階段sorting - 先過濾打席是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Batting %>;
+								threshold = <%= @num_of_game * @activePLAYER_Batting %>;
 								if(a.pa >= threshold && b.pa < threshold)
 									return 1;
 								else if(a.pa < threshold && b.pa >= threshold)
@@ -170,9 +187,9 @@
 								}
 							}
 							function SLGSorter(a, b) {
-								$('#descriptionTeamBat').text('長打率 = 壘打數 / 打數');
+								$('#descriptionCupBat').text('長打率 = 壘打數 / 打數');
 								// 兩階段sorting - 先過濾打席是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Batting %>;
+								threshold = <%= @num_of_game * @activePLAYER_Batting %>;
 								if(a.pa >= threshold && b.pa < threshold)
 									return 1;
 								else if(a.pa < threshold && b.pa >= threshold)
@@ -188,9 +205,9 @@
 								}
 							}
 							function OPSSorter(a, b) {
-								$('#descriptionTeamBat').text('整體攻擊指數 = 上壘率 + 長打率');
+								$('#descriptionCupBat').text('整體攻擊指數 = 上壘率 + 長打率');
 								// 兩階段sorting - 先過濾打席是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Batting %>;
+								threshold = <%= @num_of_game * @activePLAYER_Batting %>;
 								if(a.pa >= threshold && b.pa < threshold)
 									return 1;
 								else if(a.pa < threshold && b.pa >= threshold)
@@ -203,9 +220,9 @@
 								}
 							}
 							function TASorter(a, b) {
-								$('#descriptionTeamBat').text('攻擊指數 = (壘打數 + 盜壘成功數 + 四死球) / (打數 - 安打數 + 雙殺打)');
+								$('#descriptionCupBat').text('攻擊指數 = (壘打數 + 盜壘成功數 + 四死球) / (打數 - 安打數 + 雙殺打)');
 								// 兩階段sorting - 先過濾打席是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Batting %>;
+								threshold = <%= @num_of_game * @activePLAYER_Batting %>;
 								if(a.pa >= threshold && b.pa < threshold)
 									return 1;
 								else if(a.pa < threshold && b.pa >= threshold)
@@ -218,65 +235,67 @@
 								}
 							}
 						</script>
-						<% if @team_batting.size != 0 %>
+						<% if @cup_batting.size != 0 %>
 							<tbody>
-								<% @team_batting.each do |teamBat| %>
-									<% if teamBat.PA >= @team_info.gameNum * @activePLAYER_Batting %>
+								<% @cup_batting.each do |cupBat| %>
+									<% if cupBat.PA >= @num_of_game * @activePLAYER_Batting %>
 										<tr>
 									<% else %>
 										<tr class="nonActive">
 									<% end %>
-											<td class="colName"><%= teamBat.player_id %></td>
-											<td class="colG"><%= teamBat.G %></td>
-											<td class="colPA"><%= teamBat.PA %></td>
-											<td class="colAB"><%= teamBat.AB %></td>
-											<td class="colH"><%= teamBat.H %></td>
-											<td class="colB2"><%= teamBat.B2 %></td>
-											<td class="colB3"><%= teamBat.B3 %></td>
-											<td class="colHR"><%= teamBat.HR %></td>
-											<td class="colTB"><%= teamBat.TB %></td>
-											<td class="colRBI"><%= teamBat.RBI %></td>
-											<td class="colR"><%= teamBat.R %></td>
-											<td class="colSO"><%= teamBat.SO %></td>
-											<td class="colBB"><%= teamBat.BB %></td>
-											<td class="colIBB"><%= teamBat.IBB %></td>
-											<td class="colSF"><%= teamBat.SF %></td>
-											<td class="colE"><%= teamBat.E %></td>
-											<td class="colAVG sorting" data-PA="<%= teamBat.PA %>" data-AVG="<%= sortHelper(teamBat.AB,teamBat.H,teamBat.AVG,3) %>">
-												<% if teamBat.AB == 0 %>
-													<% if teamBat.H == 0 %>
+											<td class="colName">
+												<%= link_to cupBat.player_id, controller: "records", action: "batting", player: cupBat.player_id, year: @year, cup: @cup %>
+											</td>
+											<td class="colG"><%= cupBat.G %></td>
+											<td class="colPA"><%= cupBat.PA %></td>
+											<td class="colAB"><%= cupBat.AB %></td>
+											<td class="colH"><%= cupBat.H %></td>
+											<td class="colB2"><%= cupBat.B2 %></td>
+											<td class="colB3"><%= cupBat.B3 %></td>
+											<td class="colHR"><%= cupBat.HR %></td>
+											<td class="colTB"><%= cupBat.TB %></td>
+											<td class="colRBI"><%= cupBat.RBI %></td>
+											<td class="colR"><%= cupBat.R %></td>
+											<td class="colSO"><%= cupBat.SO %></td>
+											<td class="colBB"><%= cupBat.BB %></td>
+											<td class="colIBB"><%= cupBat.IBB %></td>
+											<td class="colSF"><%= cupBat.SF %></td>
+											<td class="colE"><%= cupBat.E %></td>
+											<td class="colAVG sorting" data-PA="<%= cupBat.PA %>" data-AVG="<%= sortHelper(cupBat.AB,cupBat.H,cupBat.AVG,3) %>">
+												<% if cupBat.AB == 0 %>
+													<% if cupBat.H == 0 %>
 														-.---
 													<% else %>
 														∞
 													<% end %>
 												<% else %>
-													<%= '%.3f' % teamBat.AVG.round(3) %>
+													<%= '%.3f' % cupBat.AVG.round(3) %>
 												<% end %>
 											</td>
-											<td class="colOBP" data-PA="<%= teamBat.PA %>" data-OBP="<%= sortHelper(teamBat.PA,(teamBat.H + teamBat.BB + teamBat.IBB),teamBat.OBP,3) %>">
-												<% if teamBat.PA == 0 %>
-													<% if teamBat.H + teamBat.BB + teamBat.IBB == 0 %>
+											<td class="colOBP" data-PA="<%= cupBat.PA %>" data-OBP="<%= sortHelper(cupBat.PA,(cupBat.H + cupBat.BB + cupBat.IBB),cupBat.OBP,3) %>">
+												<% if cupBat.PA == 0 %>
+													<% if cupBat.H + cupBat.BB + cupBat.IBB == 0 %>
 														-.---
 													<% else %>
 														∞
 													<% end %>
 												<% else %>
-													<%= '%.3f' % teamBat.OBP.round(3) %>
+													<%= '%.3f' % cupBat.OBP.round(3) %>
 												<% end %>
 											</td>
-											<td class="colSLG" data-PA="<%= teamBat.PA %>" data-SLG="<%= sortHelper(teamBat.AB,teamBat.TB,teamBat.SLG,3) %>">
-												<% if teamBat.AB == 0 %>
-													<% if teamBat.TB == 0 %>
+											<td class="colSLG" data-PA="<%= cupBat.PA %>" data-SLG="<%= sortHelper(cupBat.AB,cupBat.TB,cupBat.SLG,3) %>">
+												<% if cupBat.AB == 0 %>
+													<% if cupBat.TB == 0 %>
 														-.---
 													<% else %>
 														∞
 													<% end %>
 												<% else %>
-													<%= '%.3f' % teamBat.SLG.round(3) %>
+													<%= '%.3f' % cupBat.SLG.round(3) %>
 												<% end %>
 											</td>
-											<td class="colOPS" data-PA="<%= teamBat.PA %>" data-OPS="<%= '%.3f' % teamBat.OPS %>"><%= '%.3f' % teamBat.OPS %></td>
-											<td class="colTA" data-PA="<%= teamBat.PA %>" data-TA="<%= '%.3f' % teamBat.TA %>"><%= '%.3f' % teamBat.TA %></td>
+											<td class="colOPS" data-PA="<%= cupBat.PA %>" data-OPS="<%= '%.3f' % cupBat.OPS %>"><%= '%.3f' % cupBat.OPS %></td>
+											<td class="colTA" data-PA="<%= cupBat.PA %>" data-TA="<%= '%.3f' % cupBat.TA %>"><%= '%.3f' % cupBat.TA %></td>
 										</tr>
 								<% end %>
 							</tbody>
@@ -284,8 +303,8 @@
 					</table>
 				</div>
 				<br/>
-				<div class="table-responsive" id="div_team_batting_summary">
-					<table class="table table-striped table-condensed" id="table_team_batting_summary">
+				<div class="table-responsive" id="div_cup_batting_summary">
+					<table class="table table-striped table-condensed" id="table_cup_batting_summary">
 						<thead>
 							<tr>
 								<th>PA<br/>總打席</th>
@@ -310,57 +329,57 @@
 							</tr>
 						</thead>
 						<tbody>
-							<% if @team_batting_summary.PA != nil %>
+							<% if @cup_batting_summary.PA != nil %>
 								<tr>
-									<td><%= @team_batting_summary.PA %></td>
-									<td><%= @team_batting_summary.AB %></td>
-									<td><%= @team_batting_summary.H %></td>
-									<td><%= @team_batting_summary.B2 %></td>
-									<td><%= @team_batting_summary.B3 %></td>
-									<td><%= @team_batting_summary.HR %></td>
-									<td><%= @team_batting_summary.TB %></td>
-									<td><%= @team_batting_summary.RBI %></td>
-									<td><%= @team_batting_summary.R %></td>
-									<td><%= @team_batting_summary.SO %></td>
-									<td><%= @team_batting_summary.BB %></td>
-									<td><%= @team_batting_summary.IBB %></td>
-									<td><%= @team_batting_summary.SF %></td>
-									<td><%= @team_batting_summary.E %></td>
+									<td><%= @cup_batting_summary.PA %></td>
+									<td><%= @cup_batting_summary.AB %></td>
+									<td><%= @cup_batting_summary.H %></td>
+									<td><%= @cup_batting_summary.B2 %></td>
+									<td><%= @cup_batting_summary.B3 %></td>
+									<td><%= @cup_batting_summary.HR %></td>
+									<td><%= @cup_batting_summary.TB %></td>
+									<td><%= @cup_batting_summary.RBI %></td>
+									<td><%= @cup_batting_summary.R %></td>
+									<td><%= @cup_batting_summary.SO %></td>
+									<td><%= @cup_batting_summary.BB %></td>
+									<td><%= @cup_batting_summary.IBB %></td>
+									<td><%= @cup_batting_summary.SF %></td>
+									<td><%= @cup_batting_summary.E %></td>
 									<td>
-										<% if @team_batting_summary.AB == 0 %>
-											<% if @team_batting_summary.H == 0 %>
+										<% if @cup_batting_summary.AB == 0 %>
+											<% if @cup_batting_summary.H == 0 %>
 												-.---
 											<% else %>
 												∞
 											<% end %>
 										<% else %>
-											<%= '%.3f' % @team_batting_summary.AVG.round(3) %>
+											<%= '%.3f' % @cup_batting_summary.AVG.round(3) %>
 										<% end %>
 									</td>
 									<td>
-										<% if @team_batting_summary.PA == 0 %>
-											<% if @team_batting_summary.H + @team_batting_summary.BB + @team_batting_summary.IBB == 0 %>
+										<% if @cup_batting_summary.PA == 0 %>
+											<% if @cup_batting_summary.H + @cup_batting_summary.BB + @cup_batting_summary.IBB == 0 %>
 												-.---
 											<% else %>
 												∞
 											<% end %>
 										<% else %>
-											<%= '%.3f' % @team_batting_summary.OBP.round(3) %>
+											<%= '%.3f' % @cup_batting_summary.OBP.round(3) %>
 										<% end %>
 									</td>
 									<td>
-										<% if @team_batting_summary.AB == 0 %>
-											<% if @team_batting_summary.TB == 0 %>
+										<% if @cup_batting_summary.AB == 0 %>
+											<% if @cup_batting_summary.TB == 0 %>
 												-.---
 											<% else %>
 												∞
 											<% end %>
 										<% else %>
-											<%= '%.3f' % @team_batting_summary.SLG.round(3) %>
+											<%= '%.3f' % @cup_batting_summary.SLG.round(3) %>
 										<% end %>
 									</td>
-									<td><%= '%.3f' % @team_batting_summary.OPS %></td>
-									<td><%= '%.3f' % @team_batting_summary.TA %></td>
+									<td><%= '%.3f' % @cup_batting_summary.OPS %></td>
+									<td><%= '%.3f' % @cup_batting_summary.TA %></td>
 								</tr>
 							<% end %>
 						</tbody>
@@ -369,13 +388,13 @@
 				<br/>
 				<h4>投球成績</h4>
 				<br/>
-				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionTeamPit"></h5>
+				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionCupPit"></h5>
 				<h5 style="margin:0 0 10px; text-transform:none"><點選各項目表頭以進行排序></h5>
-				<div class="wrapperForScrollbar" id="wrapper_team_pitching_all">
-					<div class="fakeContentForScrollBar" id="content_team_pitching_all"></div>
+				<div class="wrapperForScrollbar" id="wrapper_cup_pitching_all">
+					<div class="fakeContentForScrollBar" id="content_cup_pitching_all"></div>
 				</div>
-				<div class="table-responsive" id="div_team_pitching_all">
-					<table class="table table-striped table-condensed" id="table_team_pitching_all" data-toggle="table" data-sort-name="ERA5" data-sort-order="desc">
+				<div class="table-responsive" id="div_cup_pitching_all">
+					<table class="table table-striped table-condensed" id="table_cup_pitching_all" data-toggle="table" data-sort-name="ERA5" data-sort-order="desc">
 						<thead>
 							<tr>
 								<th class= "colName" data-field="Name" data-sortable="true" data-sorter="NameSorterPit" data-align="center">Pitcher<br/>投手</th>
@@ -403,36 +422,36 @@
 							$(function(){
 								
 								var SortedName = '';
-								$('#table_team_pitching_all').on('sort.bs.table', function (e, name, order) {
+								$('#table_cup_pitching_all').on('sort.bs.table', function (e, name, order) {
 									SortedName = name;
 								});
-								$('#table_team_pitching_all').on('post-body.bs.table', function () {
-									$('#table_team_pitching_all').find('tbody tr td').each(function(){
+								$('#table_cup_pitching_all').on('post-body.bs.table', function () {
+									$('#table_cup_pitching_all').find('tbody tr td').each(function(){
 										if($(this).hasClass('sorting')){
 											$(this).removeClass('sorting');
 										}
 									});
-									SortedItem = $('#table_team_pitching_all').find('tbody tr td.col'+SortedName);
+									SortedItem = $('#table_cup_pitching_all').find('tbody tr td.col'+SortedName);
 									SortedItem.each(function(){
 										$(this).addClass('sorting');
 									});
 								});
 							});
 							$(window).on('load resize', function(){
-								$('#wrapper_team_pitching_all').width($('#div_team_pitching_all').width());
-								$('#content_team_pitching_all').width($('#table_team_pitching_all').width());
+								$('#wrapper_cup_pitching_all').width($('#div_cup_pitching_all').width());
+								$('#content_cup_pitching_all').width($('#table_cup_pitching_all').width());
 							});
 							$(function(){
-								wrapperForTablePit = $("#table_team_pitching_all").parent('div')
-								$("#wrapper_team_pitching_all").scroll(function(){
-									wrapperForTablePit.scrollLeft($("#wrapper_team_pitching_all").scrollLeft());
+								wrapperForTablePit = $("#table_cup_pitching_all").parent('div')
+								$("#wrapper_cup_pitching_all").scroll(function(){
+									wrapperForTablePit.scrollLeft($("#wrapper_cup_pitching_all").scrollLeft());
 								});
 								wrapperForTablePit.scroll(function(){
-									$("#wrapper_team_pitching_all").scrollLeft(wrapperForTablePit.scrollLeft());
+									$("#wrapper_cup_pitching_all").scrollLeft(wrapperForTablePit.scrollLeft());
 								});
 							});
 							function clearDescriptionPit(){
-								$('#descriptionTeamPit').text('');
+								$('#descriptionCupPit').text('');
 							}
 							function NameSorterPit(a, b) {
 								clearDescriptionPit();
@@ -447,7 +466,7 @@
 								return 0;
 							}
 							function AVGSorter_Pit(a, b) {
-								$('#descriptionTeamPit').text('被打擊率 = 被安打數 / 面對打數');
+								$('#descriptionCupPit').text('被打擊率 = 被安打數 / 面對打數');
 							
 								if (a.avg != "-.---" && b.avg == "-.---") return 1;
 								if (a.avg == "-.---" && b.avg != "-.---") return -1;
@@ -461,7 +480,7 @@
 								
 							}
 							function WHIPSorter(a, b) {
-								$('#descriptionTeamPit').text('每局被上壘率 = (被安打數 + 四壞) / 投球局數');
+								$('#descriptionCupPit').text('每局被上壘率 = (被安打數 + 四壞) / 投球局數');
 							
 								if (a.whip != "-.--" && b.whip == "-.--") return 1;
 								if (a.whip == "-.--" && b.whip != "-.--") return -1;
@@ -475,7 +494,7 @@
 								
 							}
 							function ERA5Sorter(a, b) {
-								$('#descriptionTeamPit').text('五局防禦率 = 自責分 x 5 / 投球局數');
+								$('#descriptionCupPit').text('五局防禦率 = 自責分 x 5 / 投球局數');
 							
 								if (a.era5 != "-.--" && b.era5 == "-.--") return 1;
 								if (a.era5 == "-.--" && b.era5 != "-.--") return -1;
@@ -489,7 +508,7 @@
 								
 							}
 							function ERA7Sorter(a, b) {
-								$('#descriptionTeamPit').text('七局防禦率 = 自責分 x 7 / 投球局數');
+								$('#descriptionCupPit').text('七局防禦率 = 自責分 x 7 / 投球局數');
 								
 								if (a.era7 != "-.--" && b.era7 == "-.--") return 1;
 								if (a.era7 == "-.--" && b.era7 != "-.--") return -1;
@@ -503,7 +522,7 @@
 								
 							}
 							function R5Sorter(a, b) {
-								$('#descriptionTeamPit').text('五局失分率 = 失分 x 5 / 投球局數');
+								$('#descriptionCupPit').text('五局失分率 = 失分 x 5 / 投球局數');
 								
 								if (a.r5 != "-.--" && b.r5 == "-.--") return 1;
 								if (a.r5 == "-.--" && b.r5 != "-.--") return -1;
@@ -517,7 +536,7 @@
 								
 							}
 							function R7Sorter(a, b) {
-								$('#descriptionTeamPit').text('七局失分率 = 失分 x 7 / 投球局數');
+								$('#descriptionCupPit').text('七局失分率 = 失分 x 7 / 投球局數');
 								
 								if (a.r7 != "-.--" && b.r7 == "-.--") return 1;
 								if (a.r7 == "-.--" && b.r7 != "-.--") return -1;
@@ -531,87 +550,89 @@
 							
 							}
 						</script>
-						<% if @team_pitching.size != 0 %>
+						<% if @cup_pitching.size != 0 %>
 							<tbody>
-								<% @team_pitching.each do |teamPit| %>
+								<% @cup_pitching.each do |cupPit| %>
 									<tr>
-										<td class="colName"><%= teamPit.player_id %></td>
-										<td class="colG"><%= teamPit.G %></td>
-										<td class="colW"><%= teamPit.W %></td>
-										<td class="colL"><%= teamPit.L %></td>
-										<td class="colIP"><%= '%.1f' % teamPit.IP.round(1) %></td>
-										<td class="colTBF"><%= teamPit.TBF %></td>
-										<td class="colH"><%= teamPit.H %></td>
-										<td class="colHR"><%= teamPit.HR %></td>
-										<td class="colSO"><%= teamPit.SO %></td>
-										<td class="colBB"><%= teamPit.BB %></td>
-										<td class="colIBB"><%= teamPit.IBB %></td>
-										<td class="colR"><%= teamPit.R %></td>
-										<td class="colER"><%= teamPit.ER %></td>
-										<td class="colAVG" data-IP="<%= teamPit.IP %>" data-AVG="<%= sortHelper((teamPit.TBF - teamPit.BB - teamPit.IBB),teamPit.H,teamPit.AVG,3) %>">
-											<% if teamPit.TBF - teamPit.BB - teamPit.IBB == 0 %>
-												<% if teamPit.H == 0 %>
+										<td class="colName">
+											<%= link_to cupPit.player_id, controller: "records", action: "pitching", player: cupPit.player_id, year: @year, cup: @cup %>
+										</td>
+										<td class="colG"><%= cupPit.G %></td>
+										<td class="colW"><%= cupPit.W %></td>
+										<td class="colL"><%= cupPit.L %></td>
+										<td class="colIP"><%= '%.1f' % cupPit.IP.round(1) %></td>
+										<td class="colTBF"><%= cupPit.TBF %></td>
+										<td class="colH"><%= cupPit.H %></td>
+										<td class="colHR"><%= cupPit.HR %></td>
+										<td class="colSO"><%= cupPit.SO %></td>
+										<td class="colBB"><%= cupPit.BB %></td>
+										<td class="colIBB"><%= cupPit.IBB %></td>
+										<td class="colR"><%= cupPit.R %></td>
+										<td class="colER"><%= cupPit.ER %></td>
+										<td class="colAVG" data-IP="<%= cupPit.IP %>" data-AVG="<%= sortHelper((cupPit.TBF - cupPit.BB - cupPit.IBB),cupPit.H,cupPit.AVG,3) %>">
+											<% if cupPit.TBF - cupPit.BB - cupPit.IBB == 0 %>
+												<% if cupPit.H == 0 %>
 													-.---
 												<% else %>
 													∞
 												<% end %>
 											<% else %>
-												<%= '%.3f' % teamPit.AVG.round(3) %>
+												<%= '%.3f' % cupPit.AVG.round(3) %>
 											<% end %>
 										</td>
-										<td class="colWHIP" data-IP="<%= teamPit.IP %>" data-WHIP="<%= sortHelper(teamPit.IP,(teamPit.H + teamPit.BB + teamPit.IBB),teamPit.WHIP,2) %>">
-											<% if teamPit.IP == 0.0 %>
-												<% if teamPit.H + teamPit.BB + teamPit.IBB == 0 %>
+										<td class="colWHIP" data-IP="<%= cupPit.IP %>" data-WHIP="<%= sortHelper(cupPit.IP,(cupPit.H + cupPit.BB + cupPit.IBB),cupPit.WHIP,2) %>">
+											<% if cupPit.IP == 0.0 %>
+												<% if cupPit.H + cupPit.BB + cupPit.IBB == 0 %>
 													-.--
 												<% else %>
 													∞
 												<% end %>
 											<% else %>
-												<%= '%.2f' % teamPit.WHIP.round(2) %>
+												<%= '%.2f' % cupPit.WHIP.round(2) %>
 											<% end %>
 										</td>
-										<td class="colERA5 sorting" data-IP="<%= teamPit.IP %>" data-ERA5="<%= sortHelper(teamPit.IP,teamPit.ER,teamPit.ERA5,2) %>">
-											<% if teamPit.IP == 0.0 %>
-												<% if teamPit.ER == 0 %>
+										<td class="colERA5 sorting" data-IP="<%= cupPit.IP %>" data-ERA5="<%= sortHelper(cupPit.IP,cupPit.ER,cupPit.ERA5,2) %>">
+											<% if cupPit.IP == 0.0 %>
+												<% if cupPit.ER == 0 %>
 													-.--
 												<% else %>
 													∞
 												<% end %>
 											<% else %>
-												<%= '%.2f' % teamPit.ERA5.round(2) %>
+												<%= '%.2f' % cupPit.ERA5.round(2) %>
 											<% end %>
 										</td>
-										<td class="colERA7" data-IP="<%= teamPit.IP %>" data-ERA7="<%= sortHelper(teamPit.IP,teamPit.ER,teamPit.ERA7,2) %>">
-											<% if teamPit.IP == 0.0 %>
-												<% if teamPit.ER == 0 %>
+										<td class="colERA7" data-IP="<%= cupPit.IP %>" data-ERA7="<%= sortHelper(cupPit.IP,cupPit.ER,cupPit.ERA7,2) %>">
+											<% if cupPit.IP == 0.0 %>
+												<% if cupPit.ER == 0 %>
 													-.--
 												<% else %>
 													∞
 												<% end %>
 											<% else %>
-												<%= '%.2f' % teamPit.ERA7.round(2) %>
+												<%= '%.2f' % cupPit.ERA7.round(2) %>
 											<% end %>
 										</td>
-										<td class="colR5" data-IP="<%= teamPit.IP %>" data-R5="<%= sortHelper(teamPit.IP,teamPit.R,teamPit.R5,2) %>">
-											<% if teamPit.IP == 0.0 %>
-												<% if teamPit.R == 0 %>
+										<td class="colR5" data-IP="<%= cupPit.IP %>" data-R5="<%= sortHelper(cupPit.IP,cupPit.R,cupPit.R5,2) %>">
+											<% if cupPit.IP == 0.0 %>
+												<% if cupPit.R == 0 %>
 													-.--
 												<% else %>
 													∞
 												<% end %>
 											<% else %>
-												<%= '%.2f' % teamPit.R5.round(2) %>
+												<%= '%.2f' % cupPit.R5.round(2) %>
 											<% end %>
 										</td>
-										<td class="colR7" data-IP="<%= teamPit.IP %>" data-R7="<%= sortHelper(teamPit.IP,teamPit.R,teamPit.R7,2) %>">
-											<% if teamPit.IP == 0.0 %>
-												<% if teamPit.R == 0 %>
+										<td class="colR7" data-IP="<%= cupPit.IP %>" data-R7="<%= sortHelper(cupPit.IP,cupPit.R,cupPit.R7,2) %>">
+											<% if cupPit.IP == 0.0 %>
+												<% if cupPit.R == 0 %>
 													-.--
 												<% else %>
 													∞
 												<% end %>
 											<% else %>
-												<%= '%.2f' % teamPit.R7.round(2) %>
+												<%= '%.2f' % cupPit.R7.round(2) %>
 											<% end %>
 										</td>
 									</tr>
@@ -621,8 +642,8 @@
 					</table>
 				</div>
 				<br/>
-				<div class="table-responsive" id="div_team_pitching_summary">
-					<table class="table table-striped table-condensed" id="table_team_pitching_summary">
+				<div class="table-responsive" id="div_cup_pitching_summary">
+					<table class="table table-striped table-condensed" id="table_cup_pitching_summary">
 						<thead>
 							<tr>
 								<th>W<br/>勝投</th>
@@ -644,83 +665,83 @@
 								<th>R/7<br/>七局失分率</th>
 							</tr>
 						</thead>
-						<% if @team_pitching_summary.TBF != nil %>
+						<% if @cup_pitching_summary.TBF != nil %>
 							<tbody>
-								<td><%= @team_pitching_summary.W %></td>
-								<td><%= @team_pitching_summary.L %></td>
-								<td><%= '%.1f' % @team_pitching_summary.IP.round(1) %></td>
-								<td><%= @team_pitching_summary.TBF %></td>
-								<td><%= @team_pitching_summary.H %></td>
-								<td><%= @team_pitching_summary.HR %></td>
-								<td><%= @team_pitching_summary.SO %></td>
-								<td><%= @team_pitching_summary.BB %></td>
-								<td><%= @team_pitching_summary.IBB %></td>
-								<td><%= @team_pitching_summary.R %></td>
-								<td><%= @team_pitching_summary.ER %></td>
+								<td><%= @cup_pitching_summary.W %></td>
+								<td><%= @cup_pitching_summary.L %></td>
+								<td><%= '%.1f' % @cup_pitching_summary.IP.round(1) %></td>
+								<td><%= @cup_pitching_summary.TBF %></td>
+								<td><%= @cup_pitching_summary.H %></td>
+								<td><%= @cup_pitching_summary.HR %></td>
+								<td><%= @cup_pitching_summary.SO %></td>
+								<td><%= @cup_pitching_summary.BB %></td>
+								<td><%= @cup_pitching_summary.IBB %></td>
+								<td><%= @cup_pitching_summary.R %></td>
+								<td><%= @cup_pitching_summary.ER %></td>
 								<td>
-									<% if @team_pitching_summary.TBF - @team_pitching_summary.BB - @team_pitching_summary.IBB == 0 %>
-										<% if @team_pitching_summary.H == 0 %>
+									<% if @cup_pitching_summary.TBF - @cup_pitching_summary.BB - @cup_pitching_summary.IBB == 0 %>
+										<% if @cup_pitching_summary.H == 0 %>
 											-.---
 										<% else %>
 											∞
 										<% end %>
 									<% else %>
-										<%= '%.3f' % @team_pitching_summary.AVG.round(3) %>
+										<%= '%.3f' % @cup_pitching_summary.AVG.round(3) %>
 									<% end %>
 								</td>
 								<td>
-									<% if @team_pitching_summary.IP == 0.0 %>
-										<% if @team_pitching_summary.H + @team_pitching_summary.BB + @team_pitching_summary.IBB == 0 %>
+									<% if @cup_pitching_summary.IP == 0.0 %>
+										<% if @cup_pitching_summary.H + @cup_pitching_summary.BB + @cup_pitching_summary.IBB == 0 %>
 											-.--
 										<% else %>
 											∞
 										<% end %>
 									<% else %>
-										<%= '%.2f' % @team_pitching_summary.WHIP.round(2) %>
+										<%= '%.2f' % @cup_pitching_summary.WHIP.round(2) %>
 									<% end %>
 								</td>
 								<td>
-									<% if @team_pitching_summary.IP == 0.0 %>
-										<% if @team_pitching_summary.ER == 0 %>
+									<% if @cup_pitching_summary.IP == 0.0 %>
+										<% if @cup_pitching_summary.ER == 0 %>
 											-.--
 										<% else %>
 											∞
 										<% end %>
 									<% else %>
-										<%= '%.2f' % @team_pitching_summary.ERA5.round(2) %>
+										<%= '%.2f' % @cup_pitching_summary.ERA5.round(2) %>
 									<% end %>
 								</td>
 								<td>
-									<% if @team_pitching_summary.IP == 0.0 %>
-										<% if @team_pitching_summary.ER == 0 %>
+									<% if @cup_pitching_summary.IP == 0.0 %>
+										<% if @cup_pitching_summary.ER == 0 %>
 											-.--
 										<% else %>
 											∞
 										<% end %>
 									<% else %>
-										<%= '%.2f' % @team_pitching_summary.ERA7.round(2) %>
+										<%= '%.2f' % @cup_pitching_summary.ERA7.round(2) %>
 									<% end %>
 								</td>
 								<td>
-									<% if @team_pitching_summary.IP == 0.0 %>
-										<% if @team_pitching_summary.R == 0 %>
+									<% if @cup_pitching_summary.IP == 0.0 %>
+										<% if @cup_pitching_summary.R == 0 %>
 											-.--
 										<% else %>
 											∞
 										<% end %>
 									<% else %>
-										<%= '%.2f' % @team_pitching_summary.R5.round(2) %>
+										<%= '%.2f' % @cup_pitching_summary.R5.round(2) %>
 									<% end %>
 								</td>
 								<td>
-									<% if @team_pitching_summary.IP == 0.0 %>
-										<% if @team_pitching_summary.R == 0 %>
+									<% if @cup_pitching_summary.IP == 0.0 %>
+										<% if @cup_pitching_summary.R == 0 %>
 											-.--
 										<% else %>
 											∞
 										<% end %>
 									<% else %>
-										<%= '%.2f' % @team_pitching_summary.R7.round(2) %>
+										<%= '%.2f' % @cup_pitching_summary.R7.round(2) %>
 									<% end %>
 								</td>
 							</tbody>
@@ -730,14 +751,14 @@
 				<br/>
 				<h4>守備成績</h4>
 				<br/>
-				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為現役球員，且每場<%= @activePLAYER_Fielding %>局 -- 目前 <%= @team_info.gameNum %> 場(需<%= '%.1f' % (@team_info.gameNum * @activePLAYER_Fielding.to_f) %>局以上)。</h5>
-				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionTeamFld"></h5>
+				<h5 style="margin:0 0 10px; text-transform:none">Active Player: 認定標準為現役球員，且每場<%= @activePLAYER_Fielding %>局 -- 目前 <%= @num_of_game %> 場(需<%= '%.1f' % (@num_of_game * @activePLAYER_Fielding.to_f) %>局以上)。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none" id="descriptionCupFld"></h5>
 				<h5 style="margin:0 0 10px; text-transform:none"><點選各項目表頭以進行排序></h5>
-				<div class="wrapperForScrollbar" id="wrapper_team_fielding_all">
-					<div class="fakeContentForScrollBar" id="content_team_fielding_all"></div>
+				<div class="wrapperForScrollbar" id="wrapper_cup_fielding_all">
+					<div class="fakeContentForScrollBar" id="content_cup_fielding_all"></div>
 				</div>
-				<div class="table-responsive" id="div_team_fielding_all">
-					<table class="table table-striped table-condensed" id="table_team_fielding_all" data-toggle="table" data-sort-name="FPCT" data-sort-order="desc">
+				<div class="table-responsive" id="div_cup_fielding_all">
+					<table class="table table-striped table-condensed" id="table_cup_fielding_all" data-toggle="table" data-sort-name="FPCT" data-sort-order="desc">
 						<thead>
 							<tr>
 								<th class= "colName" data-field="Name" data-sortable="true" data-sorter="NameSorterFld" data-align="center">Player<br/>守備員</th>
@@ -755,36 +776,36 @@
 						<script>
 							$(function(){
 								var SortedName = '';
-								$('#table_team_fielding_all').on('sort.bs.table', function (e, name, order) {
+								$('#table_cup_fielding_all').on('sort.bs.table', function (e, name, order) {
 									SortedName = name;
 								});
-								$('#table_team_fielding_all').on('post-body.bs.table', function () {
-									$('#table_team_fielding_all').find('tbody tr td').each(function(){
+								$('#table_cup_fielding_all').on('post-body.bs.table', function () {
+									$('#table_cup_fielding_all').find('tbody tr td').each(function(){
 										if($(this).hasClass('sorting')){
 											$(this).removeClass('sorting');
 										}
 									});
-									SortedItem = $('#table_team_fielding_all').find('tbody tr td.col'+SortedName);
+									SortedItem = $('#table_cup_fielding_all').find('tbody tr td.col'+SortedName);
 									SortedItem.each(function(){
 										$(this).addClass('sorting');
 									});
 								});
 							});
 							$(window).on('load resize', function(){
-								$('#wrapper_team_fielding_all').width($('#div_team_fielding_all').width());
-								$('#content_team_fielding_all').width($('#table_team_fielding_all').width());
+								$('#wrapper_cup_fielding_all').width($('#div_cup_fielding_all').width());
+								$('#content_cup_fielding_all').width($('#table_cup_fielding_all').width());
 							});
 							$(function(){
-								wrapperForTableFld = $('#table_team_fielding_all').parent('div');
-								$('#wrapper_team_fielding_all').scroll(function(){
-									wrapperForTableFld.scrollLeft($('#wrapper_team_fielding_all').scrollLeft());
+								wrapperForTableFld = $('#table_cup_fielding_all').parent('div');
+								$('#wrapper_cup_fielding_all').scroll(function(){
+									wrapperForTableFld.scrollLeft($('#wrapper_cup_fielding_all').scrollLeft());
 								});
 								wrapperForTableFld.scroll(function(){
-									$('#wrapper_team_fielding_all').scrollLeft(wrapperForTableFld.scrollLeft());
+									$('#wrapper_cup_fielding_all').scrollLeft(wrapperForTableFld.scrollLeft());
 								});
 							});
 							function clearDescriptionFld(){
-								$('#descriptionTeamFld').text('');
+								$('#descriptionCupFld').text('');
 							}
 							function NameSorterFld(a, b) {
 								clearDescriptionFld();
@@ -799,9 +820,9 @@
 								return 0;
 							}
 							function FPCTSorter(a, b) {
-								$('#descriptionTeamFld').text('守備率 = (刺殺 + 助殺) / 守備機會');
+								$('#descriptionCupFld').text('守備率 = (刺殺 + 助殺) / 守備機會');
 								// 兩階段sorting - 先過濾局數是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Fielding.to_f %>;
+								threshold = <%= @num_of_game * @activePLAYER_Fielding.to_f %>;
 								if(a.inn >= threshold && b.inn < threshold)
 									return 1;
 								else if(a.inn < threshold && b.inn >= threshold)
@@ -820,9 +841,9 @@
 								}
 							}
 							function Factor5Sorter(a, b) {
-								$('#descriptionTeamFld').text('Range Factor5 = ((刺殺 + 助殺 - 失誤) / (守備局數)) × 5，表示平均每5局該球員製造的淨出局數。');
+								$('#descriptionCupFld').text('Range Factor5 = ((刺殺 + 助殺 - 失誤) / (守備局數)) × 5，表示平均每5局該球員製造的淨出局數。');
 								// 兩階段sorting - 先過濾局數是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Fielding.to_f %>;
+								threshold = <%= @num_of_game * @activePLAYER_Fielding.to_f %>;
 								if(a.inn >= threshold && b.inn < threshold)
 									return 1;
 								else if(a.inn < threshold && b.inn >= threshold)
@@ -841,9 +862,9 @@
 								}
 							}
 							function Factor7Sorter(a, b) {
-								$('#descriptionTeamFld').text('Range Factor5 = ((刺殺 + 助殺 - 失誤) / (守備局數)) × 7，表示平均每7局該球員製造的淨出局數。');
+								$('#descriptionCupFld').text('Range Factor5 = ((刺殺 + 助殺 - 失誤) / (守備局數)) × 7，表示平均每7局該球員製造的淨出局數。');
 								// 兩階段sorting - 先過濾局數是否足額
-								threshold = <%= @team_info.gameNum * @activePLAYER_Fielding.to_f %>;
+								threshold = <%= @num_of_game * @activePLAYER_Fielding.to_f %>;
 								if(a.inn >= threshold && b.inn < threshold)
 									return 1;
 								else if(a.inn < threshold && b.inn >= threshold)
@@ -862,52 +883,54 @@
 								}
 							}
 						</script>
-						<% if @team_fielding.size != 0 %>
+						<% if @cup_fielding.size != 0 %>
 							<tbody>
-								<% @team_fielding.each do |teamFld| %>
-									<% if teamFld.INN >= @team_info.gameNum * @activePLAYER_Fielding.to_f %>
+								<% @cup_fielding.each do |cupFld| %>
+									<% if cupFld.INN >= @num_of_game * @activePLAYER_Fielding.to_f %>
 										<tr>
 									<% else %>
 										<tr class="nonActive">
 									<% end %>
-											<td class="colName"><%= teamFld.player_id %></td>
-											<td class="colG"><%= teamFld.G %></td>
-											<td class="colINN"><%= '%.1f' % teamFld.INN.round(1) %></td>
-											<td class="colTC"><%= teamFld.TC %></td>
-											<td class="colPO"><%= teamFld.PO %></td>
-											<td class="colA"><%= teamFld.A %></td>
-											<td class="colE"><%= teamFld.E %></td>
-											<td class="colFPCT sorting" data-INN="<%= teamFld.INN %>" data-FPCT="<%= sortHelper(teamFld.TC,(teamFld.PO + teamFld.A),teamFld.FPCT,3) %>">
-												<% if teamFld.TC == 0 %>
-													<% if teamFld.PO + teamFld.A == 0 %>
+											<td class="colName">
+												<%= link_to cupFld.player_id, controller: "records", action: "fielding", player: cupFld.player_id, year: @year, cup: @cup %>
+											</td>
+											<td class="colG"><%= cupFld.G %></td>
+											<td class="colINN"><%= '%.1f' % cupFld.INN.round(1) %></td>
+											<td class="colTC"><%= cupFld.TC %></td>
+											<td class="colPO"><%= cupFld.PO %></td>
+											<td class="colA"><%= cupFld.A %></td>
+											<td class="colE"><%= cupFld.E %></td>
+											<td class="colFPCT sorting" data-INN="<%= cupFld.INN %>" data-FPCT="<%= sortHelper(cupFld.TC,(cupFld.PO + cupFld.A),cupFld.FPCT,3) %>">
+												<% if cupFld.TC == 0 %>
+													<% if cupFld.PO + cupFld.A == 0 %>
 														-.---
 													<% else %>
 														∞
 													<% end %>
 												<% else %>
-													<%= '%.3f' % teamFld.FPCT.round(3) %>
+													<%= '%.3f' % cupFld.FPCT.round(3) %>
 												<% end %>
 											</td>
-											<td class="colFactor5" data-INN="<%= teamFld.INN %>" data-Factor5="<%= sortHelper(teamFld.INN,(teamFld.PO + teamFld.A - teamFld.E),teamFld.Factor5,2) %>">
-												<% if teamFld.INN == 0 %>
-													<% if teamFld.PO + teamFld.A - teamFld.E == 0 %>
+											<td class="colFactor5" data-INN="<%= cupFld.INN %>" data-Factor5="<%= sortHelper(cupFld.INN,(cupFld.PO + cupFld.A - cupFld.E),cupFld.Factor5,2) %>">
+												<% if cupFld.INN == 0 %>
+													<% if cupFld.PO + cupFld.A - cupFld.E == 0 %>
 														-.--
 													<% else %>
 														∞
 													<% end %>
 												<% else %>
-													<%= '%.2f' % teamFld.Factor5.round(2) %>
+													<%= '%.2f' % cupFld.Factor5.round(2) %>
 												<% end %>
 											</td>
-											<td class="colFactor7" data-INN="<%= teamFld.INN %>" data-Factor7="<%= sortHelper(teamFld.INN,(teamFld.PO + teamFld.A - teamFld.E),teamFld.Factor7,2) %>">
-												<% if teamFld.INN == 0 %>
-													<% if teamFld.PO + teamFld.A - teamFld.E == 0 %>
+											<td class="colFactor7" data-INN="<%= cupFld.INN %>" data-Factor7="<%= sortHelper(cupFld.INN,(cupFld.PO + cupFld.A - cupFld.E),cupFld.Factor7,2) %>">
+												<% if cupFld.INN == 0 %>
+													<% if cupFld.PO + cupFld.A - cupFld.E == 0 %>
 														-.--
 													<% else %>
 														∞
 													<% end %>
 												<% else %>
-													<%= '%.2f' % teamFld.Factor7.round(2) %>
+													<%= '%.2f' % cupFld.Factor7.round(2) %>
 												<% end %>
 											</td>
 										</tr>
@@ -917,8 +940,8 @@
 					</table>
 				</div>
 				<br/>
-				<div class="table-responsive" id="div_team_fielding_summary">
-					<table class="table table-striped table-condensed" id="table_team_fielding_summary">
+				<div class="table-responsive" id="div_cup_fielding_summary">
+					<table class="table table-striped table-condensed" id="table_cup_fielding_summary">
 						<thead>
 							<tr>
 								<th>INN<br/>守備局數</th>
@@ -931,45 +954,45 @@
 								<th>Range Factor7</th>
 							</tr>
 						</thead>
-						<% if @team_fielding_summary.INN != nil %>
+						<% if @cup_fielding_summary.INN != nil %>
 							<tbody>
 								<tr>
-									<td><%= '%.1f' % @team_fielding_summary.INN.round(1) %></td>
-									<td><%= @team_fielding_summary.TC %></td>
-									<td><%= @team_fielding_summary.PO %></td>
-									<td><%= @team_fielding_summary.A %></td>
-									<td><%= @team_fielding_summary.E %></td>
+									<td><%= '%.1f' % @cup_fielding_summary.INN.round(1) %></td>
+									<td><%= @cup_fielding_summary.TC %></td>
+									<td><%= @cup_fielding_summary.PO %></td>
+									<td><%= @cup_fielding_summary.A %></td>
+									<td><%= @cup_fielding_summary.E %></td>
 									<td>
-										<% if @team_fielding_summary.TC == 0 %>
-											<% if @team_fielding_summary.PO + @team_fielding_summary.A == 0 %>
+										<% if @cup_fielding_summary.TC == 0 %>
+											<% if @cup_fielding_summary.PO + @cup_fielding_summary.A == 0 %>
 												-.---
 											<% else %>
 												∞
 											<% end %>
 										<% else %>
-											<%= '%.3f' % @team_fielding_summary.FPCT.round(3) %>
+											<%= '%.3f' % @cup_fielding_summary.FPCT.round(3) %>
 										<% end %>
 									</td>
 									<td>
-										<% if @team_fielding_summary.INN == 0 %>
-											<% if @team_fielding_summary.PO + @team_fielding_summary.A - @team_fielding_summary.E == 0 %>
+										<% if @cup_fielding_summary.INN == 0 %>
+											<% if @cup_fielding_summary.PO + @cup_fielding_summary.A - @cup_fielding_summary.E == 0 %>
 												-.--
 											<% else %>
 												∞
 											<% end %>
 										<% else %>
-											<%= '%.2f' % @team_fielding_summary.Factor5.round(2) %>
+											<%= '%.2f' % @cup_fielding_summary.Factor5.round(2) %>
 										<% end %>
 									</td>
 									<td>
-										<% if @team_fielding_summary.INN == 0 %>
-											<% if @team_fielding_summary.PO + @team_fielding_summary.A - @team_fielding_summary.E == 0 %>
+										<% if @cup_fielding_summary.INN == 0 %>
+											<% if @cup_fielding_summary.PO + @cup_fielding_summary.A - @cup_fielding_summary.E == 0 %>
 												-.--
 											<% else %>
 												∞
 											<% end %>
 										<% else %>
-											<%= '%.2f' % @team_fielding_summary.Factor7.round(2) %>
+											<%= '%.2f' % @cup_fielding_summary.Factor7.round(2) %>
 										<% end %>
 									</td>
 								</tr>

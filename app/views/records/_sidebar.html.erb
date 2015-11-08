@@ -20,21 +20,24 @@
 				<li><%= link_to "　#{fa_icon "trophy 1x", class:"icon_sidebar"} 年度攻守排行".html_safe, {controller: "records", action: "king"} %></li>
 			</ul>
 		</li>
-		<!--
+		
 		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#menu2"> 盃賽查詢 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse" id="menu2">
-				<li><a href="#">新生盃</a>
+				<% @thisyear = (Time.now.month >= 9)?(Time.now.year):(Time.now.year - 1) %>
+				<li><%= link_to "　#{fa_icon "calendar 1x", class:"icon_sidebar"} 新生盃(".html_safe + (@thisyear - 1911).to_s + "年度)", {controller: "records", action: "cup", year: @thisyear, cup: '新生盃'} %></li>
 				</li>
-				<li><a href="#">聯盟賽</a>
+				<li><%= link_to "　#{fa_icon "calendar 1x", class:"icon_sidebar"} 聯盟賽(".html_safe + (@thisyear - 1911).to_s + "年度)", {controller: "records", action: "cup", year: @thisyear, cup: '台大聯盟'} %></li>
 				</li>
-				<li><a href="#">正式賽</a>
+				<li><%= link_to "　#{fa_icon "calendar 1x", class:"icon_sidebar"} 正式賽(".html_safe + (@thisyear - 1911).to_s + "年度)", {controller: "records", action: "cup", year: @thisyear, cup: '正式賽'} %></li>
 				</li>
-				<li><a href="#">友誼賽</a>
+				<li><%= link_to "　#{fa_icon "calendar 1x", class:"icon_sidebar"} 友誼賽(".html_safe + (@thisyear - 1911).to_s + "年度)", {controller: "records", action: "cup", year: @thisyear, cup: '友誼賽'} %></li>
 				</li>
-				<li><a href="#">所有盃賽查詢</a>
+				<li><%= link_to "　#{fa_icon "calendar-o 1x", class:"icon_sidebar"} 所有盃賽查詢".html_safe, {controller: "records", action: "cup"} %></li>
 				</li>
 			</ul>
 		</li>
+		
+		<!--
 		<li class="nav-header">
 			<a href="#" data-toggle="collapse" data-target="#menu3"> 進階分析 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse" id="menu3">
@@ -49,6 +52,7 @@
 			</ul>
 		</li>
 		-->
+		
 	</ul>
 
 	<!--

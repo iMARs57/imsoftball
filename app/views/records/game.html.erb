@@ -235,7 +235,7 @@
 															<% if battingAway.AB == 0  %>
 																-.---
 															<% else %>
-																<%= '%.3f' % battingAway.AVG %>
+																<%= '%.3f' % battingAway.AVG.round(3) %>
 															<% end %>
 														</td>
 													</tr>
@@ -268,7 +268,7 @@
 														<% if @game_AllBattingAway.AB == 0  %>
 															-.---
 														<% else %>
-															<%= '%.3f' % @game_AllBattingAway.AVG %>
+															<%= '%.3f' % @game_AllBattingAway.AVG.round(3) %>
 														<% end %>
 													</td>
 												</tr>
@@ -353,7 +353,7 @@
 															<% if battingHome.AB == 0  %>
 																-.---
 															<% else %>
-																<%= '%.3f' % battingHome.AVG %>
+																<%= '%.3f' % battingHome.AVG.round(3) %>
 															<% end %>
 														</td>
 													</tr>
@@ -386,7 +386,7 @@
 														<% if @game_AllBattingHome.AB == 0  %>
 															-.---
 														<% else %>
-															<%= '%.3f' % @game_AllBattingHome.AVG %>
+															<%= '%.3f' % @game_AllBattingHome.AVG.round(3) %>
 														<% end %>
 													</td>
 												</tr>
@@ -442,7 +442,7 @@
 												<% @game_PitchingAway.each do |pitchingAway| %>
 													<tr>
 														<td><%= pitchingAway.player_id %></td>
-														<td><%= '%.1f' % pitchingAway.IP %></td>
+														<td><%= '%.1f' % pitchingAway.IP.round(1) %></td>
 														<td><%= pitchingAway.BAOpp %></td>
 														<td><%= pitchingAway.H %></td>
 														<td><%= pitchingAway.HR %></td>
@@ -459,7 +459,7 @@
 																	∞
 																<% end %>
 															<% else %>
-																<%= '%.2f' % pitchingAway.ERA5 %>
+																<%= '%.2f' % pitchingAway.ERA5.round(2) %>
 															<% end %>
 														</td>
 														<td>
@@ -470,7 +470,7 @@
 																	∞
 																<% end %>
 															<% else %>
-																<%= '%.2f' % pitchingAway.ERA7 %>
+																<%= '%.2f' % pitchingAway.ERA7.round(2) %>
 															<% end %>
 														</td>
 													</tr>
@@ -485,7 +485,7 @@
 											<tfoot>
 												<tr>
 													<td>Total</td>
-													<td><%= '%.1f' % @game_AllPitchingAway.IP %></td>
+													<td><%= '%.1f' % @game_AllPitchingAway.IP.round(1) %></td>
 													<td><%= @game_AllPitchingAway.BAOpp %></td>
 													<td><%= @game_AllPitchingAway.H %></td>
 													<td><%= @game_AllPitchingAway.HR %></td>
@@ -502,7 +502,7 @@
 																∞
 															<% end %>
 														<% else %>
-															<%= '%.2f' % @game_AllPitchingAway.ERA5 %>
+															<%= '%.2f' % @game_AllPitchingAway.ERA5.round(2) %>
 														<% end %>
 													</td>
 													<td>
@@ -513,7 +513,7 @@
 																∞
 															<% end %>
 														<% else %>
-															<%= '%.2f' % @game_AllPitchingAway.ERA7 %>
+															<%= '%.2f' % @game_AllPitchingAway.ERA7.round(2) %>
 														<% end %>
 													</td>
 												</tr>
@@ -569,7 +569,7 @@
 												<% @game_PitchingHome.each do |pitchingHome| %>
 													<tr>
 														<td><%= pitchingHome.player_id %></td>
-														<td><%= '%.1f' % pitchingHome.IP %></td>
+														<td><%= '%.1f' % pitchingHome.IP.round(1) %></td>
 														<td><%= pitchingHome.BAOpp %></td>
 														<td><%= pitchingHome.H %></td>
 														<td><%= pitchingHome.HR %></td>
@@ -586,7 +586,7 @@
 																	∞
 																<% end %>
 															<% else %>
-																<%= '%.2f' % pitchingHome.ERA5 %>
+																<%= '%.2f' % pitchingHome.ERA5.round(2) %>
 															<% end %>
 														</td>
 														<td>
@@ -597,7 +597,7 @@
 																	∞
 																<% end %>
 															<% else %>
-																<%= '%.2f' % pitchingHome.ERA7 %>
+																<%= '%.2f' % pitchingHome.ERA7.round(2) %>
 															<% end %>
 														</td>
 													</tr>
@@ -612,7 +612,7 @@
 											<tfoot>
 												<tr>
 													<td>Total</td>
-													<td><%= '%.1f' % @game_AllPitchingHome.IP %></td>
+													<td><%= '%.1f' % @game_AllPitchingHome.IP.round(1) %></td>
 													<td><%= @game_AllPitchingHome.BAOpp %></td>
 													<td><%= @game_AllPitchingHome.H %></td>
 													<td><%= @game_AllPitchingHome.HR %></td>
@@ -629,7 +629,7 @@
 																∞
 															<% end %>
 														<% else %>
-															<%= '%.2f' % @game_AllPitchingHome.ERA5 %>
+															<%= '%.2f' % @game_AllPitchingHome.ERA5.round(2) %>
 														<% end %>
 													</td>
 													<td>
@@ -640,7 +640,7 @@
 																∞
 															<% end %>
 														<% else %>
-															<%= '%.2f' % @game_AllPitchingHome.ERA7 %>
+															<%= '%.2f' % @game_AllPitchingHome.ERA7.round(2) %>
 														<% end %>
 													</td>
 												</tr>
@@ -691,7 +691,7 @@
 													<tr>
 														<td><%= fieldingAway.POS %></td>
 														<td><%= fieldingAway.player_id %></td>
-														<td><%= '%.1f' % fieldingAway.INN %></td>
+														<td><%= '%.1f' % fieldingAway.INN.round(1) %></td>
 														<td><%= fieldingAway.TC %></td>
 														<td><%= fieldingAway.PO %></td>
 														<td><%= fieldingAway.K %></td>
@@ -701,7 +701,7 @@
 															<% if fieldingAway.TC == 0  %>
 																-.---
 															<% else %>
-																<%= '%.3f' % fieldingAway.FPCT %>
+																<%= '%.3f' % fieldingAway.FPCT.round(3) %>
 															<% end %>
 														</td>
 													</tr>
@@ -725,7 +725,7 @@
 														<% if @game_AllFieldingAway.TC == 0  %>
 															-.---
 														<% else %>
-															<%= '%.3f' % @game_AllFieldingAway.FPCT %>
+															<%= '%.3f' % @game_AllFieldingAway.FPCT.round(3) %>
 														<% end %>
 													</td>
 												</tr>
@@ -776,7 +776,7 @@
 													<tr>
 														<td><%= fieldingHome.POS %></td>
 														<td><%= fieldingHome.player_id %></td>
-														<td><%= '%.1f' % fieldingHome.INN %></td>
+														<td><%= '%.1f' % fieldingHome.INN.round(1) %></td>
 														<td><%= fieldingHome.TC %></td>
 														<td><%= fieldingHome.PO %></td>
 														<td><%= fieldingHome.K %></td>
@@ -786,7 +786,7 @@
 															<% if fieldingHome.TC == 0  %>
 																-.---
 															<% else %>
-																<%= '%.3f' % fieldingHome.FPCT %>
+																<%= '%.3f' % fieldingHome.FPCT.round(3) %>
 															<% end %>
 														</td>
 													</tr>
@@ -810,7 +810,7 @@
 														<% if @game_AllFieldingHome.TC == 0  %>
 															-.---
 														<% else %>
-															<%= '%.3f' % @game_AllFieldingHome.FPCT %>
+															<%= '%.3f' % @game_AllFieldingHome.FPCT.round(3) %>
 														<% end %>
 													</td>
 												</tr>

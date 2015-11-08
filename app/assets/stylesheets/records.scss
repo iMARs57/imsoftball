@@ -64,7 +64,11 @@
 #table_team_gamelist > thead > tr > th,
 #table_team_batting_summary > thead > tr > th,
 #table_team_pitching_summary > thead > tr > th,
-#table_team_fielding_summary > thead > tr > th{
+#table_team_fielding_summary > thead > tr > th,
+#table_cup_gamelist > thead > tr > th,
+#table_cup_batting_summary > thead > tr > th,
+#table_cup_pitching_summary > thead > tr > th,
+#table_cup_fielding_summary > thead > tr > th{
 	
 	background:rgba(192,192,192,0.7);
 }
@@ -73,7 +77,8 @@
 #div_batting_playerDetail,
 #div_pitching_playerDetail,
 #div_pitching_playerEachYear,
-#div_team_gamelist{
+#div_team_gamelist,
+#div_cup_gamelist{
 	
 	border: 1px solid #e3e3e3;
 	border-radius: 5px;
@@ -131,6 +136,10 @@ img.teamLogo{
 #table_team_batting_summary > thead > tr > th, #table_team_batting_summary > tbody > tr > td,
 #table_team_pitching_summary > thead > tr > th, #table_team_pitching_summary > tbody > tr > td,
 #table_team_fielding_summary > thead > tr > th, #table_team_fielding_summary > tbody > tr > td,
+#table_cup_gamelist > thead > tr > th, #table_cup_gamelist > tbody > tr > td,
+#table_cup_batting_summary > thead > tr > th, #table_cup_batting_summary > tbody > tr > td,
+#table_cup_pitching_summary > thead > tr > th, #table_cup_pitching_summary > tbody > tr > td,
+#table_cup_fielding_summary > thead > tr > th, #table_cup_fielding_summary > tbody > tr > td
 {
 	
 	text-align: center;
@@ -255,7 +264,10 @@ td.win{
 #table_pitching_playerIP > tbody > tr > td,
 #table_team_batting_summary > tbody > tr > td,
 #table_team_pitching_summary > tbody > tr > td,
-#table_team_fielding_summary > tbody > tr > td{	
+#table_team_fielding_summary > tbody > tr > td,
+#table_cup_batting_summary > tbody > tr > td,
+#table_cup_pitching_summary > tbody > tr > td,
+#table_cup_fielding_summary > tbody > tr > td{	
 	background:rgba(235,235,235,0.7);
 }
 

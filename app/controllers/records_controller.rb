@@ -452,13 +452,31 @@ class RecordsController < ApplicationController
 														G.cup_id = C.cup_id AND
 														C.year = ' + @year.to_s + ') '
 			elsif @year == 'Wildcard' && @cup != nil # 年份選不分年度且盃賽不為空
-				@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
+				if @cup == '官方賽'
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
 														games AS G, 
 														cups AS C
 												  WHERE BAT.game_id = G.game_id AND
 														G.cup_id = C.cup_id AND
-														C.cup_name = "' + @cup + '") '
+														C.official = 1) '
+				elsif @cup == '正式賽'
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
+												   FROM battings AS BAT,
+														games AS G, 
+														cups AS C
+												  WHERE BAT.game_id = G.game_id AND
+														G.cup_id = C.cup_id AND
+														C.formal = 1) '
+				else
+					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
+													   FROM battings AS BAT,
+															games AS G, 
+															cups AS C
+													  WHERE BAT.game_id = G.game_id AND
+															G.cup_id = C.cup_id AND
+															C.cup_name = "' + @cup + '") '
+				end
 			elsif @year != nil && @cup != nil # 年份非空且盃賽非空
 				if @cup == '官方賽'
 					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
@@ -478,15 +496,6 @@ class RecordsController < ApplicationController
 														G.cup_id = C.cup_id AND
 														C.year = ' + @year.to_s + ' AND
 														C.formal = 1) '
-				elsif @cup == '聯盟賽'
-					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
-												   FROM battings AS BAT,
-														games AS G, 
-														cups AS C
-												  WHERE BAT.game_id = G.game_id AND
-														G.cup_id = C.cup_id AND
-														C.year = ' + @year.to_s + ' AND
-														C.cup_name = "台大聯盟") '
 				else
 					@sql_year = ' AND BAT.game_id IN (SELECT DISTINCT G.game_id
 												   FROM battings AS BAT,
@@ -851,17 +860,74 @@ class RecordsController < ApplicationController
 			
 			@player = params[:player]
 			@year = params[:year]
+			@cup = params[:cup]
 			@sortBy = (params[:sortBy] == nil)? ('W'):(params[:sortBy])
 			@sql_year = ' '
 			
-			if @year != nil && @year != 'Wildcard'
-				@sql_year = ' AND PIT.game_id IN (SELECT G.game_id 
-												    FROM pitchings AS PIT,
-														 games AS G,
+			# 別頁傳入cup參數導入此頁時會用到
+			if @year != nil && @year != 'Wildcard' && @cup == nil # 年份不是選不分年度且盃賽為空
+				@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+													FROM pitchings AS PIT,
+														 games AS G, 
 														 cups AS C
 												   WHERE PIT.game_id = G.game_id AND
 														 G.cup_id = C.cup_id AND
 														 C.year = ' + @year.to_s + ') '
+			elsif @year == 'Wildcard' && @cup != nil # 年份選不分年度且盃賽不為空
+				if @cup == '官方賽'
+					@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+													FROM pitchings AS PIT,
+														 games AS G, 
+														 cups AS C
+												   WHERE PIT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id AND
+														 C.official = 1) '
+				elsif @cup == '正式賽'
+					@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+													FROM pitchings AS PIT,
+														 games AS G, 
+														 cups AS C
+												   WHERE PIT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id AND
+														 C.formal = 1) '
+				else	
+					@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+														FROM pitchings AS PIT,
+															 games AS G, 
+															 cups AS C
+													   WHERE PIT.game_id = G.game_id AND
+															 G.cup_id = C.cup_id AND
+															 C.cup_name = "' + @cup + '") '
+				end
+			elsif @year != nil && @cup != nil # 年份非空且盃賽非空
+				if @cup == '官方賽'
+					@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+													FROM pitchings AS PIT,
+														 games AS G, 
+														 cups AS C
+												   WHERE PIT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id AND
+														 C.year = ' + @year.to_s + ' AND
+														 C.official = 1) '
+				elsif @cup == '正式賽'
+					@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+													FROM pitchings AS PIT,
+														 games AS G, 
+														 cups AS C
+												   WHERE PIT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id AND
+														 C.year = ' + @year.to_s + ' AND
+														 C.formal = 1) '
+				else
+					@sql_year = ' AND PIT.game_id IN (SELECT DISTINCT G.game_id
+													FROM pitchings AS PIT,
+														 games AS G, 
+														 cups AS C
+												   WHERE PIT.game_id = G.game_id AND
+														 G.cup_id = C.cup_id AND
+														 C.year = ' + @year.to_s + ' AND
+														 C.cup_name = "' + @cup + '") '
+				end
 			end
 			
 			if @player == nil && @year == nil
@@ -979,7 +1045,6 @@ class RecordsController < ApplicationController
 			elsif @player != 'all'
 				
 				if @year == 'Wildcard'
-					@sql_year = ' '
 					@playerPitchingEachYear = Pitching.find_by_sql('SELECT C.year,
 																		   COUNT(PIT.game_id) AS G,
 																		   SUM(PIT.W) AS W,
@@ -1006,14 +1071,6 @@ class RecordsController < ApplicationController
 																		   PIT.game_id = G.game_id AND
 																		   G.cup_id = C.cup_id
 																  GROUP BY C.year')
-				else
-					@sql_year = ' AND PIT.game_id IN (SELECT G.game_id 
-														FROM pitchings AS PIT,
-															 games AS G,
-															 cups AS C
-													   WHERE PIT.game_id = G.game_id AND
-															 G.cup_id = C.cup_id AND
-															 C.year = ' + @year.to_s + ') '
 				end
 				
 				@playerPitchingSummary = Pitching.find_by_sql('SELECT COUNT(PIT.game_id) AS G,
@@ -1160,13 +1217,31 @@ class RecordsController < ApplicationController
 														  G.cup_id = C.cup_id AND
 														  C.year = ' + @year.to_s + ') '
 			elsif @year == 'Wildcard' && @cup != nil
-				@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
-													 FROM fieldings AS FIELD,
-														  games AS G, 
-														  cups AS C
-													WHERE FIELD.game_id = G.game_id AND
-														  G.cup_id = C.cup_id AND
-														  C.cup_name = "' + @cup + '") '
+				if @cup == '官方賽'
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.official = 1) '
+				elsif @cup == '正式賽'
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.formal = 1) '
+				else	
+					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
+														 FROM fieldings AS FIELD,
+															  games AS G, 
+															  cups AS C
+														WHERE FIELD.game_id = G.game_id AND
+															  G.cup_id = C.cup_id AND
+															  C.cup_name = "' + @cup + '") '
+				end
 			elsif @year != nil && @cup != nil
 				if @cup == '官方賽'
 					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
@@ -1186,15 +1261,6 @@ class RecordsController < ApplicationController
 															  G.cup_id = C.cup_id AND
 															  C.year = ' + @year.to_s + 'AND
 															  C.formal = 1) '
-				elsif @cup == '聯盟賽'
-					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
-														 FROM fieldings AS FIELD,
-															  games AS G, 
-															  cups AS C
-														WHERE FIELD.game_id = G.game_id AND
-															  G.cup_id = C.cup_id AND
-															  C.year = ' + @year.to_s + 'AND
-															  C.cup_name = "台大聯盟") '
 				else
 					@sql_year = ' AND FIELD.game_id IN (SELECT G.game_id 
 														 FROM fieldings AS FIELD,
@@ -2018,4 +2084,287 @@ class RecordsController < ApplicationController
 			redirect_to :action => 'new', :controller => 'sessions'
 		end
 	end
+	
+	def cup
+		
+		if logged_in?
+		
+			@year = params[:year]
+			@activePLAYER_Batting = 1
+			@activePLAYER_Fielding = 1.5
+			
+			if @year == 'Wildcard' 
+				@Cyear = ' '
+			else
+				@Cyear = ' AND C.year = ' + @year.to_s + ' '
+			end
+			@cup = params[:cup]
+			
+			if @year== nil || @cup == nil
+				
+				@year_option = Array.new
+				@allCupName = Cup.select('DISTINCT cups.cup_name')
+				@allCupName.each do |eachName|
+					@year_option.push(['不分年度-' + eachName.cup_name,'Wildcard'])
+				end
+				@year_option.push(['不分年度-正式賽','Wildcard'])
+				@year_option.push(['不分年度-官方賽','Wildcard'])
+				
+				@allyear = Cup.select('DISTINCT cups.year').order('cups.year DESC')
+				@allyear.each do |eachyear|
+					@year_option.push([eachyear.year.to_s + '年度-正式賽',eachyear.year])
+				end
+				@allyear.each do |eachyear|
+					@year_option.push([eachyear.year.to_s + '年度-官方賽',eachyear.year])
+				end
+				@allCupYearName = Cup.select('DISTINCT cups.year, cups.cup_name').order('cups.year DESC')
+				@allCupYearName.each do |eachyearname|
+					@year_option.push([eachyearname.year.to_s + '年度-' + eachyearname.cup_name,eachyearname.year])
+				end
+				
+				@allOfficial = Cup.select('DISTINCT cups.cup_name').where('cups.official = 1').order('cups.cup_name')
+				@allFormal = Cup.select('DISTINCT cups.cup_name').where('cups.formal = 1').order('cups.cup_name')
+				@listOfficial = ''
+				@listFormal = ''
+				@allOfficial.each_with_index do |eachOfficial, index|
+					@listOfficial += eachOfficial.cup_name
+					if index == @allOfficial.length() - 1
+						@listOfficial += '。'
+					else
+						@listOfficial += ' '
+					end
+				end
+				@allFormal.each_with_index do |eachFormal, index|
+					@listFormal += eachFormal.cup_name
+					if index == @allFormal.length() - 1
+						@listFormal += '。'
+					else
+						@listFormal += ' '
+					end
+				end
+			
+			else
+				
+				if @cup == '正式賽'
+					@gameNumber = 'SELECT COUNT(*) AS NUM
+									 FROM games AS G, 
+										  cups AS C
+									WHERE G.cup_id = C.cup_id AND
+										  C.formal = 1 ' + @Cyear
+					@cup_name = ' C.formal = 1 '
+				elsif @cup == '官方賽'
+					@gameNumber = 'SELECT COUNT(*) AS NUM
+									 FROM games AS G, 
+										  cups AS C
+									WHERE G.cup_id = C.cup_id AND
+										  C.official = 1 ' + @Cyear
+					@cup_name = ' C.official = 1 ';	
+				else
+					@gameNumber = 'SELECT COUNT(*) AS NUM
+									 FROM games AS G,
+										  cups AS C
+									WHERE G.cup_id = C.cup_id AND
+										  C.cup_name = "' + @cup + '" ' + @Cyear
+					@cup_name = ' C.cup_name = "' + @cup + '" '
+				end
+				
+				# for 新生盃
+				if @cup == '新生盃'
+					@active = ' '
+				else
+					@active = ' AND PLY.member = 1 '
+				end
+				
+				@num_of_game = Game.find_by_sql(@gameNumber)[0].NUM
+			
+				@cup_gamelist = Game.find_by_sql('SELECT G.game_id,
+														 year,
+														 cup_name,
+														 teamAway.team_name AS teamAwayName,
+														 G.away_score,
+														 G.home_score,
+														 teamHome.team_name AS teamHomeName,
+														 G.time,
+														 G.mvp
+													FROM games AS G,
+														 cups AS C,
+														 teams AS teamHome,
+														 teams AS teamAway
+												   WHERE G.cup_id = C.cup_id AND
+														 teamHome.team_id = G.home_team_id AND
+														 teamAway.team_id = G.away_team_id AND ' +
+														 @cup_name + 
+														 @Cyear +
+											  ' ORDER BY G.game_id')
+				@cup_batting = Batting.find_by_sql('SELECT BAT.player_id,
+														   COUNT(*) AS G,
+														   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+														   SUM(BAT.AB) AS AB,
+														   SUM(BAT.H) AS H,
+															SUM(BAT.B2) AS B2,
+															SUM(BAT.B3) AS B3,
+															SUM(BAT.HR) AS HR,
+															SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+															SUM(BAT.RBI) AS RBI,
+															SUM(BAT.R) AS R,
+															SUM(BAT.SO) AS SO,
+															SUM(BAT.BB) AS BB,
+															SUM(BAT.IBB) AS IBB,
+															SUM(BAT.SF) AS SF,
+															SUM(BAT.E) AS E,
+															CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															(CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA 
+													   FROM battings AS BAT,
+															players AS PLY
+													  WHERE BAT.player_id = PLY.player_id ' + @active + ' AND
+															BAT.game_id IN (SELECT G.game_id
+																			  FROM games AS G,
+																				   cups AS C
+																			 WHERE G.cup_id = C.cup_id AND ' +
+																				   @cup_name +
+																				   @Cyear + ' )
+																		  GROUP BY BAT.player_id
+																		  ORDER BY (SUM(BAT.H)/(SUM(BAT.AB)+0.00000000000000000000000000000000000001)) DESC,
+																				   ((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.00000000000000001)) DESC,
+																				   (SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.000000000000000001) DESC')
+				@cup_batting_summary = Batting.find_by_sql('SELECT SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																   SUM(BAT.AB) AS AB,
+																   SUM(BAT.H) AS H,
+																   SUM(BAT.B2) AS B2,
+																   SUM(BAT.B3) AS B3,
+																   SUM(BAT.HR) AS HR,
+																   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																   SUM(BAT.RBI) AS RBI,
+																   SUM(BAT.R) AS R,
+																   SUM(BAT.SO) AS SO,
+																   SUM(BAT.BB) AS BB,
+																   SUM(BAT.IBB) AS IBB,
+																   SUM(BAT.SF) AS SF,
+																   SUM(BAT.E) AS E,
+																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA 
+															  FROM battings AS BAT,
+																   players AS PLY
+															 WHERE BAT.player_id = PLY.player_id ' + @active + ' AND
+																   BAT.game_id IN (SELECT G.game_id
+																					  FROM games AS G,
+																						   cups AS C
+																					 WHERE G.cup_id = C.cup_id AND ' +
+																						   @cup_name +
+																						   @Cyear + ' )')[0]
+				@cup_pitching = Pitching.find_by_sql('SELECT PIT.player_id,
+															  COUNT(PIT.game_id) AS G,
+															  SUM(PIT.W) AS W,
+															  SUM(PIT.L) AS L,
+															  SUM(PIT.IPouts/3.0) AS IP,
+															  SUM(PIT.BAOpp) AS TBF,
+															  SUM(PIT.H) AS H,
+															  SUM(PIT.HR) AS HR,
+															  SUM(PIT.SO) AS SO,
+															  SUM(PIT.BB) AS BB,
+															  SUM(PIT.IBB) AS IBB,
+															  SUM(PIT.R) AS R,
+															  SUM(PIT.ER) AS ER,
+															  CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+														      (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+														      CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+														      CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+														      CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+														      CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+														 FROM pitchings AS PIT,
+															  players AS PLY
+														WHERE PLY.player_id = PIT.player_id ' + @active + ' AND
+															  PIT.game_id IN (SELECT game_id
+																				FROM games AS G,
+																					 cups AS C
+																			   WHERE G.cup_id = C.cup_id AND ' +
+																					 @cup_name +
+																					 @Cyear + ' )
+																			GROUP BY PIT.player_id
+																			ORDER BY SUM(PIT.ER)/SUM(PIT.IPouts+0.0000000000000000000000000000000000000001)')
+				@cup_pitching_summary = Pitching.find_by_sql('SELECT SUM(PIT.W) AS W,
+																     SUM(PIT.L) AS L,
+																     SUM(PIT.IPouts/3.0) AS IP,
+																     SUM(PIT.BAOpp) AS TBF,
+																     SUM(PIT.H) AS H,
+																     SUM(PIT.HR) AS HR,
+																     SUM(PIT.SO) AS SO,
+																     SUM(PIT.BB) AS BB,
+																     SUM(PIT.IBB) AS IBB,
+																     SUM(PIT.R) AS R,
+																     SUM(PIT.ER) AS ER,
+																     CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																     (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+																     CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																     CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																     CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																     CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+																FROM pitchings AS PIT,
+																	 players AS PLY
+															   WHERE PLY.player_id = PIT.player_id ' + @active + ' AND
+																	 PIT.game_id IN (SELECT game_id
+																					   FROM games AS G,
+																							cups AS C
+																					  WHERE G.cup_id = C.cup_id AND ' +
+																							@cup_name +
+																							@Cyear + ' )')[0]
+				
+				if @cup == '系級盃'
+					@activePLAYER_Fielding = 1;
+				end
+				
+				@cup_fielding = Fielding.find_by_sql('SELECT FIELD.player_id,
+															 COUNT(FIELD.game_id) AS G,
+															 SUM(FIELD.Innouts/3.0) AS INN,
+															 SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															 SUM(FIELD.PO) AS PO,
+															 SUM(FIELD.A) AS A,
+															 SUM(FIELD.E) AS E,
+															 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+															 (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+															 (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+														FROM fieldings AS FIELD,
+															 players AS PLY
+													   WHERE FIELD.player_id = PLY.player_id ' + @active + ' AND
+															 FIELD.game_id IN (SELECT game_id
+																				 FROM games AS G,
+																					  cups AS C
+																				WHERE G.cup_id = C.cup_id AND ' +
+																					  @cup_name +
+																					  @Cyear + ' )
+																			 GROUP BY FIELD.player_id
+																			 ORDER BY CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 DESC,
+																					  SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')
+				@cup_fielding_summary = Fielding.find_by_sql('SELECT SUM(FIELD.Innouts/3.0) AS INN,
+																	 SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																	 SUM(FIELD.PO) AS PO,
+																	 SUM(FIELD.A) AS A,
+																	 SUM(FIELD.E) AS E,
+																	 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT,
+																	 (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*5 AS Factor5,
+																	 (SUM(PO)+SUM(A)-SUM(E))/((SUM(FIELD.InnOuts)+0.0000000000000000000000000000001)/3.0)*7 AS Factor7
+																FROM fieldings AS FIELD,
+																	 players AS PLY
+															   WHERE FIELD.player_id = PLY.player_id ' + @active + ' AND
+																	 FIELD.game_id IN (SELECT game_id
+																						 FROM games AS G,
+																							  cups AS C
+																						WHERE G.cup_id = C.cup_id AND ' +
+																							  @cup_name +
+																							  @Cyear + ' )')[0]
+			end
+		
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	
+	end
+	
 end
