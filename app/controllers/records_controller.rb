@@ -1442,7 +1442,9 @@ class RecordsController < ApplicationController
 														  FROM fieldings AS FIELD
 														 WHERE FIELD.player_id = "' + @player + '" ' + @sql_year +
 													 'GROUP BY FIELD.POS 
-													  ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')
+													  ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC,
+															   SUM(FIELD.Innouts/3.0) DESC,
+															   COUNT(FIELD.game_id) DESC')
 				@playerFieldingGrass = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
 																	SUM(FIELD.Innouts/3.0) AS INN,
 																	SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
@@ -2358,6 +2360,542 @@ class RecordsController < ApplicationController
 																						WHERE G.cup_id = C.cup_id AND ' +
 																							  @cup_name +
 																							  @Cyear + ' )')[0]
+			end
+		
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	
+	end
+	
+	def playerBattingClassifiedHelper(type, player_id)
+	
+		if type == 'formal'
+			@select_game_id = ' SELECT G.game_id
+								  FROM battings AS BAT,
+									   games AS G,
+									   cups AS C
+								 WHERE BAT.game_id = G.game_id AND
+									   G.cup_id = C.cup_id AND
+									   C.formal = 1 '
+		elsif type == 'official'
+			@select_game_id = ' SELECT G.game_id
+								  FROM battings AS BAT,
+									   games AS G,
+									   cups AS C
+								 WHERE BAT.game_id = G.game_id AND
+									   G.cup_id = C.cup_id AND
+									   C.formal = 1 AND
+									   C.official = 1 '
+		else
+			@select_game_id = ' SELECT G.game_id
+								  FROM battings AS BAT,
+									   games AS G,
+									   cups AS C
+								 WHERE BAT.game_id = G.game_id AND
+									   G.cup_id = C.cup_id AND
+									   C.formal = 0 '
+		end
+	
+		@playerBattingClassified = Batting.find_by_sql('SELECT COUNT(BAT.game_id) AS G,
+															   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+															   SUM(BAT.AB) AS AB,
+															   SUM(BAT.H) AS H,
+															   SUM(BAT.B2) AS B2,
+															   SUM(BAT.B3) AS B3,
+															   SUM(BAT.HR) AS HR,
+															   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+															   SUM(BAT.RBI) AS RBI,
+															   SUM(BAT.R) AS R,
+															   SUM(BAT.SO) AS SO,
+															   SUM(BAT.BB) AS BB,
+															   SUM(BAT.IBB) AS IBB,
+															   SUM(BAT.SF) AS SF,
+															   SUM(BAT.E) AS E,
+															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA,
+															   (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+														  FROM battings AS BAT
+														 WHERE BAT.game_id IN (' + @select_game_id + ') AND
+															   BAT.player_id = "' + player_id + '" ')[0]
+		return @playerBattingClassified
+	end
+	
+	def playerPitchingClassifiedHelper(type, player_id)
+	
+		if type == 'formal'
+			@select_game_id = ' SELECT G.game_id
+								  FROM pitchings AS PIT,
+									   games AS G,
+									   cups AS C
+								 WHERE PIT.game_id = G.game_id AND
+									   G.cup_id = C.cup_id AND
+									   C.formal = 1 '
+		elsif type == 'official'
+			@select_game_id = ' SELECT G.game_id
+								  FROM pitchings AS PIT,
+									   games AS G,
+									   cups AS C
+								 WHERE PIT.game_id = G.game_id AND
+									   G.cup_id = C.cup_id AND
+									   C.official = 1 '
+		elsif type == 'friendly'
+			@select_game_id = ' SELECT G.game_id
+								  FROM pitchings AS PIT,
+									   games AS G,
+									   cups AS C
+								 WHERE PIT.game_id = G.game_id AND
+									   G.cup_id = C.cup_id AND
+									   C.formal = 0 '
+		elsif type == 'starter'
+			@select_game_id = ' SELECT G.game_id
+								  FROM pitchings AS PIT,
+									   games AS G
+								 WHERE PIT.game_id = G.game_id AND
+									   PIT.player_id = "' + player_id + '" AND
+									   PIT.order = 1 '
+		elsif type == 'reliever'
+			@select_game_id = ' SELECT G.game_id
+								  FROM pitchings AS PIT,
+									   games AS G
+								 WHERE PIT.game_id = G.game_id AND
+									   PIT.player_id = "' + player_id + '" AND
+									   PIT.order > 1 '
+		end
+	
+		@playerPitchingClassified = Pitching.find_by_sql('SELECT COUNT(PIT.game_id) AS G,
+															     SUM(PIT.W) AS W,
+															     SUM(PIT.L) AS L,
+															     SUM(PIT.IPouts/3.0) AS IP,
+															     SUM(PIT.BAOpp) AS TBF,
+															     SUM(PIT.H) AS H,
+															     SUM(PIT.HR) AS HR,
+															     SUM(PIT.SO) AS SO,
+															     SUM(PIT.BB) AS BB,
+															     SUM(PIT.IBB) AS IBB,
+															     SUM(PIT.R) AS R,
+															     SUM(PIT.ER) AS ER,
+															     CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															     (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+															     CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+															     CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+															     CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+															     CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+															FROM pitchings AS PIT
+														   WHERE PIT.game_id IN (' + @select_game_id + ') AND
+																 PIT.player_id = "' + player_id + '" ')[0]
+		return @playerPitchingClassified
+	end
+	
+	def player
+	
+		if logged_in?
+		
+			@player = params[:player]
+			
+			if @player == nil
+				
+				@player_option = Array.new
+				@allPlayer = Player.select('players.player_id, members.name').where('players.member = 1').joins('INNER JOIN members ON members.id = players.player_id').order('players.player_id')
+				@allPlayer.each do |eachPlayer|
+					@player_option.push([eachPlayer.name + ' (' + eachPlayer.player_id + ')',eachPlayer.player_id])
+				end
+				
+			else
+			
+				@playerName = Member.find(@player).name
+				@playerYearBatting = Batting.find_by_sql('SELECT C.year,
+																 COUNT(BAT.game_id) AS G,
+																 SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																 SUM(BAT.AB) AS AB,
+																 SUM(BAT.H) AS H,
+																 SUM(BAT.B2) AS B2,
+																 SUM(BAT.B3) AS B3,
+																 SUM(BAT.HR) AS HR,
+																 SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																 SUM(BAT.RBI) AS RBI,
+																 SUM(BAT.R) AS R,
+																 SUM(BAT.SO) AS SO,
+																 SUM(BAT.BB) AS BB,
+																 SUM(BAT.IBB) AS IBB,
+																 SUM(BAT.SF) AS SF,
+																 SUM(BAT.E) AS E,
+																 CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																 CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																 CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																 (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																 CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA,
+																 (CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+															FROM battings AS BAT,
+																 games AS G,
+																 cups AS C
+														   WHERE BAT.game_id = G.game_id AND
+																 G.cup_id = C.cup_id AND
+																 BAT.player_id = "' + @player + '"
+														GROUP BY C.year')
+				@playerYearBattingSummary = Batting.find_by_sql('SELECT COUNT(BAT.game_id) AS G,
+																		SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																		SUM(BAT.AB) AS AB,
+																		SUM(BAT.H) AS H,
+																		SUM(BAT.B2) AS B2,
+																		SUM(BAT.B3) AS B3,
+																		SUM(BAT.HR) AS HR,
+																		SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																		SUM(BAT.RBI) AS RBI,
+																		SUM(BAT.R) AS R,
+																		SUM(BAT.SO) AS SO,
+																		SUM(BAT.BB) AS BB,
+																		SUM(BAT.IBB) AS IBB,
+																		SUM(BAT.SF) AS SF,
+																		SUM(BAT.E) AS E,
+																		CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																		CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																		CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																		(CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																		CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA,
+																		(CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0)*1000+SUM(BAT.HR)*20+SUM(BAT.RBI)*5+(SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3) AS SILVER
+																   FROM battings AS BAT,
+																		games AS G,
+																		cups AS C
+																  WHERE BAT.game_id = G.game_id AND
+																		G.cup_id = C.cup_id AND
+																		BAT.player_id = "' + @player + '"')[0]
+				
+				@allOfficial = Cup.select('DISTINCT cups.cup_name').where('cups.official = 1').order('cups.cup_name')
+				@allFormal = Cup.select('DISTINCT cups.cup_name').where('cups.formal = 1').order('cups.cup_name')
+				@listOfficial = ''
+				@listFormal = ''
+				@allOfficial.each_with_index do |eachOfficial, index|
+					@listOfficial += eachOfficial.cup_name
+					if index == @allOfficial.length() - 1
+						@listOfficial += '。'
+					else
+						@listOfficial += ' '
+					end
+				end
+				@allFormal.each_with_index do |eachFormal, index|
+					@listFormal += eachFormal.cup_name
+					if index == @allFormal.length() - 1
+						@listFormal += '。'
+					else
+						@listFormal += ' '
+					end
+				end
+				
+				@playerBattingFormal = playerBattingClassifiedHelper('formal',@player)
+				@playerBattingOfficial = playerBattingClassifiedHelper('official',@player)
+				@playerBattingFriendly = playerBattingClassifiedHelper('friendly',@player)
+				
+				@playerFielding = Fielding.find_by_sql('SELECT FIELD.POS,
+															   COUNT(FIELD.game_id) AS G,
+															   SUM(FIELD.Innouts/3.0) AS INN,
+															   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															   SUM(FIELD.PO) AS PO,
+															   SUM(FIELD.A) AS A,
+															   SUM(FIELD.E) AS E,
+															   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+														  FROM fieldings AS FIELD
+														 WHERE FIELD.player_id = "' + @player + '" 
+													  GROUP BY FIELD.POS 
+													  ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC,
+															   SUM(FIELD.Innouts/3.0) DESC,
+															   COUNT(FIELD.game_id) DESC')
+				@playerFieldingGrass = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																	SUM(FIELD.Innouts/3.0) AS INN,
+																	SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																	SUM(FIELD.PO) AS PO,
+																	SUM(FIELD.A) AS A,
+																	SUM(FIELD.E) AS E,
+																	CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															   FROM fieldings AS FIELD,
+																	positions AS PO,
+																	games AS G
+															  WHERE G.game_id = FIELD.game_id AND
+																	PO.pos = FIELD.POS AND
+																	FIELD.player_id = "' + @player + '" AND
+																	G.grassfield = 1 AND
+																	FIELD.POS IN (SELECT POS 
+																					FROM positions
+																				   WHERE field = "IF") 
+																			    ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingGrass.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingGrass = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingClay = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																   SUM(FIELD.Innouts/3.0) AS INN,
+																   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																   SUM(FIELD.PO) AS PO,
+																   SUM(FIELD.A) AS A,
+																   SUM(FIELD.E) AS E,
+																   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															  FROM fieldings AS FIELD,
+																   positions AS PO,
+																   games AS G
+															 WHERE G.game_id = FIELD.game_id AND
+																   PO.pos = FIELD.POS AND
+																   FIELD.player_id = "' + @player + '" AND
+																   G.grassfield = 0 AND
+																   FIELD.POS IN (SELECT POS 
+																				   FROM positions
+																				  WHERE field = "IF") 
+																			   ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingClay.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingClay = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingIn = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																 SUM(FIELD.Innouts/3.0) AS INN,
+																 SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																 SUM(FIELD.PO) AS PO,
+																 SUM(FIELD.A) AS A,
+																 SUM(FIELD.E) AS E,
+																 CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															FROM fieldings AS FIELD,
+																 positions AS PO
+														   WHERE PO.pos = FIELD.POS AND
+																 FIELD.player_id = "' + @player + '" AND
+																 FIELD.POS IN (SELECT POS
+																				 FROM positions
+																				WHERE field = "IF") 
+																			 ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingIn.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingIn = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingOut = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																  SUM(FIELD.Innouts/3.0) AS INN,
+																  SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																  SUM(FIELD.PO) AS PO,
+																  SUM(FIELD.A) AS A,
+																  SUM(FIELD.E) AS E,
+																  CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															 FROM fieldings AS FIELD,
+																  positions AS PO
+															WHERE PO.pos = FIELD.POS AND
+																  FIELD.player_id = "' + @player + '" AND
+																  FIELD.POS IN (SELECT POS
+																				  FROM positions
+																				 WHERE field = "OF") 
+																			  ORDER BY SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) DESC')[0]
+				if @playerFieldingOut.G == 0
+					Struct.new("PlayerFielding", :G, :INN, :TC, :PO, :A, :E, :FPCT)
+					@playerFieldingOut = Struct::PlayerFielding.new(0,0,0,0,0,0,0)
+				end
+				
+				@playerFieldingTotal = Fielding.find_by_sql('SELECT COUNT(FIELD.game_id) AS G,
+																	SUM(FIELD.Innouts/3.0) AS INN,
+																	SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+																	SUM(FIELD.PO) AS PO,
+																	SUM(FIELD.A) AS A,
+																	SUM(FIELD.E) AS E,
+																	CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+															   FROM fieldings AS FIELD,
+																	positions AS PO
+															  WHERE PO.pos = FIELD.POS AND
+																	FIELD.player_id = "' + @player + '"')[0]
+				@playerYearPitching = Pitching.find_by_sql('SELECT C.year,
+																   COUNT(PIT.game_id) AS G,
+																   SUM(PIT.W) AS W,
+																   SUM(PIT.L) AS L,
+																   SUM(PIT.IPouts/3.0) AS IP,
+																   SUM(PIT.BAOpp) AS TBF,
+																   SUM(PIT.H) AS H,
+																   SUM(PIT.HR) AS HR,
+																   SUM(PIT.SO) AS SO,
+																   SUM(PIT.BB) AS BB,
+																   SUM(PIT.IBB) AS IBB,
+																   SUM(PIT.R) AS R,
+																   SUM(PIT.ER) AS ER,
+																   CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																   (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+																   CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																   CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																   CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																   CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+															  FROM pitchings AS PIT, 
+																   games AS G,
+																   cups AS C 
+															 WHERE PIT.player_id = "' + @player + '" AND
+																   PIT.game_id = G.game_id AND
+																   G.cup_id = C.cup_id
+														  GROUP BY C.year')
+				@playerPitchingSummary = Pitching.find_by_sql('SELECT COUNT(PIT.game_id) AS G,
+																	  SUM(PIT.W) AS W,
+																	  SUM(PIT.L) AS L,
+																	  SUM(PIT.IPouts/3.0) AS IP,
+																	  SUM(PIT.BAOpp) AS TBF,
+																	  SUM(PIT.H) AS H,
+																	  SUM(PIT.HR) AS HR,
+																	  SUM(PIT.SO) AS SO,
+																	  SUM(PIT.BB) AS BB,
+																	  SUM(PIT.IBB) AS IBB,
+																	  SUM(PIT.R) AS R,
+																	  SUM(PIT.ER) AS ER,
+																	  CAST(CAST((SUM(PIT.H)/(SUM(PIT.BAOpp)-SUM(PIT.BB)-SUM(PIT.IBB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																	  (SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/(SUM(PIT.IPouts)+0.0000000000000000000000000000000000001)*3 AS WHIP,
+																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA5,
+																	  CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS ERA7,
+																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R5,
+																	  CAST(CAST(SUM(PIT.R)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*1000 AS SIGNED) AS DECIMAL)/1000.0 AS R7
+																 FROM pitchings AS PIT
+																WHERE PIT.player_id = "' + @player + '" ')[0]
+				@playerPitchingFormal = playerPitchingClassifiedHelper('formal',@player)
+				@playerPitchingOfficial = playerPitchingClassifiedHelper('official',@player)
+				@playerPitchingFriendly = playerPitchingClassifiedHelper('friendly',@player)
+				@playerPitchingStarter = playerPitchingClassifiedHelper('starter',@player)
+				@playerPitchingReliever = playerPitchingClassifiedHelper('reliever',@player)
+				
+				@playerBattingMax = Batting.find_by_sql('SELECT MAX(BAT.AB+BAT.BB+BAT.IBB+BAT.SF) AS PA,
+																MAX(BAT.AB) AS AB,
+																MAX(BAT.H) AS H,
+																MAX(BAT.H-BAT.B2-BAT.B3-BAT.HR) AS B1,
+																MAX(BAT.B2) AS B2,
+																MAX(BAT.B3) AS B3,
+																MAX(BAT.HR) AS HR,
+																MAX(BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) AS TB,
+																MAX(BAT.RBI) AS RBI,
+																MAX(BAT.R) AS R,
+																MAX(BAT.SO) AS SO,
+																MAX(BAT.BB) AS BB,
+																MAX(BAT.IBB) AS IBB,
+																MAX(BAT.SF) AS SF,
+																MAX(BAT.E) AS E
+														   FROM battings AS BAT
+														  WHERE BAT.player_id = "' + @player + '" ')[0]
+				@playerPitchingMax = Pitching.find_by_sql('SELECT MAX(PIT.IPouts/3.0) AS IP,
+																  MAX(PIT.BAOpp) AS TBF,
+																  MAX(PIT.H) AS H,
+																  MAX(PIT.HR) AS HR,
+																  MAX(PIT.SO) AS SO,
+																  MAX(PIT.BB) AS BB,
+																  MAX(PIT.IBB) AS IBB,
+																  MAX(PIT.R) AS R,
+																  MAX(PIT.ER) AS ER
+															 FROM pitchings AS PIT
+															WHERE PIT.player_id = "' + @player + '" ')[0]
+				@playerBattingContinuity = Batting.find_by_sql('SELECT BAT.H,
+																	   BAT.RBI,
+																	   BAT.R,
+																	   BAT.HR,
+																	   BAT.SO
+																  FROM battings AS BAT
+																 WHERE BAT.player_id = "' + @player + '"
+															  ORDER BY BAT.game_id')
+				@playerPitchingContinuity = Pitching.find_by_sql('SELECT PIT.W,
+																		 PIT.L,
+																		 PIT.SO,
+																		 PIT.HR,
+																		 PIT.R
+																	FROM pitchings AS PIT
+																   WHERE PIT.player_id = "' + @player + '"
+																ORDER BY PIT.game_id')
+				@ArrayBat_H = Array.new
+				@ArrayBat_RBI = Array.new
+				@ArrayBat_R = Array.new
+				@ArrayBat_HR = Array.new
+				@ArrayBat_SO = Array.new
+				@currentBat_HSort = 0
+				@wildcardBat_HSort = 0
+				@currentBat_NHSort = 0
+				@wildcardBat_NHSort = 0
+				@currentBat_SOSort = 0
+				@wildcardBat_SOSort = 0
+				@currentBat_NSOSort = 0
+				@wildcardBat_NSOSort = 0
+				@currentBat_RBISort = 0
+				@wildcardBat_RBISort = 0
+				@currentBat_RSort = 0
+				@wildcardBat_RSort = 0
+				@currentBat_HRSort = 0
+				@wildcardBat_HRSort = 0
+				
+				@playerBattingContinuity.each do |batContinuity|
+					@ArrayBat_H.push(batContinuity.H)
+					@ArrayBat_RBI.push(batContinuity.RBI)
+					@ArrayBat_R.push(batContinuity.R)
+					@ArrayBat_HR.push(batContinuity.HR)
+					@ArrayBat_SO.push(batContinuity.SO)
+				end
+				
+				for i in 0..(@playerBattingContinuity.length - 1)
+					# 安打
+					@currentBat_HSort = (@ArrayBat_H[i] == 0)? (0):(@currentBat_HSort + 1)
+					@wildcardBat_HSort = (@currentBat_HSort >= @wildcardBat_HSort)? (@currentBat_HSort):(@wildcardBat_HSort)
+					# 無安打
+					@currentBat_NHSort = (@ArrayBat_H[i] != 0)? (0):(@currentBat_NHSort + 1)
+					@wildcardBat_NHSort = (@currentBat_NHSort >= @wildcardBat_NHSort)? (@currentBat_NHSort):(@wildcardBat_NHSort)
+					# 三振
+					@currentBat_SOSort = (@ArrayBat_SO[i] == 0)? (0):(@currentBat_SOSort + 1)
+					@wildcardBat_SOSort = (@currentBat_SOSort >= @wildcardBat_SOSort)? (@currentBat_SOSort):(@wildcardBat_SOSort)
+					# 無三振
+					@currentBat_NSOSort = (@ArrayBat_SO[i] != 0)? (0):(@currentBat_NSOSort + 1)
+					@wildcardBat_NSOSort = (@currentBat_NSOSort >= @wildcardBat_NSOSort)? (@currentBat_NSOSort):(@wildcardBat_NSOSort)
+					# 打點
+					@currentBat_RBISort = (@ArrayBat_RBI[i] == 0)? (0):(@currentBat_RBISort + 1)
+					@wildcardBat_RBISort = (@currentBat_RBISort >= @wildcardBat_RBISort)? (@currentBat_RBISort):(@wildcardBat_RBISort)
+					# 得分
+					@currentBat_RSort = (@ArrayBat_R[i] == 0)? (0):(@currentBat_RSort + 1)
+					@wildcardBat_RSort = (@currentBat_RSort >= @wildcardBat_RSort)? (@currentBat_RSort):(@wildcardBat_RSort)
+					# 全壘打
+					@currentBat_HRSort = (@ArrayBat_HR[i] == 0)? (0):(@currentBat_HRSort + 1)
+					@wildcardBat_HRSort = (@currentBat_HRSort >= @wildcardBat_HRSort)? (@currentBat_HRSort):(@wildcardBat_HRSort)
+				end
+				
+				@ArrayPit_W = Array.new
+				@ArrayPit_L = Array.new
+				@ArrayPit_SO = Array.new
+				@ArrayPit_HR = Array.new
+				@ArrayPit_R = Array.new
+				@currentPit_WSort = 0
+				@wildcardPit_WSort = 0
+				@currentPit_LSort = 0
+				@wildcardPit_LSort = 0
+				@currentPit_SOSort = 0
+				@wildcardPit_SOSort = 0
+				@currentPit_HRSort = 0
+				@wildcardPit_HRSort = 0
+				@currentPit_RSort = 0
+				@wildcardPit_RSort = 0
+				@currentPit_NRSort = 0
+				@wildcardPit_NRSort = 0
+				
+				@playerPitchingContinuity.each do |pitContinuity|
+					@ArrayPit_W.push(pitContinuity.W)
+					@ArrayPit_L.push(pitContinuity.L)
+					@ArrayPit_SO.push(pitContinuity.SO)
+					@ArrayPit_HR.push(pitContinuity.HR)
+					@ArrayPit_R.push(pitContinuity.R)
+				end
+				
+				for i in 0..(@playerPitchingContinuity.length - 1)
+					# 勝, 無勝負關係要跳過
+					@currentPit_WSort = (@ArrayPit_W[i] == 0)? ((@ArrayPit_L[i] == 0)? (@currentPit_WSort):(0)):(@currentPit_WSort + 1)
+					@wildcardPit_WSort = (@currentPit_WSort >= @wildcardPit_WSort)? (@currentPit_WSort):(@wildcardPit_WSort)
+					# 敗, 無勝負關係要跳過
+					@currentPit_LSort = (@ArrayPit_L[i] == 0)? ((@ArrayPit_W[i] == 0)? (@currentPit_LSort):(0)):(@currentPit_LSort + 1)
+					@wildcardPit_LSort = (@currentPit_LSort >= @wildcardPit_LSort)? (@currentPit_LSort):(@wildcardPit_LSort)
+					# 三振
+					@currentPit_SOSort = (@ArrayPit_SO[i] == 0)? (0):(@currentPit_SOSort + 1)
+					@wildcardPit_SOSort = (@currentPit_SOSort >= @wildcardPit_SOSort)? (@currentPit_SOSort):(@wildcardPit_SOSort)
+					# 失分
+					@currentPit_RSort = (@ArrayPit_R[i] == 0)? (0):(@currentPit_RSort + 1)
+					@wildcardPit_RSort = (@currentPit_RSort >= @wildcardPit_RSort)? (@currentPit_RSort):(@wildcardPit_RSort)
+					# 無失分
+					@currentPit_NRSort = (@ArrayPit_R[i] != 0)? (0):(@currentPit_NRSort + 1)
+					@wildcardPit_NRSort = (@currentPit_NRSort >= @wildcardPit_NRSort)? (@currentPit_NRSort):(@wildcardPit_NRSort)
+					# 被全壘打
+					@currentPit_HRSort = (@ArrayPit_HR[i] == 0)? (0):(@currentPit_HRSort + 1)
+					@wildcardPit_HRSort = (@currentPit_HRSort >= @wildcardPit_HRSort)? (@currentPit_HRSort):(@wildcardPit_HRSort)
+				end
+				
 			end
 		
 		else

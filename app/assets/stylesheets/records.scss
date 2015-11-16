@@ -67,8 +67,17 @@
 #table_team_fielding_summary > thead > tr > th,
 #table_cup_gamelist > thead > tr > th,
 #table_cup_batting_summary > thead > tr > th,
-#table_cup_pitching_summary > thead > tr > th,
-#table_cup_fielding_summary > thead > tr > th{
+#table_player_yearBatting > thead > tr > th,
+#table_player_yearBatting3PA > thead > tr > th,
+#table_player_yearBattingPercent > thead > tr > th,
+#table_player_BattingClassified > thead > tr > th,
+#table_player_Fielding > thead > tr > th,
+#table_player_yearPitching > thead > tr > th,
+#table_player_yearPitching5IP > thead > tr > th,
+#table_player_yearPitchingClassified > thead > tr > th,
+#table_player_BattingMax > thead > tr > th,
+#table_player_PitchingMax > thead > tr > th
+{
 	
 	background:rgba(192,192,192,0.7);
 }
@@ -140,6 +149,16 @@ img.teamLogo{
 #table_cup_batting_summary > thead > tr > th, #table_cup_batting_summary > tbody > tr > td,
 #table_cup_pitching_summary > thead > tr > th, #table_cup_pitching_summary > tbody > tr > td,
 #table_cup_fielding_summary > thead > tr > th, #table_cup_fielding_summary > tbody > tr > td
+#table_player_yearBatting > thead > tr > th, #table_player_yearBatting > tbody > tr > td, #table_player_yearBatting > tfoot > tr > td,
+#table_player_yearBatting3PA > thead > tr > th, #table_player_yearBatting3PA > tbody > tr > td, #table_player_yearBatting3PA > tfoot > tr > td,
+#table_player_yearBattingPercent > thead > tr > th, #table_player_yearBattingPercent > tbody > tr > td, #table_player_yearBattingPercent > tfoot > tr > td,
+#table_player_BattingClassified > thead > tr > th, #table_player_BattingClassified > tbody > tr > td,
+#table_player_Fielding > thead > tr > th, #table_player_Fielding > tbody > tr > td, #table_player_Fielding > tfoot > tr > td,
+#table_player_yearPitching > thead > tr > th, #table_player_yearPitching > tbody > tr > td, #table_player_yearPitching > tfoot > tr > td,
+#table_player_yearPitching5IP > thead > tr > th, #table_player_yearPitching5IP > tbody > tr > td, #table_player_yearPitching5IP > tfoot > tr > td,
+#table_player_yearPitchingClassified > thead > tr > th, #table_player_yearPitchingClassified > tbody > tr > td,
+#table_player_BattingMax > thead > tr > th, #table_player_BattingMax > tbody > tr > td,
+#table_player_PitchingMax > thead > tr > th, #table_player_PitchingMax > tbody > tr > td
 {
 	
 	text-align: center;
@@ -154,7 +173,13 @@ img.teamLogo{
 #table_game_fieldingHome > tfoot > tr > td,
 #table_batting_all_summary > tfoot > tr > td,
 #table_fielding_all_summary > tfoot > tr > td,
-#table_fielding_player > tfoot > tr > td{
+#table_fielding_player > tfoot > tr > td,
+#table_player_yearBatting > tfoot > tr > td,
+#table_player_yearBatting3PA > tfoot > tr > td,
+#table_player_yearBattingPercent > tfoot > tr > td,
+#table_player_Fielding > tfoot > tr > td,
+#table_player_yearPitching > tfoot > tr > td,
+#table_player_yearPitching5IP > tfoot > tr > td{
 	
 	background:rgb(149,149,149);
 	color:white;
@@ -203,6 +228,11 @@ img.teamLogo{
 #records * div.recordsContent * a{
 	
 	color: blue;
+}
+
+#records * div.recordsContent * tfoot * a{
+	
+	color: white;
 }
 
 #records * div.recordsContent * a:hover{
@@ -267,7 +297,10 @@ td.win{
 #table_team_fielding_summary > tbody > tr > td,
 #table_cup_batting_summary > tbody > tr > td,
 #table_cup_pitching_summary > tbody > tr > td,
-#table_cup_fielding_summary > tbody > tr > td{	
+#table_cup_fielding_summary > tbody > tr > td,
+#table_player_BattingMax > tbody > tr > td,
+#table_player_PitchingMax > tbody > tr > td
+{	
 	background:rgba(235,235,235,0.7);
 }
 

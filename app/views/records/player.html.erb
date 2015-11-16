@@ -1,0 +1,1360 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<h3>隊員查詢</h3>
+			<hr>
+			<% if @player == nil %>
+				<%= form_tag("player" , method:"get") do %>
+					<%= select_tag(:player, options_for_select(@player_option,@player_option[0][1])) %>
+					<%= submit_tag("查詢", name: nil) %>
+				<% end %>
+			<% else %>
+				<h4><%= @playerName %> (<%= @player %>)</h4>
+				<br/>
+				<h4>年度打擊表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_player_yearBatting">
+					<table class="table table-condensed" id="table_player_yearBatting">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>G<br/>場次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+								<th>SSI<br/>銀棒指數</th>
+							</tr>
+						</thead>
+						<% if @playerYearBatting.size != 0 %>
+							<tbody>
+								<% @playerYearBatting.each do |yearBatting| %>	
+									<tr>
+										<td>
+											<%= link_to yearBatting.year, controller: "records", action: "batting", player: @player, year: yearBatting.year %>
+										</td>
+										<td><%= yearBatting.G %></td>
+										<td><%= yearBatting.PA %></td>
+										<td><%= yearBatting.AB %></td>
+										<td><%= yearBatting.H %></td>
+										<td><%= yearBatting.B2 %></td>
+										<td><%= yearBatting.B3 %></td>
+										<td><%= yearBatting.HR %></td>
+										<td><%= yearBatting.TB %></td>
+										<td><%= yearBatting.RBI %></td>
+										<td><%= yearBatting.R %></td>
+										<td><%= yearBatting.SO %></td>
+										<td><%= yearBatting.BB %></td>
+										<td><%= yearBatting.IBB %></td>
+										<td><%= yearBatting.SF %></td>
+										<td><%= yearBatting.E %></td>
+										<td><%= '%.3f' % yearBatting.AVG.round(3) %></td>
+										<td><%= '%.3f' % yearBatting.OBP.round(3) %></td>
+										<td><%= '%.3f' % yearBatting.SLG.round(3) %></td>
+										<td><%= '%.3f' % yearBatting.OPS.round(3) %></td>
+										<td><%= '%.3f' % yearBatting.TA.round(3) %></td>
+										<td><%= '%.1f' % yearBatting.SILVER.round(1) %></td>
+									</tr>
+								<% end %>
+							</tbody>
+						<% end %>
+						<% if @playerYearBattingSummary.PA != nil %>	
+							<tfoot>	
+								<tr>
+									<td>
+										<%= link_to 'Total', controller: "records", action: "batting", player: @player, year: 'Wildcard' %>
+									</td>
+									<td><%= @playerYearBattingSummary.G %></td>
+									<td><%= @playerYearBattingSummary.PA %></td>
+									<td><%= @playerYearBattingSummary.AB %></td>
+									<td><%= @playerYearBattingSummary.H %></td>
+									<td><%= @playerYearBattingSummary.B2 %></td>
+									<td><%= @playerYearBattingSummary.B3 %></td>
+									<td><%= @playerYearBattingSummary.HR %></td>
+									<td><%= @playerYearBattingSummary.TB %></td>
+									<td><%= @playerYearBattingSummary.RBI %></td>
+									<td><%= @playerYearBattingSummary.R %></td>
+									<td><%= @playerYearBattingSummary.SO %></td>
+									<td><%= @playerYearBattingSummary.BB %></td>
+									<td><%= @playerYearBattingSummary.IBB %></td>
+									<td><%= @playerYearBattingSummary.SF %></td>
+									<td><%= @playerYearBattingSummary.E %></td>
+									<td><%= '%.3f' % @playerYearBattingSummary.AVG.round(3) %></td>
+									<td><%= '%.3f' % @playerYearBattingSummary.OBP.round(3) %></td>
+									<td><%= '%.3f' % @playerYearBattingSummary.SLG.round(3) %></td>
+									<td><%= '%.3f' % @playerYearBattingSummary.OPS.round(3) %></td>
+									<td><%= '%.3f' % @playerYearBattingSummary.TA.round(3) %></td>
+									<td><%= '%.1f' % @playerYearBattingSummary.SILVER.round(1) %></td>
+								</tr>
+							</tfoot>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>平均三打席打擊表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_player_yearBatting3PA">
+					<table class="table table-condensed" id="table_player_yearBatting3PA">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>SamplePA<br/>樣本打席</th>
+								<th>PA<br/>打席</th>
+								<th>AB<br/>打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+							</tr>
+						</thead>
+						<% if @playerYearBatting.size != 0 %>
+							<tbody>
+								<% @playerYearBatting.each do |yearBatting| %>	
+									<tr>
+										<td><%= yearBatting.year %></td>
+										<td><%= yearBatting.PA %></td>
+										<td><%= '%.3f' % (yearBatting.PA * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.AB * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.H * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.B2 * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.B3 * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.HR * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.TB * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.RBI * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.R * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.SO * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.BB * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.IBB * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.SF * 3.0 / yearBatting.PA).round(3) %></td>
+										<td><%= '%.3f' % (yearBatting.E * 3.0 / yearBatting.PA).round(3) %></td>
+									</tr>
+								<% end %>
+							</tbody>
+						<% end %>
+						<% if @playerYearBattingSummary.PA != nil %>	
+							<tfoot>	
+								<tr>
+									<td>Total</td>
+									<td><%= @playerYearBattingSummary.PA %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.PA * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.AB * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.H * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.B2 * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.B3 * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.HR * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.TB * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.RBI * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.R * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.SO * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.BB * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.IBB * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.SF * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+									<td><%= '%.3f' % (@playerYearBattingSummary.E * 3.0 / @playerYearBattingSummary.PA).round(3) %></td>
+								</tr>
+							</tfoot>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>打擊百分比</h4>
+				<br/>
+				<div class="table-responsive" id="div_player_yearBattingPercent">
+					<table class="table table-condensed" id="table_player_yearBattingPercent">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>SamplePA<br/>樣本打席</th>
+								<th>PA<br/>打席</th>
+								<th>AB<br/>打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+							</tr>
+						</thead>
+						<% if @playerYearBatting.size != 0 %>
+							<tbody>
+								<% @playerYearBatting.each do |yearBatting| %>	
+									<tr>
+										<td><%= yearBatting.year %></td>
+										<td><%= yearBatting.PA %></td>
+										<td>100</td>
+										<td><%= '%.2f' % (yearBatting.AB * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.H * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.B2 * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.B3 * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.HR * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.TB * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.RBI * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.R * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.SO * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.BB * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.IBB * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.SF * 100.0 / yearBatting.PA).round(2) %></td>
+										<td><%= '%.2f' % (yearBatting.E * 100.0 / yearBatting.PA).round(2) %></td>
+									</tr>
+								<% end %>
+							</tbody>
+						<% end %>
+						<% if @playerYearBattingSummary.PA != nil %>	
+							<tfoot>	
+								<tr>
+									<td>Total</td>
+									<td><%= @playerYearBattingSummary.PA %></td>
+									<td>100</td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.AB * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.H * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.B2 * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.B3 * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.HR * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.TB * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.RBI * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.R * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.SO * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.BB * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.IBB * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.SF * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+									<td><%= '%.2f' % (@playerYearBattingSummary.E * 100.0 / @playerYearBattingSummary.PA).round(2) %></td>
+								</tr>
+							</tfoot>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>分類打擊表現</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">官方賽為：<%= @listOfficial %><br/>正式賽為：<%= @listFormal %></h5>
+				<div class="table-responsive" id="div_player_BattingClassified">
+					<table class="table table-condensed" id="table_player_BattingClassified">
+						<thead>
+							<tr>
+								<th>Type<br/>分類</th>
+								<th>G<br/>場次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+								<th>SSI<br/>銀棒指數</th>
+							</tr>
+						</thead>
+						<% if @playerBattingFormal.PA != nil %>	
+							<tbody>	
+								<tr>
+									<td>
+										<%= link_to '正式賽', controller: "records", action: "batting", player: @player, cup: '正式賽', year: 'Wildcard' %>
+									</td>
+									<td><%= @playerBattingFormal.G %></td>
+									<td><%= @playerBattingFormal.PA %></td>
+									<td><%= @playerBattingFormal.AB %></td>
+									<td><%= @playerBattingFormal.H %></td>
+									<td><%= @playerBattingFormal.B2 %></td>
+									<td><%= @playerBattingFormal.B3 %></td>
+									<td><%= @playerBattingFormal.HR %></td>
+									<td><%= @playerBattingFormal.TB %></td>
+									<td><%= @playerBattingFormal.RBI %></td>
+									<td><%= @playerBattingFormal.R %></td>
+									<td><%= @playerBattingFormal.SO %></td>
+									<td><%= @playerBattingFormal.BB %></td>
+									<td><%= @playerBattingFormal.IBB %></td>
+									<td><%= @playerBattingFormal.SF %></td>
+									<td><%= @playerBattingFormal.E %></td>
+									<td><%= '%.3f' % @playerBattingFormal.AVG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFormal.OBP.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFormal.SLG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFormal.OPS.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFormal.TA.round(3) %></td>
+									<td><%= '%.1f' % @playerBattingFormal.SILVER.round(1) %></td>
+								</tr>
+							</tbody>
+						<% end %>
+						<% if @playerBattingOfficial.PA != nil %>	
+							<tbody>	
+								<tr>
+									<td>
+										<%= link_to '官方賽', controller: "records", action: "batting", player: @player, cup: '官方賽', year: 'Wildcard' %>
+									</td>
+									<td><%= @playerBattingOfficial.G %></td>
+									<td><%= @playerBattingOfficial.PA %></td>
+									<td><%= @playerBattingOfficial.AB %></td>
+									<td><%= @playerBattingOfficial.H %></td>
+									<td><%= @playerBattingOfficial.B2 %></td>
+									<td><%= @playerBattingOfficial.B3 %></td>
+									<td><%= @playerBattingOfficial.HR %></td>
+									<td><%= @playerBattingOfficial.TB %></td>
+									<td><%= @playerBattingOfficial.RBI %></td>
+									<td><%= @playerBattingOfficial.R %></td>
+									<td><%= @playerBattingOfficial.SO %></td>
+									<td><%= @playerBattingOfficial.BB %></td>
+									<td><%= @playerBattingOfficial.IBB %></td>
+									<td><%= @playerBattingOfficial.SF %></td>
+									<td><%= @playerBattingOfficial.E %></td>
+									<td><%= '%.3f' % @playerBattingOfficial.AVG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingOfficial.OBP.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingOfficial.SLG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingOfficial.OPS.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingOfficial.TA.round(3) %></td>
+									<td><%= '%.1f' % @playerBattingOfficial.SILVER.round(1) %></td>
+								</tr>
+							</tbody>
+						<% end %>
+						<% if @playerBattingFriendly.PA != nil %>	
+							<tbody>	
+								<tr>
+									<td>其他賽事</td>
+									<td><%= @playerBattingFriendly.G %></td>
+									<td><%= @playerBattingFriendly.PA %></td>
+									<td><%= @playerBattingFriendly.AB %></td>
+									<td><%= @playerBattingFriendly.H %></td>
+									<td><%= @playerBattingFriendly.B2 %></td>
+									<td><%= @playerBattingFriendly.B3 %></td>
+									<td><%= @playerBattingFriendly.HR %></td>
+									<td><%= @playerBattingFriendly.TB %></td>
+									<td><%= @playerBattingFriendly.RBI %></td>
+									<td><%= @playerBattingFriendly.R %></td>
+									<td><%= @playerBattingFriendly.SO %></td>
+									<td><%= @playerBattingFriendly.BB %></td>
+									<td><%= @playerBattingFriendly.IBB %></td>
+									<td><%= @playerBattingFriendly.SF %></td>
+									<td><%= @playerBattingFriendly.E %></td>
+									<td><%= '%.3f' % @playerBattingFriendly.AVG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFriendly.OBP.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFriendly.SLG.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFriendly.OPS.round(3) %></td>
+									<td><%= '%.3f' % @playerBattingFriendly.TA.round(3) %></td>
+									<td><%= '%.1f' % @playerBattingFriendly.SILVER.round(1) %></td>
+								</tr>
+							</tbody>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>生涯守備表現</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">捕手紀錄不含三振刺殺。</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">(g) for grass field and (c) for clay field.</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">此處場次之總和可能因比賽中更換球員或守備位置,或該球員為增額球員(EP)等因素,而與該球員實際出賽場次不盡相同。</h5>
+				<div class="table-responsive" id="div_player_Fielding">
+					<table class="table table-striped table-condensed" id="table_player_Fielding">
+						<thead>
+							<tr>
+								<th>POS<br/>守位</th>
+								<th>G<br/>場次</th>
+								<th>INN<br/>守備局數</th>
+								<th>TC<br/>守備機會</th>
+								<th>PO<br/>刺殺</th>
+								<th>A<br/>助殺</th>
+								<th>E<br/>失誤</th>
+								<th>FPCT<br/>守備率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerFielding.size != 0 %>
+								<% @playerFielding.each do |playerFld| %>
+									<tr>
+										<td style="//text-align:right;"><%= playerFld.POS %></td>
+										<td><%= playerFld.G %></td>
+										<td><%= '%.1f' % playerFld.INN.round(1) %></td>
+										<td><%= playerFld.TC %></td>
+										<td><%= playerFld.PO %></td>
+										<td><%= playerFld.A %></td>
+										<td><%= playerFld.E %></td>
+										<td>
+											<% if playerFld.TC == 0 %>
+												<% if playerFld.PO + playerFld.A == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % playerFld.FPCT.round(3) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+							<tr class="borderline">
+								<td style="//text-align:right;">Infielder(g)</td>
+								<td><%= @playerFieldingGrass.G %></td>
+								<td><%= '%.1f' % @playerFieldingGrass.INN.round(1) %></td>
+								<td><%= @playerFieldingGrass.TC %></td>
+								<td><%= @playerFieldingGrass.PO %></td>
+								<td><%= @playerFieldingGrass.A %></td>
+								<td><%= @playerFieldingGrass.E %></td>
+								<td>
+									<% if @playerFieldingGrass.TC == 0 %>
+										<% if @playerFieldingGrass.PO + @playerFieldingGrass.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingGrass.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+							<tr>
+								<td style="//text-align:right;">Infielder(c)</td>
+								<td><%= @playerFieldingClay.G %></td>
+								<td><%= '%.1f' % @playerFieldingClay.INN.round(1) %></td>
+								<td><%= @playerFieldingClay.TC %></td>
+								<td><%= @playerFieldingClay.PO %></td>
+								<td><%= @playerFieldingClay.A %></td>
+								<td><%= @playerFieldingClay.E %></td>
+								<td>
+									<% if @playerFieldingClay.TC == 0 %>
+										<% if @playerFieldingClay.PO + @playerFieldingClay.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingClay.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+							<tr class="borderline">
+								<td style="//text-align:right;">Infielder</td>
+								<td><%= @playerFieldingIn.G %></td>
+								<td><%= '%.1f' % @playerFieldingIn.INN.round(1) %></td>
+								<td><%= @playerFieldingIn.TC %></td>
+								<td><%= @playerFieldingIn.PO %></td>
+								<td><%= @playerFieldingIn.A %></td>
+								<td><%= @playerFieldingIn.E %></td>
+								<td>
+									<% if @playerFieldingIn.TC == 0 %>
+										<% if @playerFieldingIn.PO + @playerFieldingIn.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingIn.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+							<tr>
+								<td style="//text-align:right;">Outfielder</td>
+								<td><%= @playerFieldingOut.G %></td>
+								<td><%= '%.1f' % @playerFieldingOut.INN.round(1) %></td>
+								<td><%= @playerFieldingOut.TC %></td>
+								<td><%= @playerFieldingOut.PO %></td>
+								<td><%= @playerFieldingOut.A %></td>
+								<td><%= @playerFieldingOut.E %></td>
+								<td>
+									<% if @playerFieldingOut.TC == 0 %>
+										<% if @playerFieldingOut.PO + @playerFieldingOut.A == 0 %>
+											-.---
+										<% else %>
+											∞
+										<% end %>
+									<% else %>
+										<%= '%.3f' % @playerFieldingOut.FPCT.round(3) %>
+									<% end %>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<% if @playerFieldingTotal.G != nil %>
+								<tr>
+									<td style="//text-align:right;">Total</td>
+									<td><%= @playerFieldingTotal.G %></td>
+									<td><%= '%.1f' % @playerFieldingTotal.INN.round(1) %></td>
+									<td><%= @playerFieldingTotal.TC %></td>
+									<td><%= @playerFieldingTotal.PO %></td>
+									<td><%= @playerFieldingTotal.A %></td>
+									<td><%= @playerFieldingTotal.E %></td>
+									<td>
+										<% if @playerFieldingTotal.TC == 0 %>
+											<% if @playerFieldingTotal.PO + @playerFieldingTotal.A == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerFieldingTotal.FPCT.round(3) %>
+										<% end %>
+									</td>
+								</tr>
+							<% end %>
+						</tfoot>
+					</table>
+				</div>
+				<br/>
+				<h4>年度投球表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_player_yearPitching">
+					<table class="table table-striped table-condensed" id="table_player_yearPitching">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>G<br/>場次</th>
+								<th>W<br/>勝投</th>
+								<th>L<br/>敗投</th>
+								<th>IP<br/>局數</th>
+								<th>TBF<br/>面對打席</th>
+								<th>H<br/>被安打</th>
+								<th>HR<br/>被全壘打</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>R<br/>失分</th>
+								<th>ER<br/>自責</th>
+								<th>AVG<br/>被打擊率</th>
+								<th>WHIP<br/>每局被上壘率</th>
+								<th>ERA5<br/>五局防禦率</th>
+								<th>ERA7<br/>七局防禦率</th>
+								<th>R/5<br/>五局失分率</th>
+								<th>R/7<br/>七局失分率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerYearPitching.size != 0 %>
+								<% @playerYearPitching.each do |eachyear| %>
+									<tr>
+										<td><%= link_to eachyear.year, controller: "records", action: "pitching", player: @player, year: eachyear.year %></td>
+										<td><%= eachyear.G %></td>
+										<td><%= eachyear.W %></td>
+										<td><%= eachyear.L %></td>
+										<td><%= '%.1f' % eachyear.IP.round(1) %></td>
+										<td><%= eachyear.TBF %></td>
+										<td><%= eachyear.H %></td>
+										<td><%= eachyear.HR %></td>
+										<td><%= eachyear.SO %></td>
+										<td><%= eachyear.BB %></td>
+										<td><%= eachyear.IBB %></td>
+										<td><%= eachyear.R %></td>
+										<td><%= eachyear.ER %></td>
+										<td>
+											<% if eachyear.TBF - eachyear.BB - eachyear.IBB == 0 %>
+												<% if eachyear.H == 0 %>
+													-.---
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.3f' % eachyear.AVG.round(3) %>
+											<% end %>
+										</td>
+										<td>
+											<% if eachyear.IP == 0.0 %>
+												<% if eachyear.H + eachyear.BB + eachyear.IBB == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % eachyear.WHIP.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if eachyear.IP == 0.0 %>
+												<% if eachyear.ER == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % eachyear.ERA5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if eachyear.IP == 0.0 %>
+												<% if eachyear.ER == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % eachyear.ERA7.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if eachyear.IP == 0.0 %>
+												<% if eachyear.R == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % eachyear.R5.round(2) %>
+											<% end %>
+										</td>
+										<td>
+											<% if eachyear.IP == 0.0 %>
+												<% if eachyear.R == 0 %>
+													-.--
+												<% else %>
+													∞
+												<% end %>
+											<% else %>
+												<%= '%.2f' % eachyear.R7.round(2) %>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+						<% if @playerPitchingSummary.TBF != nil %>
+							<tfoot>
+								<tr>
+									<td><%= link_to 'Total', controller: "records", action: "pitching", player: @player, year: 'Wildcard' %></td>
+									<td><%= @playerPitchingSummary.G %></td>
+									<td><%= @playerPitchingSummary.W %></td>
+									<td><%= @playerPitchingSummary.L %></td>
+									<td><%= '%.1f' % @playerPitchingSummary.IP.round(1) %></td>
+									<td><%= @playerPitchingSummary.TBF %></td>
+									<td><%= @playerPitchingSummary.H %></td>
+									<td><%= @playerPitchingSummary.HR %></td>
+									<td><%= @playerPitchingSummary.SO %></td>
+									<td><%= @playerPitchingSummary.BB %></td>
+									<td><%= @playerPitchingSummary.IBB %></td>
+									<td><%= @playerPitchingSummary.R %></td>
+									<td><%= @playerPitchingSummary.ER %></td>
+									<td>
+										<% if @playerPitchingSummary.TBF - @playerPitchingSummary.BB - @playerPitchingSummary.IBB == 0 %>
+											<% if @playerPitchingSummary.H == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerPitchingSummary.AVG.round(3) %>
+										<% end %>
+										
+									</td>
+									<td>
+										<% if @playerPitchingSummary.IP == 0.0 %>
+											<% if @playerPitchingSummary.H + @playerPitchingSummary.BB + @playerPitchingSummary.IBB == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingSummary.WHIP.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingSummary.IP == 0.0 %>
+											<% if @playerPitchingSummary.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingSummary.ERA5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingSummary.IP == 0.0 %>
+											<% if @playerPitchingSummary.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingSummary.ERA7.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingSummary.IP == 0.0 %>
+											<% if @playerPitchingSummary.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingSummary.R5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingSummary.IP == 0.0 %>
+											<% if @playerPitchingSummary.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingSummary.R7.round(2) %>
+										<% end %>
+									</td>
+								</tr>
+							</tfoot>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>平均五局表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_player_yearPitching5IP">
+					<table class="table table-striped table-condensed" id="table_player_yearPitching5IP">
+						<thead>
+							<tr>
+								<th>Year<br/>年度</th>
+								<th>SampleIP<br/>樣本局數</th>
+								<th>IP<br/>局數</th>
+								<th>TBF<br/>面對打席</th>
+								<th>H<br/>被安打</th>
+								<th>HR<br/>被全壘打</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>R<br/>失分</th>
+								<th>ER<br/>自責</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @playerYearPitching.size != 0 %>
+								<% @playerYearPitching.each do |eachyear| %>
+									<tr>
+										<td><%= eachyear.year %></td>
+										<td><%= '%.1f' % eachyear.IP.round(1) %></td>
+										<td><%= '%.1f' % (eachyear.IP * 5.0 / eachyear.IP).round(1) %></td>
+										<td><%= '%.2f' % (eachyear.TBF * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.H * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.HR * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.SO * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.BB * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.IBB * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.R * 5.0 / eachyear.IP).round(2) %></td>
+										<td><%= '%.2f' % (eachyear.ER * 5.0 / eachyear.IP).round(2) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+						<% if @playerPitchingSummary.TBF != nil %>
+							<tfoot>
+								<tr>
+									<td>Total</td>
+									<td><%= '%.1f' % @playerPitchingSummary.IP.round(1) %></td>
+									<td><%= '%.1f' % (@playerPitchingSummary.IP * 5.0 / @playerPitchingSummary.IP).round(1) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.TBF * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.H * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.HR * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.SO * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.BB * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.IBB * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.R * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+									<td><%= '%.2f' % (@playerPitchingSummary.ER * 5.0 / @playerPitchingSummary.IP).round(2) %></td>
+								</tr>
+							</tfoot>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>分類投球表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_player_yearPitching">
+					<table class="table table-striped table-condensed" id="table_player_yearPitching">
+						<thead>
+							<tr>
+								<th>Type<br/>分類</th>
+								<th>G<br/>場次</th>
+								<th>W<br/>勝投</th>
+								<th>L<br/>敗投</th>
+								<th>IP<br/>局數</th>
+								<th>TBF<br/>面對打席</th>
+								<th>H<br/>被安打</th>
+								<th>HR<br/>被全壘打</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>R<br/>失分</th>
+								<th>ER<br/>自責</th>
+								<th>AVG<br/>被打擊率</th>
+								<th>WHIP<br/>每局被上壘率</th>
+								<th>ERA5<br/>五局防禦率</th>
+								<th>ERA7<br/>七局防禦率</th>
+								<th>R/5<br/>五局失分率</th>
+								<th>R/7<br/>七局失分率</th>
+							</tr>
+						</thead>
+						<% if @playerPitchingFormal.TBF != nil %>
+							<tbody>
+								<tr>
+									<td><%= link_to '正式賽', controller: "records", action: "pitching", player: @player, year: 'Wildcard', cup: '正式賽' %></td>
+									<td><%= @playerPitchingFormal.G %></td>
+									<td><%= @playerPitchingFormal.W %></td>
+									<td><%= @playerPitchingFormal.L %></td>
+									<td><%= '%.1f' % @playerPitchingFormal.IP.round(1) %></td>
+									<td><%= @playerPitchingFormal.TBF %></td>
+									<td><%= @playerPitchingFormal.H %></td>
+									<td><%= @playerPitchingFormal.HR %></td>
+									<td><%= @playerPitchingFormal.SO %></td>
+									<td><%= @playerPitchingFormal.BB %></td>
+									<td><%= @playerPitchingFormal.IBB %></td>
+									<td><%= @playerPitchingFormal.R %></td>
+									<td><%= @playerPitchingFormal.ER %></td>
+									<td>
+										<% if @playerPitchingFormal.TBF - @playerPitchingFormal.BB - @playerPitchingFormal.IBB == 0 %>
+											<% if @playerPitchingFormal.H == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerPitchingFormal.AVG.round(3) %>
+										<% end %>
+										
+									</td>
+									<td>
+										<% if @playerPitchingFormal.IP == 0.0 %>
+											<% if @playerPitchingFormal.H + @playerPitchingFormal.BB + @playerPitchingFormal.IBB == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFormal.WHIP.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFormal.IP == 0.0 %>
+											<% if @playerPitchingFormal.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFormal.ERA5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFormal.IP == 0.0 %>
+											<% if @playerPitchingFormal.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFormal.ERA7.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFormal.IP == 0.0 %>
+											<% if @playerPitchingFormal.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFormal.R5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFormal.IP == 0.0 %>
+											<% if @playerPitchingFormal.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFormal.R7.round(2) %>
+										<% end %>
+									</td>
+								</tr>
+							</tbody>
+						<% end %>
+						<% if @playerPitchingOfficial.TBF != nil %>
+							<tbody>
+								<tr>
+									<td><%= link_to '官方賽', controller: "records", action: "pitching", player: @player, year: 'Wildcard', cup: '官方賽' %></td>
+									<td><%= @playerPitchingOfficial.G %></td>
+									<td><%= @playerPitchingOfficial.W %></td>
+									<td><%= @playerPitchingOfficial.L %></td>
+									<td><%= '%.1f' % @playerPitchingOfficial.IP.round(1) %></td>
+									<td><%= @playerPitchingOfficial.TBF %></td>
+									<td><%= @playerPitchingOfficial.H %></td>
+									<td><%= @playerPitchingOfficial.HR %></td>
+									<td><%= @playerPitchingOfficial.SO %></td>
+									<td><%= @playerPitchingOfficial.BB %></td>
+									<td><%= @playerPitchingOfficial.IBB %></td>
+									<td><%= @playerPitchingOfficial.R %></td>
+									<td><%= @playerPitchingOfficial.ER %></td>
+									<td>
+										<% if @playerPitchingOfficial.TBF - @playerPitchingOfficial.BB - @playerPitchingOfficial.IBB == 0 %>
+											<% if @playerPitchingOfficial.H == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerPitchingOfficial.AVG.round(3) %>
+										<% end %>
+										
+									</td>
+									<td>
+										<% if @playerPitchingOfficial.IP == 0.0 %>
+											<% if @playerPitchingOfficial.H + @playerPitchingOfficial.BB + @playerPitchingOfficial.IBB == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingOfficial.WHIP.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingOfficial.IP == 0.0 %>
+											<% if @playerPitchingOfficial.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingOfficial.ERA5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingOfficial.IP == 0.0 %>
+											<% if @playerPitchingOfficial.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingOfficial.ERA7.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingOfficial.IP == 0.0 %>
+											<% if @playerPitchingOfficial.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingOfficial.R5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingOfficial.IP == 0.0 %>
+											<% if @playerPitchingOfficial.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingOfficial.R7.round(2) %>
+										<% end %>
+									</td>
+								</tr>
+							</tbody>
+						<% end %>
+						<% if @playerPitchingFriendly.TBF != nil %>
+							<tbody>
+								<tr>
+									<td>其他賽事</td>
+									<td><%= @playerPitchingFriendly.G %></td>
+									<td><%= @playerPitchingFriendly.W %></td>
+									<td><%= @playerPitchingFriendly.L %></td>
+									<td><%= '%.1f' % @playerPitchingFriendly.IP.round(1) %></td>
+									<td><%= @playerPitchingFriendly.TBF %></td>
+									<td><%= @playerPitchingFriendly.H %></td>
+									<td><%= @playerPitchingFriendly.HR %></td>
+									<td><%= @playerPitchingFriendly.SO %></td>
+									<td><%= @playerPitchingFriendly.BB %></td>
+									<td><%= @playerPitchingFriendly.IBB %></td>
+									<td><%= @playerPitchingFriendly.R %></td>
+									<td><%= @playerPitchingFriendly.ER %></td>
+									<td>
+										<% if @playerPitchingFriendly.TBF - @playerPitchingFriendly.BB - @playerPitchingFriendly.IBB == 0 %>
+											<% if @playerPitchingFriendly.H == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerPitchingFriendly.AVG.round(3) %>
+										<% end %>
+										
+									</td>
+									<td>
+										<% if @playerPitchingFriendly.IP == 0.0 %>
+											<% if @playerPitchingFriendly.H + @playerPitchingFriendly.BB + @playerPitchingFriendly.IBB == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFriendly.WHIP.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFriendly.IP == 0.0 %>
+											<% if @playerPitchingFriendly.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFriendly.ERA5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFriendly.IP == 0.0 %>
+											<% if @playerPitchingFriendly.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFriendly.ERA7.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFriendly.IP == 0.0 %>
+											<% if @playerPitchingFriendly.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFriendly.R5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingFriendly.IP == 0.0 %>
+											<% if @playerPitchingFriendly.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingFriendly.R7.round(2) %>
+										<% end %>
+									</td>
+								</tr>
+							</tbody>
+						<% end %>
+						<% if @playerPitchingStarter.TBF != nil %>
+							<tbody>
+								<tr>
+									<td>先發</td>
+									<td><%= @playerPitchingStarter.G %></td>
+									<td><%= @playerPitchingStarter.W %></td>
+									<td><%= @playerPitchingStarter.L %></td>
+									<td><%= '%.1f' % @playerPitchingStarter.IP.round(1) %></td>
+									<td><%= @playerPitchingStarter.TBF %></td>
+									<td><%= @playerPitchingStarter.H %></td>
+									<td><%= @playerPitchingStarter.HR %></td>
+									<td><%= @playerPitchingStarter.SO %></td>
+									<td><%= @playerPitchingStarter.BB %></td>
+									<td><%= @playerPitchingStarter.IBB %></td>
+									<td><%= @playerPitchingStarter.R %></td>
+									<td><%= @playerPitchingStarter.ER %></td>
+									<td>
+										<% if @playerPitchingStarter.TBF - @playerPitchingStarter.BB - @playerPitchingStarter.IBB == 0 %>
+											<% if @playerPitchingStarter.H == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerPitchingStarter.AVG.round(3) %>
+										<% end %>
+										
+									</td>
+									<td>
+										<% if @playerPitchingStarter.IP == 0.0 %>
+											<% if @playerPitchingStarter.H + @playerPitchingStarter.BB + @playerPitchingStarter.IBB == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingStarter.WHIP.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingStarter.IP == 0.0 %>
+											<% if @playerPitchingStarter.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingStarter.ERA5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingStarter.IP == 0.0 %>
+											<% if @playerPitchingStarter.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingStarter.ERA7.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingStarter.IP == 0.0 %>
+											<% if @playerPitchingStarter.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingStarter.R5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingStarter.IP == 0.0 %>
+											<% if @playerPitchingStarter.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingStarter.R7.round(2) %>
+										<% end %>
+									</td>
+								</tr>
+							</tbody>
+						<% end %>
+						<% if @playerPitchingReliever.TBF != nil %>
+							<tbody>
+								<tr>
+									<td>後援</td>
+									<td><%= @playerPitchingReliever.G %></td>
+									<td><%= @playerPitchingReliever.W %></td>
+									<td><%= @playerPitchingReliever.L %></td>
+									<td><%= '%.1f' % @playerPitchingReliever.IP.round(1) %></td>
+									<td><%= @playerPitchingReliever.TBF %></td>
+									<td><%= @playerPitchingReliever.H %></td>
+									<td><%= @playerPitchingReliever.HR %></td>
+									<td><%= @playerPitchingReliever.SO %></td>
+									<td><%= @playerPitchingReliever.BB %></td>
+									<td><%= @playerPitchingReliever.IBB %></td>
+									<td><%= @playerPitchingReliever.R %></td>
+									<td><%= @playerPitchingReliever.ER %></td>
+									<td>
+										<% if @playerPitchingReliever.TBF - @playerPitchingReliever.BB - @playerPitchingReliever.IBB == 0 %>
+											<% if @playerPitchingReliever.H == 0 %>
+												-.---
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.3f' % @playerPitchingReliever.AVG.round(3) %>
+										<% end %>
+										
+									</td>
+									<td>
+										<% if @playerPitchingReliever.IP == 0.0 %>
+											<% if @playerPitchingReliever.H + @playerPitchingReliever.BB + @playerPitchingReliever.IBB == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingReliever.WHIP.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingReliever.IP == 0.0 %>
+											<% if @playerPitchingReliever.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingReliever.ERA5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingReliever.IP == 0.0 %>
+											<% if @playerPitchingReliever.ER == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingReliever.ERA7.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingReliever.IP == 0.0 %>
+											<% if @playerPitchingReliever.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingReliever.R5.round(2) %>
+										<% end %>
+									</td>
+									<td>
+										<% if @playerPitchingReliever.IP == 0.0 %>
+											<% if @playerPitchingReliever.R == 0 %>
+												-.--
+											<% else %>
+												∞
+											<% end %>
+										<% else %>
+											<%= '%.2f' % @playerPitchingReliever.R7.round(2) %>
+										<% end %>
+									</td>
+								</tr>
+							</tbody>
+						<% end %>
+					</table>
+				</div>
+				<br/>
+				<h4>單場最高紀錄</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">打擊</h5>
+				<div class="table-responsive" id="div_player_BattingMax">
+					<table class="table table-striped table-condensed" id="table_player_BattingMax">
+						<thead>
+							<tr>
+								<th>PA<br/>打席</th>
+								<th>AB<br/>打數</th>
+								<th>H<br/>安打</th>
+								<th>1B<br/>一壘</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>因失誤上壘</th>
+							</tr>
+						</thead>
+						<tbody>	
+							<tr>
+								<td><%= @playerBattingMax.PA %></td>
+								<td><%= @playerBattingMax.AB %></td>
+								<td><%= @playerBattingMax.H %></td>
+								<td><%= @playerBattingMax.B1 %></td>
+								<td><%= @playerBattingMax.B2 %></td>
+								<td><%= @playerBattingMax.B3 %></td>
+								<td><%= @playerBattingMax.HR %></td>
+								<td><%= @playerBattingMax.TB %></td>
+								<td><%= @playerBattingMax.RBI %></td>
+								<td><%= @playerBattingMax.R %></td>
+								<td><%= @playerBattingMax.SO %></td>
+								<td><%= @playerBattingMax.BB %></td>
+								<td><%= @playerBattingMax.IBB %></td>
+								<td><%= @playerBattingMax.SF %></td>
+								<td><%= @playerBattingMax.E %></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h5 style="margin:0 0 10px; text-transform:none">投球</h5>
+				<div class="table-responsive" id="div_player_PitchingMax">
+					<table class="table table-striped table-condensed" id="table_player_PitchingMax">
+						<thead>
+							<tr>
+								<th>IP<br/>局數</th>
+								<th>TBF<br/>面對打席</th>
+								<th>H<br/>被安打</th>
+								<th>HR<br/>被全壘打</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>R<br/>失分</th>
+								<th>ER<br/>自責</th>
+							</tr>
+						</thead>
+						<tbody>	
+							<tr>
+								<td><%= '%.1f' % @playerPitchingMax.IP.round(1) %></td>
+								<td><%= @playerPitchingMax.TBF %></td>
+								<td><%= @playerPitchingMax.H %></td>
+								<td><%= @playerPitchingMax.HR %></td>
+								<td><%= @playerPitchingMax.SO %></td>
+								<td><%= @playerPitchingMax.BB %></td>
+								<td><%= @playerPitchingMax.IBB %></td>
+								<td><%= @playerPitchingMax.R %></td>
+								<td><%= @playerPitchingMax.ER %></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br/>
+				<h4>連續場次紀錄</h4>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">現今紀錄(生涯紀錄)</h5>
+				<h5 style="margin:0 0 10px; text-transform:none">打擊</h5>
+				<ul>
+					<li>連續安打場次，共 <%= @currentBat_HSort %>(<%= @wildcardBat_HSort %>) 場。</li>
+					<li>連續無安打場次，共 <%= @currentBat_NHSort %>(<%= @wildcardBat_NHSort %>) 場。</li>
+					<li>連續三振場次，共 <%= @currentBat_SOSort %>(<%= @wildcardBat_SOSort %>) 場。</li>
+					<li>連續無三振場次，共 <%= @currentBat_NSOSort %>(<%= @wildcardBat_NSOSort %>) 場。</li>
+					<li>連續打點場次，共 <%= @currentBat_RBISort %>(<%= @wildcardBat_RBISort %>) 場。</li>
+					<li>連續得分場次，共 <%= @currentBat_RSort %>(<%= @wildcardBat_RSort %>) 場。</li>
+					<li>連續全壘打場次，共 <%= @currentBat_HRSort %>(<%= @wildcardBat_HRSort %>) 場。</li>
+				</ul>
+				<br/>
+				<h5 style="margin:0 0 10px; text-transform:none">投球</h5>
+				<ul>
+					<li>連續勝場場次，共 <%= @currentPit_WSort %>(<%= @wildcardPit_WSort %>) 場。</li>
+					<li>連續敗場場次，共 <%= @currentPit_LSort %>(<%= @wildcardPit_LSort %>) 場。</li>
+					<li>連續三振場次，共 <%= @currentPit_SOSort %>(<%= @wildcardPit_SOSort %>) 場。</li>
+					<li>連續失分場次，共 <%= @currentPit_RSort %>(<%= @wildcardPit_RSort %>) 場。</li>
+					<li>連續無失分場次，共 <%= @currentPit_NRSort %>(<%= @wildcardPit_NRSort %>) 場。</li>
+					<li>連續被全壘打場次，共 <%= @currentPit_HRSort %>(<%= @wildcardPit_HRSort %>) 場。</li>
+				</ul>
+			<% end %>
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>
