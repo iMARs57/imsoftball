@@ -18,7 +18,7 @@
 				<h4>年度打擊表現</h4>
 				<br/>
 				<div class="table-responsive" id="div_player_yearBatting">
-					<table class="table table-condensed" id="table_player_yearBatting">
+					<table class="table table-striped table-condensed" id="table_player_yearBatting">
 						<thead>
 							<tr>
 								<th>Year<br/>年度</th>
@@ -113,7 +113,7 @@
 				<h4>平均三打席打擊表現</h4>
 				<br/>
 				<div class="table-responsive" id="div_player_yearBatting3PA">
-					<table class="table table-condensed" id="table_player_yearBatting3PA">
+					<table class="table table-striped table-condensed" id="table_player_yearBatting3PA">
 						<thead>
 							<tr>
 								<th>Year<br/>年度</th>
@@ -186,7 +186,7 @@
 				<h4>打擊百分比</h4>
 				<br/>
 				<div class="table-responsive" id="div_player_yearBattingPercent">
-					<table class="table table-condensed" id="table_player_yearBattingPercent">
+					<table class="table table-striped table-condensed" id="table_player_yearBattingPercent">
 						<thead>
 							<tr>
 								<th>Year<br/>年度</th>
@@ -260,7 +260,7 @@
 				<br/>
 				<h5 style="margin:0 0 10px; text-transform:none">官方賽為：<%= @listOfficial %><br/>正式賽為：<%= @listFormal %></h5>
 				<div class="table-responsive" id="div_player_BattingClassified">
-					<table class="table table-condensed" id="table_player_BattingClassified">
+					<table class="table table-striped table-condensed" id="table_player_BattingClassified">
 						<thead>
 							<tr>
 								<th>Type<br/>分類</th>
@@ -287,8 +287,8 @@
 								<th>SSI<br/>銀棒指數</th>
 							</tr>
 						</thead>
-						<% if @playerBattingFormal.PA != nil %>	
-							<tbody>	
+						<tbody>
+							<% if @playerBattingFormal.PA != nil %>	
 								<tr>
 									<td>
 										<%= link_to '正式賽', controller: "records", action: "batting", player: @player, cup: '正式賽', year: 'Wildcard' %>
@@ -315,10 +315,8 @@
 									<td><%= '%.3f' % @playerBattingFormal.TA.round(3) %></td>
 									<td><%= '%.1f' % @playerBattingFormal.SILVER.round(1) %></td>
 								</tr>
-							</tbody>
-						<% end %>
-						<% if @playerBattingOfficial.PA != nil %>	
-							<tbody>	
+							<% end %>
+							<% if @playerBattingOfficial.PA != nil %>	
 								<tr>
 									<td>
 										<%= link_to '官方賽', controller: "records", action: "batting", player: @player, cup: '官方賽', year: 'Wildcard' %>
@@ -345,10 +343,8 @@
 									<td><%= '%.3f' % @playerBattingOfficial.TA.round(3) %></td>
 									<td><%= '%.1f' % @playerBattingOfficial.SILVER.round(1) %></td>
 								</tr>
-							</tbody>
-						<% end %>
-						<% if @playerBattingFriendly.PA != nil %>	
-							<tbody>	
+							<% end %>
+							<% if @playerBattingFriendly.PA != nil %>	
 								<tr>
 									<td>其他賽事</td>
 									<td><%= @playerBattingFriendly.G %></td>
@@ -373,8 +369,8 @@
 									<td><%= '%.3f' % @playerBattingFriendly.TA.round(3) %></td>
 									<td><%= '%.1f' % @playerBattingFriendly.SILVER.round(1) %></td>
 								</tr>
-							</tbody>
-						<% end %>
+							<% end %>
+						</tbody>
 					</table>
 				</div>
 				<br/>
@@ -793,8 +789,8 @@
 				<br/>
 				<h4>分類投球表現</h4>
 				<br/>
-				<div class="table-responsive" id="div_player_yearPitching">
-					<table class="table table-striped table-condensed" id="table_player_yearPitching">
+				<div class="table-responsive" id="div_player_yearPitchingClassified">
+					<table class="table table-striped table-condensed" id="table_player_yearPitchingClassified">
 						<thead>
 							<tr>
 								<th>Type<br/>分類</th>
@@ -818,8 +814,8 @@
 								<th>R/7<br/>七局失分率</th>
 							</tr>
 						</thead>
-						<% if @playerPitchingFormal.TBF != nil %>
-							<tbody>
+						<tbody>	
+							<% if @playerPitchingFormal.TBF != nil %>
 								<tr>
 									<td><%= link_to '正式賽', controller: "records", action: "pitching", player: @player, year: 'Wildcard', cup: '正式賽' %></td>
 									<td><%= @playerPitchingFormal.G %></td>
@@ -902,10 +898,8 @@
 										<% end %>
 									</td>
 								</tr>
-							</tbody>
-						<% end %>
-						<% if @playerPitchingOfficial.TBF != nil %>
-							<tbody>
+							<% end %>
+							<% if @playerPitchingOfficial.TBF != nil %>
 								<tr>
 									<td><%= link_to '官方賽', controller: "records", action: "pitching", player: @player, year: 'Wildcard', cup: '官方賽' %></td>
 									<td><%= @playerPitchingOfficial.G %></td>
@@ -988,10 +982,8 @@
 										<% end %>
 									</td>
 								</tr>
-							</tbody>
-						<% end %>
-						<% if @playerPitchingFriendly.TBF != nil %>
-							<tbody>
+							<% end %>
+							<% if @playerPitchingFriendly.TBF != nil %>
 								<tr>
 									<td>其他賽事</td>
 									<td><%= @playerPitchingFriendly.G %></td>
@@ -1074,10 +1066,8 @@
 										<% end %>
 									</td>
 								</tr>
-							</tbody>
-						<% end %>
-						<% if @playerPitchingStarter.TBF != nil %>
-							<tbody>
+							<% end %>
+							<% if @playerPitchingStarter.TBF != nil %>
 								<tr>
 									<td>先發</td>
 									<td><%= @playerPitchingStarter.G %></td>
@@ -1160,10 +1150,8 @@
 										<% end %>
 									</td>
 								</tr>
-							</tbody>
-						<% end %>
-						<% if @playerPitchingReliever.TBF != nil %>
-							<tbody>
+							<% end %>
+							<% if @playerPitchingReliever.TBF != nil %>
 								<tr>
 									<td>後援</td>
 									<td><%= @playerPitchingReliever.G %></td>
@@ -1246,8 +1234,8 @@
 										<% end %>
 									</td>
 								</tr>
-							</tbody>
-						<% end %>
+							<% end %>
+						</tbody>
 					</table>
 				</div>
 				<br/>
