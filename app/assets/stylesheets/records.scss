@@ -67,6 +67,8 @@
 #table_team_fielding_summary > thead > tr > th,
 #table_cup_gamelist > thead > tr > th,
 #table_cup_batting_summary > thead > tr > th,
+#table_cup_pitching_summary > thead > tr > th,
+#table_cup_fielding_summary > thead > tr > th,
 #table_player_yearBatting > thead > tr > th,
 #table_player_yearBatting3PA > thead > tr > th,
 #table_player_yearBattingPercent > thead > tr > th,
@@ -76,7 +78,18 @@
 #table_player_yearPitching5IP > thead > tr > th,
 #table_player_yearPitchingClassified > thead > tr > th,
 #table_player_BattingMax > thead > tr > th,
-#table_player_PitchingMax > thead > tr > th
+#table_player_PitchingMax > thead > tr > th,
+#table_order_all > thead > tr > th,
+#table_order_all_Summary > thead > tr > th,
+#table_order_player_eachgame > thead > tr > th,
+#table_order_player_eachorder > thead > tr > th,
+#table_order_player_Summary > thead > tr > th,
+#table_lucky > thead > tr > th,
+#table_rider > thead > tr > th,
+#table_continuity_batting > thead > tr > th,
+#table_continuity_fielding > thead > tr > th,
+#table_continuity_pitching > thead > tr > th,
+table[id^='table_max_'] > thead > tr > th
 {
 	
 	background:rgba(192,192,192,0.7);
@@ -148,7 +161,7 @@ img.teamLogo{
 #table_cup_gamelist > thead > tr > th, #table_cup_gamelist > tbody > tr > td,
 #table_cup_batting_summary > thead > tr > th, #table_cup_batting_summary > tbody > tr > td,
 #table_cup_pitching_summary > thead > tr > th, #table_cup_pitching_summary > tbody > tr > td,
-#table_cup_fielding_summary > thead > tr > th, #table_cup_fielding_summary > tbody > tr > td
+#table_cup_fielding_summary > thead > tr > th, #table_cup_fielding_summary > tbody > tr > td,
 #table_player_yearBatting > thead > tr > th, #table_player_yearBatting > tbody > tr > td, #table_player_yearBatting > tfoot > tr > td,
 #table_player_yearBatting3PA > thead > tr > th, #table_player_yearBatting3PA > tbody > tr > td, #table_player_yearBatting3PA > tfoot > tr > td,
 #table_player_yearBattingPercent > thead > tr > th, #table_player_yearBattingPercent > tbody > tr > td, #table_player_yearBattingPercent > tfoot > tr > td,
@@ -158,7 +171,18 @@ img.teamLogo{
 #table_player_yearPitching5IP > thead > tr > th, #table_player_yearPitching5IP > tbody > tr > td, #table_player_yearPitching5IP > tfoot > tr > td,
 #table_player_yearPitchingClassified > thead > tr > th, #table_player_yearPitchingClassified > tbody > tr > td,
 #table_player_BattingMax > thead > tr > th, #table_player_BattingMax > tbody > tr > td,
-#table_player_PitchingMax > thead > tr > th, #table_player_PitchingMax > tbody > tr > td
+#table_player_PitchingMax > thead > tr > th, #table_player_PitchingMax > tbody > tr > td,
+#table_order_all > thead > tr > th, #table_order_all > tbody > tr > td,
+#table_order_all_Summary > thead > tr > th, #table_order_all_Summary > tbody > tr > td,
+#table_order_player_eachgame > thead > tr > th, #table_order_player_eachgame > tbody > tr > td,
+#table_order_player_eachorder > thead > tr > th, #table_order_player_eachorder > tbody > tr > td,
+#table_order_player_Summary > thead > tr > th, #table_order_player_Summary > tbody > tr > td,
+#table_lucky > thead > tr > th, #table_lucky > tbody > tr > td,
+#table_rider > thead > tr > th, #table_rider > tbody > tr > td,
+#table_continuity_batting > thead > tr > th, #table_continuity_batting > tbody > tr > td,
+#table_continuity_fielding > thead > tr > th, #table_continuity_fielding > tbody > tr > td,
+#table_continuity_pitching > thead > tr > th, #table_continuity_pitching > tbody > tr > td,
+table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td
 {
 	
 	text-align: center;
@@ -233,6 +257,7 @@ img.teamLogo{
 #records * div.recordsContent * tfoot * a{
 	
 	color: white;
+	text-decoration: underline;
 }
 
 #records * div.recordsContent * a:hover{
@@ -299,13 +324,21 @@ td.win{
 #table_cup_pitching_summary > tbody > tr > td,
 #table_cup_fielding_summary > tbody > tr > td,
 #table_player_BattingMax > tbody > tr > td,
-#table_player_PitchingMax > tbody > tr > td
+#table_player_PitchingMax > tbody > tr > td,
+#table_order_player_Summary > tbody > tr > td
 {	
 	background:rgba(235,235,235,0.7);
 }
 
 #table_pitching_all_IP > tbody > tr > td,
-#table_pitching_playerIP > tbody > tr > td{	
+#table_pitching_playerIP > tbody > tr > td,
+#table_lucky > thead > tr > th, #table_lucky > tbody > tr > td,
+#table_rider > thead > tr > th, #table_rider > tbody > tr > td,
+#table_continuity_batting > thead > tr > th, #table_continuity_batting > tbody > tr > td,
+#table_continuity_fielding > thead > tr > th, #table_continuity_fielding > tbody > tr > td,
+#table_continuity_pitching > thead > tr > th, #table_continuity_pitching > tbody > tr > td,
+table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td
+{	
 	white-space: nowrap;
 }
 

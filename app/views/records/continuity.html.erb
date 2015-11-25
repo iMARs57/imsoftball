@@ -1,0 +1,143 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<h3>連續場次紀錄</h3>
+			<hr>
+			<h4>打擊</h4>
+			<br/>
+			<div class="table-responsive" id="div_continuity_batting">
+				<table class="table table-striped table-condensed" id="table_continuity_batting">
+					<thead>
+						<tr>
+							<th>打者</th>
+							<th>安打(生涯)</th>
+							<th>無安打(生涯)</th>
+							<th>打點(生涯)</th>
+							<th>得分(生涯)</th>
+							<th>全壘打(生涯)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% if @currentBat_HSort.size != 0 %>
+							<tr style="color:rgb(236,132,29)">
+								<td>Best</td>
+								<td><%= @arrayID2Name[@wildcardBat_HSort.max_by{|k,v| v}[0]] %>(<%= @wildcardBat_HSort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardBat_NHSort.max_by{|k,v| v}[0]] %>(<%= @wildcardBat_NHSort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardBat_RBISort.max_by{|k,v| v}[0]] %>(<%= @wildcardBat_RBISort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardBat_RSort.max_by{|k,v| v}[0]] %>(<%= @wildcardBat_RSort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardBat_HRSort.max_by{|k,v| v}[0]] %>(<%= @wildcardBat_HRSort.max_by{|k,v| v}[1] %>)</td>
+							</tr>
+							<% @currentBat_HSort.each do |key,value| %>
+								<tr>
+									<td><%= link_to @arrayID2Name[key], controller: "records", action: "batting", player: key, year: 'Wildcard' %></td>
+									<td <% if @currentBat_HSort[key] == @wildcardBat_HSort[key] && @currentBat_HSort[key] != 0 %>style="color:red"<% end %>>
+										<%= @currentBat_HSort[key] %>(<%= @wildcardBat_HSort[key] %>)
+									</td>
+									<td <% if @currentBat_NHSort[key] == @wildcardBat_NHSort[key] && @currentBat_NHSort[key] != 0 %>style="color:green"<% end %>>
+										<%= @currentBat_NHSort[key] %>(<%= @wildcardBat_NHSort[key] %>)
+									</td>
+									<td <% if @currentBat_RBISort[key] == @wildcardBat_RBISort[key] && @currentBat_RBISort[key] != 0 %>style="color:red"<% end %>>
+										<%= @currentBat_RBISort[key] %>(<%= @wildcardBat_RBISort[key] %>)
+									</td>
+									<td <% if @currentBat_RSort[key] == @wildcardBat_RSort[key] && @currentBat_RSort[key] != 0 %>style="color:red"<% end %>>
+										<%= @currentBat_RSort[key] %>(<%= @wildcardBat_RSort[key] %>)
+									</td>
+									<td <% if @currentBat_HRSort[key] == @wildcardBat_HRSort[key] && @currentBat_HRSort[key] != 0 %>style="color:red"<% end %>>
+										<%= @currentBat_HRSort[key] %>(<%= @wildcardBat_HRSort[key] %>)
+									</td>
+								</tr>
+							<% end %>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+			<br/>
+			<div class="col-sm-6">
+				<h4>守備</h4>
+				<br/>
+				<div class="table-responsive" id="div_continuity_fielding">
+					<table class="table table-striped table-condensed" id="table_continuity_fielding">
+						<thead>
+							<tr>
+								<th>野手</th>
+								<th>失誤(生涯)</th>
+								<th>無失誤(生涯)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @currentFld_ESort.size != 0 %>
+								<tr style="color:rgb(236,132,29)">
+									<td>Best</td>
+									<td><%= @arrayID2Name[@wildcardFld_ESort.max_by{|k,v| v}[0]] %>(<%= @wildcardFld_ESort.max_by{|k,v| v}[1] %>)</td>
+									<td><%= @arrayID2Name[@wildcardFld_NESort.max_by{|k,v| v}[0]] %>(<%= @wildcardFld_NESort.max_by{|k,v| v}[1] %>)</td>
+								</tr>
+								<% @currentFld_ESort.each do |key,value| %>
+									<tr>
+										<td><%= link_to @arrayID2Name[key], controller: "records", action: "fielding", player: key, year: 'Wildcard' %></td>
+										<td <% if @currentFld_ESort[key] == @wildcardFld_ESort[key] && @currentFld_ESort[key] != 0 %>style="color:green"<% end %>>
+											<%= @currentFld_ESort[key] %>(<%= @wildcardFld_ESort[key] %>)
+										</td>
+										<td <% if @currentFld_NESort[key] == @wildcardFld_NESort[key] && @currentFld_NESort[key] != 0 %>style="color:red"<% end %>>
+											<%= @currentFld_NESort[key] %>(<%= @wildcardFld_NESort[key] %>)
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				<br/>
+			</div>
+			<h4>投球</h4>
+			<br/>
+			<div class="table-responsive" id="div_continuity_fielding">
+				<table class="table table-striped table-condensed" id="table_continuity_fielding">
+					<thead>
+						<tr>
+							<th>投手</th>
+							<th>勝場(生涯)</th>
+							<th>敗場(生涯)</th>
+							<th>三振(生涯)</th>
+							<th>被全壘打(生涯)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% if @currentPit_WSort.size != 0 %>
+							<tr style="color:rgb(236,132,29)">
+								<td>Best</td>
+								<td><%= @arrayID2Name[@wildcardPit_WSort.max_by{|k,v| v}[0]] %>(<%= @wildcardPit_WSort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardPit_LSort.max_by{|k,v| v}[0]] %>(<%= @wildcardPit_LSort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardPit_SOSort.max_by{|k,v| v}[0]] %>(<%= @wildcardPit_SOSort.max_by{|k,v| v}[1] %>)</td>
+								<td><%= @arrayID2Name[@wildcardPit_HRSort.max_by{|k,v| v}[0]] %>(<%= @wildcardPit_HRSort.max_by{|k,v| v}[1] %>)</td>
+							</tr>
+							<% @currentPit_WSort.each do |key,value| %>
+								<tr>
+									<td><%= link_to @arrayID2Name[key], controller: "records", action: "pitching", player: key, year: 'Wildcard' %></td>
+									<td <% if @currentPit_WSort[key] == @wildcardPit_WSort[key] && @currentPit_WSort[key] != 0 %>style="color:red"<% end %>>
+										<%= @currentPit_WSort[key] %>(<%= @wildcardPit_WSort[key] %>)
+									</td>
+									<td <% if @currentPit_LSort[key] == @wildcardPit_LSort[key] && @currentPit_LSort[key] != 0 %>style="color:green"<% end %>>
+										<%= @currentPit_LSort[key] %>(<%= @wildcardPit_LSort[key] %>)
+									</td>
+									<td <% if @currentPit_SOSort[key] == @wildcardPit_SOSort[key] && @currentPit_SOSort[key] != 0 %>style="color:red"<% end %>>
+										<%= @currentPit_SOSort[key] %>(<%= @wildcardPit_SOSort[key] %>)
+									</td>
+									<td <% if @currentPit_HRSort[key] == @wildcardPit_HRSort[key] && @currentPit_HRSort[key] != 0 %>style="color:green"<% end %>>
+										<%= @currentPit_HRSort[key] %>(<%= @wildcardPit_HRSort[key] %>)
+									</td>
+								</tr>
+							<% end %>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

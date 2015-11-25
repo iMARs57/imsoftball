@@ -90,11 +90,16 @@
 										</td>
 									</tr>
 									<tr>
-										<td colspan="4" style="word-break:keep-all;white-space:nowrap;">
-											<div style="display:inline-block; width:35%; text-align:left; font-size:1.5em"><%= @game_onegame.teamAwayName %></div>
-											<div style="display:inline-block; width:auto; font-size:2em; color: yellow;"><%= @game_onegame.away_score %>：<%= @game_onegame.home_score %></div>
-											<div style="display:inline-block; width:35%; text-align:right; font-size:1.5em"><%= @game_onegame.teamHomeName %></div>
+										<td id='board_versus' colspan="4" style="word-break:keep-all;white-space:nowrap;">
+											<div id='board_nameAway' style="display:inline-block; width:35%; text-align:left; font-size:1.5em"><%= @game_onegame.teamAwayName %></div>
+											<div id='board_score' style="padding:0 10px; display:inline-block; width:auto; font-size:2em; color: yellow;"><%= @game_onegame.away_score %>：<%= @game_onegame.home_score %></div>
+											<div id='board_nameHome' style="display:inline-block; width:35%; text-align:right; font-size:1.5em"><%= @game_onegame.teamHomeName %></div>
 										</td>
+										<script>
+											$(window).on('load resize', function(){
+												$('#board_versus').css('min-width',$('#board_nameAway').width()+$('#board_score').width()+$('#board_nameHome').width()+20);
+											});
+										</script>
 									</tr>
 									<tr>
 										<td colspan="4">

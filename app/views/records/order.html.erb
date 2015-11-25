@@ -1,0 +1,378 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<h3>打擊棒次查詢</h3>
+			<hr>
+			<% if @player == nil && @year == nil %>
+				<script>
+					function select_year(){
+						year = document.getElementById('year').value;
+						obj = eval('playerIn'+year);
+						for(i=0;i<obj.length;i++) document.getElementById('player').options[i] = new Option(obj[i], obj[i]);
+						document.getElementById('player').length = i;
+						document.getElementById('player').selectedIndex = i - 1;
+						i = document.getElementById('player').length;
+						document.getElementById('player').options[i] = new Option("all", "all");
+						document.getElementById('player').length = i + 1;
+						document.getElementById('player').selectedIndex = i;
+					
+					}
+					
+					$(window).on('load', function(){
+						select_year();
+					});
+					
+					<% @year_option.each do |yearOption| %>
+						var <%= 'playerIn' + yearOption[1].to_s %> = new Array();
+						<% @playerInThisYear = playersInYear(yearOption[1],'Batting') %>
+						<% @playerInThisYear.each do |playerITY| %>
+							<%= 'playerIn' + yearOption[1].to_s %>.push("<%= playerITY.player_id %>");
+						<% end %>
+					<% end %>
+				</script>
+				<%= form_tag("order" , method:"get") do %>
+					<table>
+						<tr>
+							<td><%= select_tag(:year, options_for_select(@year_option,@year_option[@year_option.length-2][1]), onchange:"select_year();") %></td>
+							<td><%= select_tag(:player) %></td>
+						</tr>
+						<tr>
+							<td colspan="2"><%= submit_tag("查詢", name: nil) %></td>
+						</tr>
+					</table>
+				<% end %>
+			
+			<% elsif @player == 'all' %>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 打擊棒次表現</h4>
+				<br/>
+				<div class="wrapperForScrollbar" id="wrapper_order_all">
+					<div class="fakeContentForScrollBar" id="content_order_all"></div>
+				</div>
+				<div class="table-responsive" id="div_order_all">
+					<table class="table table-striped table-condensed" id="table_order_all">
+						<thead>
+							<tr>
+								<th>Batter<br/>打者</th>
+								<th>Order<br/>棒次</th>
+								<th>G<br/>場次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @order_allPlayer.size != 0 %>
+								<% @order_allPlayer.each do |eachplayer| %>
+									<tr>
+										<td><%= eachplayer.player_id %></td>
+										<td><%= eachplayer.order %></td>
+										<td><%= eachplayer.G %></td>
+										<td><%= eachplayer.PA %></td>
+										<td><%= eachplayer.AB %></td>
+										<td><%= eachplayer.H %></td>
+										<td><%= eachplayer.B2 %></td>
+										<td><%= eachplayer.B3 %></td>
+										<td><%= eachplayer.HR %></td>
+										<td><%= eachplayer.TB %></td>
+										<td><%= eachplayer.RBI %></td>
+										<td><%= eachplayer.R %></td>
+										<td><%= eachplayer.SO %></td>
+										<td><%= eachplayer.BB %></td>
+										<td><%= eachplayer.IBB %></td>
+										<td><%= eachplayer.SF %></td>
+										<td><%= eachplayer.E %></td>
+										<td><%= '%.3f' % eachplayer.AVG.round(3) %></td>
+										<td><%= '%.3f' % eachplayer.OBP.round(3) %></td>
+										<td><%= '%.3f' % eachplayer.SLG.round(3) %></td>
+										<td><%= '%.3f' % eachplayer.OPS.round(3) %></td>
+										<td><%= '%.3f' % eachplayer.TA.round(3) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				<script>
+					$(window).on('load resize', function(){
+						$('#wrapper_order_all').width($('#div_order_all').width());
+						$('#content_order_all').width($('#table_order_all').width());
+					});
+					$(function(){
+						wrapperForTable = $("#table_order_all").parent('div')
+						$("#wrapper_order_all").scroll(function(){
+							wrapperForTable.scrollLeft($("#wrapper_order_all").scrollLeft());
+						});
+						wrapperForTable.scroll(function(){
+							$("#wrapper_order_all").scrollLeft(wrapperForTable.scrollLeft());
+						});
+					});
+				</script>
+				<br/>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 打擊棒次表現總結</h4>
+				<br/>
+				<div class="table-responsive" id="div_order_all_Summary">
+					<table class="table table-striped table-condensed" id="table_order_all_Summary">
+						<thead>
+							<tr>
+								<th>Order<br/>棒次</th>
+								<th>Times<br/>人次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @order_allPlayerSummary.size != 0 %>
+								<% @order_allPlayerSummary.each do |eachOrderSummary| %>
+									<tr>
+										<td><%= eachOrderSummary.order %></td>
+										<td><%= eachOrderSummary.times %></td>
+										<td><%= eachOrderSummary.PA %></td>
+										<td><%= eachOrderSummary.AB %></td>
+										<td><%= eachOrderSummary.H %></td>
+										<td><%= eachOrderSummary.B2 %></td>
+										<td><%= eachOrderSummary.B3 %></td>
+										<td><%= eachOrderSummary.HR %></td>
+										<td><%= eachOrderSummary.TB %></td>
+										<td><%= eachOrderSummary.RBI %></td>
+										<td><%= eachOrderSummary.R %></td>
+										<td><%= eachOrderSummary.SO %></td>
+										<td><%= eachOrderSummary.BB %></td>
+										<td><%= eachOrderSummary.IBB %></td>
+										<td><%= eachOrderSummary.SF %></td>
+										<td><%= eachOrderSummary.E %></td>
+										<td><%= '%.3f' % eachOrderSummary.AVG.round(3) %></td>
+										<td><%= '%.3f' % eachOrderSummary.OBP.round(3) %></td>
+										<td><%= '%.3f' % eachOrderSummary.SLG.round(3) %></td>
+										<td><%= '%.3f' % eachOrderSummary.OPS.round(3) %></td>
+										<td><%= '%.3f' % eachOrderSummary.TA.round(3) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			<% else %>
+				<h4><%= @player %></h4>
+				<br/>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 每場棒次表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_order_player_eachgame">
+					<table class="table table-striped table-condensed" id="table_order_player_eachgame">
+						<thead>
+							<tr>
+								<th>Game<br/>場次</th>
+								<th>Order<br/>棒次</th>
+								<th>PA<br/>打席</th>
+								<th>AB<br/>打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @order_eachgame.size != 0 %>
+								<% @order_eachgame.each do |eachgame| %>
+									<tr>
+										<td><%= link_to eachgame.game_id, controller: "records", action: "game", game_id: eachgame.game_id %></td>
+										<td><%= eachgame.order %></td>
+										<td><%= eachgame.PA %></td>
+										<td><%= eachgame.AB %></td>
+										<td><%= eachgame.H %></td>
+										<td><%= eachgame.B2 %></td>
+										<td><%= eachgame.B3 %></td>
+										<td><%= eachgame.HR %></td>
+										<td><%= eachgame.TB %></td>
+										<td><%= eachgame.RBI %></td>
+										<td><%= eachgame.R %></td>
+										<td><%= eachgame.SO %></td>
+										<td><%= eachgame.BB %></td>
+										<td><%= eachgame.IBB %></td>
+										<td><%= eachgame.SF %></td>
+										<td><%= eachgame.E %></td>
+										<td><%= '%.3f' % eachgame.AVG.round(3) %></td>
+										<td><%= '%.3f' % eachgame.OBP.round(3) %></td>
+										<td><%= '%.3f' % eachgame.SLG.round(3) %></td>
+										<td><%= '%.3f' % eachgame.OPS.round(3) %></td>
+										<td><%= '%.3f' % eachgame.TA.round(3) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				<br/>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 單一棒次表現</h4>
+				<br/>
+				<div class="table-responsive" id="div_order_player_eachorder">
+					<table class="table table-striped table-condensed" id="table_order_player_eachorder">
+						<thead>
+							<tr>
+								<th>Order<br/>棒次</th>
+								<th>G<br/>場次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @order_eachorder.size != 0 %>
+								<% @order_eachorder.each do |eachorder| %>
+									<tr>
+										<td><%= eachorder.order %></td>
+										<td><%= eachorder.G %></td>
+										<td><%= eachorder.PA %></td>
+										<td><%= eachorder.AB %></td>
+										<td><%= eachorder.H %></td>
+										<td><%= eachorder.B2 %></td>
+										<td><%= eachorder.B3 %></td>
+										<td><%= eachorder.HR %></td>
+										<td><%= eachorder.TB %></td>
+										<td><%= eachorder.RBI %></td>
+										<td><%= eachorder.R %></td>
+										<td><%= eachorder.SO %></td>
+										<td><%= eachorder.BB %></td>
+										<td><%= eachorder.IBB %></td>
+										<td><%= eachorder.SF %></td>
+										<td><%= eachorder.E %></td>
+										<td><%= '%.3f' % eachorder.AVG.round(3) %></td>
+										<td><%= '%.3f' % eachorder.OBP.round(3) %></td>
+										<td><%= '%.3f' % eachorder.SLG.round(3) %></td>
+										<td><%= '%.3f' % eachorder.OPS.round(3) %></td>
+										<td><%= '%.3f' % eachorder.TA.round(3) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+				<br/>
+				<h4><%= @year == 'Wildcard'? ("不分年度"):(@year.to_s + '年(' + (@year.to_i-1911).to_s + '年度)') %> 打擊表現總結</h4>
+				<br/>
+				<div class="table-responsive" id="div_order_player_Summary">
+					<table class="table table-striped table-condensed" id="table_order_player_Summary">
+						<thead>
+							<tr>
+								<th>G<br/>場次</th>
+								<th>PA<br/>總打席</th>
+								<th>AB<br/>總打數</th>
+								<th>H<br/>安打</th>
+								<th>2B<br/>二壘</th>
+								<th>3B<br/>三壘</th>
+								<th>HR<br/>全壘</th>
+								<th>TB<br/>壘打數</th>
+								<th>RBI<br/>打點</th>
+								<th>R<br/>得分</th>
+								<th>SO<br/>三振</th>
+								<th>BB<br/>四壞</th>
+								<th>IBB<br/>故意</th>
+								<th>SF<br/>犧牲</th>
+								<th>BOE<br/>失誤</th>
+								<th>AVG<br/>打擊率</th>
+								<th>OBP<br/>上壘率</th>
+								<th>SLG<br/>長打率</th>
+								<th>OPS<br/>整體攻擊指數</th>
+								<th>TA<br/>攻擊指數</th>
+							</tr>
+						</thead>
+						<% if @order_playerSummary.PA != nil %>
+							<tbody>
+								<tr>
+									<td><%= @order_playerSummary.G %></td>
+									<td><%= @order_playerSummary.PA %></td>
+									<td><%= @order_playerSummary.AB %></td>
+									<td><%= @order_playerSummary.H %></td>
+									<td><%= @order_playerSummary.B2 %></td>
+									<td><%= @order_playerSummary.B3 %></td>
+									<td><%= @order_playerSummary.HR %></td>
+									<td><%= @order_playerSummary.TB %></td>
+									<td><%= @order_playerSummary.RBI %></td>
+									<td><%= @order_playerSummary.R %></td>
+									<td><%= @order_playerSummary.SO %></td>
+									<td><%= @order_playerSummary.BB %></td>
+									<td><%= @order_playerSummary.IBB %></td>
+									<td><%= @order_playerSummary.SF %></td>
+									<td><%= @order_playerSummary.E %></td>
+									<td><%= '%.3f' % @order_playerSummary.AVG.round(3) %></td>
+									<td><%= '%.3f' % @order_playerSummary.OBP.round(3) %></td>
+									<td><%= '%.3f' % @order_playerSummary.SLG.round(3) %></td>
+									<td><%= '%.3f' % @order_playerSummary.OPS.round(3) %></td>
+									<td><%= '%.3f' % @order_playerSummary.TA.round(3) %></td>
+								</tr>
+							</tbody>
+						<% end %>
+					</table>
+				</div>
+			<% end %>
+        </div>
+        <!-- /col-span-9 -->
+    </div>
+</div>
+<!-- /Main -->
+</section>

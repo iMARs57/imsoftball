@@ -1,0 +1,93 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<div class="col-sm-6">
+				<h3>幸運星指數</h3>
+				<hr>
+				<h5 style="margin:0 0 10px; text-transform:none">出賽時，贏球機率高。</h5>
+				<div class="table-responsive" id="div_lucky">
+					<table class="table table-striped table-condensed" id="table_lucky">
+						<thead>
+							<tr>
+								<th>姓名</th>
+								<th>出賽勝場</th>
+								<th>總出賽數</th>
+								<th>出賽勝率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @luckySort.size != 0 %>
+								<% @luckySort.each do |key,value| %>
+									<tr>
+										<td><%= @arrayID2Name[key] %></td>
+										<td><%= @win_times[key] %></td>
+										<td><%= @game_times[key] %></td>
+										<td><%= '%.3f' % value.round(3) %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<h3>順風車指數</h3>
+				<hr>
+				<h5 style="margin:0 0 10px; text-transform:none">勝場打擊率差：隊上贏球時(大家打的好)，我也打的比平常好。<br/>敗場打擊率差：隊上輸球時，我打的更差(罪魁禍首？)。</h5>
+				<div class="table-responsive" id="div_rider">
+					<table class="table table-striped table-condensed" id="table_rider">
+						<thead>
+							<tr>
+								<th>姓名</th>
+								<th>平均打擊率</th>
+								<th>勝場打擊率</th>
+								<th>敗場打擊率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @riderSort.size != 0 %>
+								<% @riderSort.each do |key,value| %>
+									<%
+										@winRate = (@win_AB[key] != 0)?(@win_H[key].to_f / @win_AB[key]):(0)
+										@loseRate = (@lose_AB[key] != 0)?(@lose_H[key].to_f / @lose_AB[key]):(0)
+										@totalRate = (@game_AB[key] != 0)?(@game_H[key].to_f / @game_AB[key]):(0)
+									%>
+									<tr>
+										<td>
+											<%= link_to @arrayID2Name[key], controller: "records", action: "batting", player: key, year: 'Wildcard' %>
+										</td>
+										<td><%= '%.3f' % @totalRate.round(3) %></td>
+										<td>
+											<%= '%.3f' % @winRate.round(3) %>
+											(
+											<span style="color:<%= (@winRate - @totalRate >= 0)?('red'):('green') %>">
+												<%= (@winRate - @totalRate >= 0)?('+'):('') %><%= '%.3f' % (@winRate - @totalRate).round(3) %>
+											</span>
+											)
+										</td>
+										<td>
+											<%= '%.3f' % @loseRate.round(3) %>
+											(
+											<span style="color:<%= (@loseRate - @totalRate >= 0)?('red'):('green') %>">
+												<%= (@loseRate - @totalRate >= 0)?('+'):('') %><%= '%.3f' % (@loseRate - @totalRate).round(3) %>
+											</span>
+											)
+										</td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

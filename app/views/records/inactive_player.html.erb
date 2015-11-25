@@ -1,0 +1,20 @@
+<%= javascript_include_tag 'records' %>
+<!-- Main -->
+<section id="records">
+<div class="container-fluid">
+    <div class="row">
+        <%= render :partial => "sidebar" %>
+		<div class="recordsContent col-sm-9">
+			<h3>其他球員查詢</h3>
+			<hr>
+			<%= form_tag("player" , method:"get") do %>
+				<%= select_tag(:player, options_for_select(@player_option,@player_option[0][1])) %>
+				<%= hidden_field_tag 'inactive', 'true' %>
+				<%= submit_tag("查詢", name: nil) %>
+			<% end %>
+		</div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

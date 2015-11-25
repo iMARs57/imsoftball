@@ -2496,6 +2496,7 @@ class RecordsController < ApplicationController
 		if logged_in?
 		
 			@player = params[:player]
+			@inactive = params[:inactive]
 			
 			if @player == nil
 				
@@ -2507,7 +2508,7 @@ class RecordsController < ApplicationController
 				
 			else
 			
-				@playerName = Member.find(@player).name
+				@playerName = (Member.find_by_id(@player))? Member.find(@player).name : @player
 				@playerYearBatting = Batting.find_by_sql('SELECT C.year,
 																 COUNT(BAT.game_id) AS G,
 																 SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
@@ -2781,6 +2782,16 @@ class RecordsController < ApplicationController
 																  MAX(PIT.ER) AS ER
 															 FROM pitchings AS PIT
 															WHERE PIT.player_id = "' + @player + '" ')[0]
+				
+				if @playerBattingMax.PA == nil
+					Struct.new("PlayerBattingMax", :player_id, :PA, :AB, :H, :B1, :B2, :B3, :HR, :TB, :RBI, :R, :SO, :BB, :IBB, :SF, :E)
+					@playerBattingMax = Struct::PlayerBattingMax.new(@player,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+				end
+				if @playerPitchingMax.TBF == nil
+					Struct.new("PlayerPitchingMax", :player_id, :IP, :TBF, :H, :HR, :SO, :BB, :IBB, :R, :ER)
+					@playerPitchingMax = Struct::PlayerPitchingMax.new(@player,0.0,0,0,0,0,0,0,0,0)
+				end
+				
 				@playerBattingContinuity = Batting.find_by_sql('SELECT BAT.H,
 																	   BAT.RBI,
 																	   BAT.R,
@@ -2904,5 +2915,946 @@ class RecordsController < ApplicationController
 		end
 	
 	end
+	
+	def inactive_player
+	
+		if logged_in?
+
+			@player_option = Array.new
+			@allPlayer = Player.select('players.player_id').where('players.member = 0 AND players.player_id NOT LIKE "傭兵%"').order('players.player_id')
+			@allPlayer.each do |eachPlayer|
+				@player_option.push([eachPlayer.player_id,eachPlayer.player_id])
+			end
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
+	
+	def order
+	
+		if logged_in?
+
+			# 每年有幾場比賽
+			@gameNumberInEachYear = Cup.find_by_sql('SELECT cups.year,
+															COUNT(*) AS gameNumber
+													   FROM games,
+															cups
+													  WHERE games.cup_id = cups.cup_id
+												   GROUP BY cups.year')
+			@gameNumberInYear = Hash.new(0)
+			@gameNumberInWildcard = 0
+			@gameNumberInEachYear.each do |gNIEY|
+				@gameNumberInYear[gNIEY.year.to_s] = gNIEY.gameNumber
+				@gameNumberInWildcard += gNIEY.gameNumber
+			end
+			@gameNumberInYear['Wildcard'] = @gameNumberInWildcard
+			
+			@player = params[:player]
+			@year = params[:year]
+			@sql_year = (@year != 'Wildcard')? (' AND BAT.game_id IN (SELECT G.game_id FROM battings AS BAT, games AS G, cups AS C WHERE BAT.game_id = G.game_id and G.cup_id = C.cup_id and C.year = ' + @year.to_s + ' ) '):(' ')
+			
+			if @player == nil && @year == nil
+			
+				@year_option = Array.new
+				@allyear = Cup.select('DISTINCT cups.year').order('cups.year')
+				@allyear.each do |eachyear|
+					@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
+				end
+				@year_option.push(["不分年度","Wildcard"])
+			
+			elsif @player == 'all'
+			
+				@order_allPlayer = Batting.find_by_sql('SELECT BAT.player_id,
+															   BAT.order,
+															   COUNT(BAT.game_id) AS G,
+															   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+															   SUM(BAT.AB) AS AB,
+															   SUM(BAT.H) AS H,
+															   SUM(BAT.B2) AS B2,
+															   SUM(BAT.B3) AS B3,
+															   SUM(BAT.HR) AS HR,
+															   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+															   SUM(BAT.RBI) AS RBI,
+															   SUM(BAT.R) AS R,
+															   SUM(BAT.SO) AS SO,
+															   SUM(BAT.BB) AS BB,
+															   SUM(BAT.IBB) AS IBB,
+															   SUM(BAT.SF) AS SF,
+															   SUM(BAT.E) AS E,
+															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+														  FROM battings AS BAT
+														 WHERE BAT.player_id IN (SELECT player_id
+																				   FROM players
+																				  WHERE member = 1) ' + @sql_year +
+																			  'GROUP BY BAT.player_id,
+																						BAT.order
+																			   ORDER BY BAT.order,
+																						SUM(BAT.H)/(SUM(BAT.AB)+0.000000000000000000000000000000000000000001) DESC')
+				@order_allPlayerSummary = Batting.find_by_sql('SELECT BAT.order,
+																	  COUNT(BAT.game_id) AS times,
+																	  SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																      SUM(BAT.AB) AS AB,
+																      SUM(BAT.H) AS H,
+																      SUM(BAT.B2) AS B2,
+																      SUM(BAT.B3) AS B3,
+																      SUM(BAT.HR) AS HR,
+																      SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																      SUM(BAT.RBI) AS RBI,
+																      SUM(BAT.R) AS R,
+																      SUM(BAT.SO) AS SO,
+																      SUM(BAT.BB) AS BB,
+																      SUM(BAT.IBB) AS IBB,
+																      SUM(BAT.SF) AS SF,
+																      SUM(BAT.E) AS E,
+																      CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																      CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																      CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																      (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																      CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+																 FROM battings AS BAT
+																WHERE BAT.player_id IN (SELECT player_id
+																						  FROM players
+																						 WHERE member = 1 ) ' + @sql_year +
+																					 'GROUP BY BAT.order
+																					  ORDER BY BAT.order')
+			else
+				@order_eachgame = Batting.find_by_sql('SELECT BAT.game_id,
+															  BAT.order,
+															  (BAT.AB+BAT.BB+BAT.IBB+BAT.SF) AS PA,
+															  BAT.AB,
+															  BAT.H,
+															  BAT.B2,
+															  BAT.B3,
+															  BAT.HR,
+															  (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) AS TB,
+															  BAT.RBI,
+															  BAT.R,
+															  BAT.SO,
+															  BAT.BB,
+															  BAT.IBB,
+															  BAT.SF,
+															  BAT.E,
+															  CAST(CAST((BAT.H/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															  CAST(CAST(((BAT.H+BAT.BB+BAT.IBB)/(BAT.AB+BAT.BB+BAT.IBB+BAT.SF+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															  CAST(CAST(((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															  (CAST(CAST(((BAT.H+BAT.BB+BAT.IBB)/(BAT.AB+BAT.BB+BAT.IBB+BAT.SF+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)/(BAT.AB+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															  CAST(CAST((((BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)+BAT.BB+BAT.IBB)/(BAT.AB-BAT.H+BAT.GIDP+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+														 FROM battings AS BAT
+														WHERE BAT.player_id = "' + @player + '" ' + @sql_year +
+													'ORDER BY BAT.game_id')
+				@order_eachorder = Batting.find_by_sql('SELECT BAT.order,
+															   COUNT(BAT.game_id) AS G,
+															   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+															   SUM(BAT.AB) AS AB,
+															   SUM(BAT.H) AS H,
+															   SUM(BAT.B2) AS B2,
+															   SUM(BAT.B3) AS B3,
+															   SUM(BAT.HR) AS HR,
+															   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+															   SUM(BAT.RBI) AS RBI,
+															   SUM(BAT.R) AS R,
+															   SUM(BAT.SO) AS SO,
+															   SUM(BAT.BB) AS BB,
+															   SUM(BAT.IBB) AS IBB,
+															   SUM(BAT.SF) AS SF,
+															   SUM(BAT.E) AS E,
+															   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+														  FROM battings AS BAT
+														 WHERE BAT.player_id = "' + @player + '" ' + @sql_year +
+													 'GROUP BY BAT.order
+													  ORDER BY BAT.order')
+				@order_playerSummary = Batting.find_by_sql('SELECT COUNT(BAT.game_id) AS G,
+																   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+																   SUM(BAT.AB) AS AB,
+																   SUM(BAT.H) AS H,
+																   SUM(BAT.B2) AS B2,
+																   SUM(BAT.B3) AS B3,
+																   SUM(BAT.HR) AS HR,
+																   SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+																   SUM(BAT.RBI) AS RBI,
+																   SUM(BAT.R) AS R,
+																   SUM(BAT.SO) AS SO,
+																   SUM(BAT.BB) AS BB,
+																   SUM(BAT.IBB) AS IBB,
+																   SUM(BAT.SF) AS SF,
+																   SUM(BAT.E) AS E,
+																   CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+																   CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+																   (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+																   CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+															  FROM battings AS BAT
+															 WHERE BAT.player_id = "' + @player + '" ' + @sql_year)[0]
+			end
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
+	
+	def lucky
+	
+		if logged_in?
+
+			@active = ' AND BAT.player_id IN (SELECT player_id FROM players WHERE players.member = 1 ) '
+			
+			@lucky_win = Batting.find_by_sql('SELECT MBR.name,
+													 Bat.player_id,
+													 SUM(H) AS H,
+													 SUM(AB) AS AB,
+													 COUNT(*) AS times
+												FROM games AS G,
+													 battings AS BAT,
+													 members AS MBR
+											   WHERE G.game_id = BAT.game_id AND
+													 ((BAT.team_id = G.home_team_id AND home_score > away_score) OR
+													  (BAT.team_id = G.away_team_id AND home_score < away_score)) ' + @active + ' AND
+													 BAT.player_id = MBR.id
+										    GROUP BY Bat.player_id')
+			@lucky_lose = Batting.find_by_sql('SELECT MBR.name,
+													  Bat.player_id,
+													  SUM(H) AS H,
+													  SUM(AB) AS AB,
+													  COUNT(*) AS times
+												 FROM games AS G,
+													  battings AS BAT,
+													  members AS MBR
+											    WHERE G.game_id = BAT.game_id AND
+													  ((BAT.team_id = G.home_team_id AND home_score < away_score) OR
+													   (BAT.team_id = G.away_team_id AND home_score > away_score)) ' + @active + ' AND
+													  BAT.player_id = MBR.id
+											 GROUP BY Bat.player_id')
+			@lucky_game = Batting.find_by_sql('SELECT MBR.name,
+													  Bat.player_id,
+													  SUM(H) AS H,
+													  SUM(AB) AS AB,
+													  COUNT(*) AS times
+												 FROM games AS G,
+													  battings AS BAT,
+													  members AS MBR
+											    WHERE G.game_id = BAT.game_id ' + @active + ' AND
+													  BAT.player_id = MBR.id
+											 GROUP BY Bat.player_id')
+			
+			@win_times = Hash.new(0)
+			@win_H = Hash.new(0)
+			@win_AB = Hash.new(0)
+			if @lucky_win.size > 0
+				@lucky_win.each do |eachWin|
+					@win_times[eachWin.player_id] = eachWin.times
+					@win_H[eachWin.player_id] = eachWin.H
+					@win_AB[eachWin.player_id] = eachWin.AB
+				end
+			end
+			
+			@lose_times = Hash.new(0)
+			@lose_H = Hash.new(0)
+			@lose_AB = Hash.new(0)
+			if @lucky_lose.size > 0
+				@lucky_lose.each do |eachLose|
+					@lose_times[eachLose.player_id] = eachLose.times
+					@lose_H[eachLose.player_id] = eachLose.H
+					@lose_AB[eachLose.player_id] = eachLose.AB
+				end
+			end
+			
+			@arrayID2Name = Hash.new
+			@game_times = Hash.new(0)
+			@game_H = Hash.new(0)
+			@game_AB = Hash.new(0)
+			if @lucky_game.size > 0
+				@lucky_game.each do |eachGame|
+					@game_times[eachGame.player_id] = eachGame.times
+					@game_H[eachGame.player_id] = eachGame.H
+					@game_AB[eachGame.player_id] = eachGame.AB
+					@arrayID2Name[eachGame.player_id] = (eachGame.name == nil)? (eachGame.player_id):(eachGame.name)
+				end
+			end
+			
+			@luckySort = Array.new
+			@win_times.each do |key,value|
+				@luckySort.push([key,(value.to_f / @game_times[key])])
+			end
+			
+			@luckySort.sort!{|a,b| b[1] <=> a[1]}
+			
+			@riderSort = Array.new(0)
+			@win_times.each do |key,value|
+				@winRate = (@win_AB[key] != 0)? (@win_H[key].to_f / @win_AB[key]):(0)
+				@totalRate = (@game_AB[key] != 0)? (@game_H[key].to_f / @game_AB[key]):(0)
+				@riderSort.push([key,@winRate - @totalRate])
+			end
+			
+			@riderSort.sort!{|a,b| b[1] <=> a[1]}
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
+	
+	def continuity
+	
+		if logged_in?
+
+			@allMember = Player.select('players.player_id, members.name').where('players.member = 1').joins('LEFT JOIN members ON members.id = players.player_id').order('players.player_id')
+			@currentBat_HSort = Hash.new{0}
+			@wildcardBat_HSort = Hash.new{0}
+			@currentBat_NHSort = Hash.new{0}
+			@wildcardBat_NHSort = Hash.new{0}
+			@currentBat_RBISort = Hash.new{0}
+			@wildcardBat_RBISort = Hash.new{0}
+			@currentBat_RSort = Hash.new{0}
+			@wildcardBat_RSort = Hash.new{0}
+			@currentBat_HRSort = Hash.new{0}
+			@wildcardBat_HRSort = Hash.new{0}
+			@currentFld_ESort = Hash.new{0}
+			@wildcardFld_ESort = Hash.new{0}
+			@currentFld_NESort = Hash.new{0}
+			@wildcardFld_NESort = Hash.new{0}
+			@arrayID2Name = Hash.new
+			
+			@allMember.each do |eachMember|
+				
+				@arrayID2Name[eachMember.player_id] = (eachMember.name == nil)? (eachMember.player_id):(eachMember.name)
+				@battingContinuity = Batting.find_by_sql('SELECT BAT.H,
+																 BAT.RBI,
+																 BAT.R,
+																 BAT.HR
+															FROM battings AS BAT
+														   WHERE BAT.player_id = "' + eachMember.player_id + '"
+														ORDER BY BAT.game_id')
+				@fieldingContinuity = Fielding.find_by_sql('SELECT SUM(FIELD.E) AS E
+															  FROM fieldings AS FIELD
+															 WHERE FIELD.player_id = "' + eachMember.player_id + '"
+														  GROUP BY FIELD.game_id
+														  ORDER BY FIELD.game_id')
+				@ArrayBat_H = Array.new
+				@ArrayBat_RBI = Array.new
+				@ArrayBat_R = Array.new
+				@ArrayBat_HR = Array.new
+				@ArrayFld_E = Array.new
+				
+				@battingContinuity.each do |batContinuity|
+					@ArrayBat_H.push(batContinuity.H)
+					@ArrayBat_RBI.push(batContinuity.RBI)
+					@ArrayBat_R.push(batContinuity.R)
+					@ArrayBat_HR.push(batContinuity.HR)
+				end
+				
+				@fieldingContinuity.each do |fldContinuity|
+					@ArrayFld_E.push(fldContinuity.E)
+				end
+				
+				for i in 0..(@battingContinuity.length - 1)
+					# 安打
+					@currentBat_HSort[eachMember.player_id] = (@ArrayBat_H[i] == 0)? (0):(@currentBat_HSort[eachMember.player_id] + 1)
+					@wildcardBat_HSort[eachMember.player_id] = (@currentBat_HSort[eachMember.player_id] >= @wildcardBat_HSort[eachMember.player_id])? (@currentBat_HSort[eachMember.player_id]):(@wildcardBat_HSort[eachMember.player_id])
+					# 無安打
+					@currentBat_NHSort[eachMember.player_id] = (@ArrayBat_H[i] != 0)? (0):(@currentBat_NHSort[eachMember.player_id] + 1)
+					@wildcardBat_NHSort[eachMember.player_id] = (@currentBat_NHSort[eachMember.player_id] >= @wildcardBat_NHSort[eachMember.player_id])? (@currentBat_NHSort[eachMember.player_id]):(@wildcardBat_NHSort[eachMember.player_id])
+					# 打點
+					@currentBat_RBISort[eachMember.player_id] = (@ArrayBat_RBI[i] == 0)? (0):(@currentBat_RBISort[eachMember.player_id] + 1)
+					@wildcardBat_RBISort[eachMember.player_id] = (@currentBat_RBISort[eachMember.player_id] >= @wildcardBat_RBISort[eachMember.player_id])? (@currentBat_RBISort[eachMember.player_id]):(@wildcardBat_RBISort[eachMember.player_id])
+					# 得分
+					@currentBat_RSort[eachMember.player_id] = (@ArrayBat_R[i] == 0)? (0):(@currentBat_RSort[eachMember.player_id] + 1)
+					@wildcardBat_RSort[eachMember.player_id] = (@currentBat_RSort[eachMember.player_id] >= @wildcardBat_RSort[eachMember.player_id])? (@currentBat_RSort[eachMember.player_id]):(@wildcardBat_RSort[eachMember.player_id])
+					# 全壘打
+					@currentBat_HRSort[eachMember.player_id] = (@ArrayBat_HR[i] == 0)? (0):(@currentBat_HRSort[eachMember.player_id] + 1)
+					@wildcardBat_HRSort[eachMember.player_id] = (@currentBat_HRSort[eachMember.player_id] >= @wildcardBat_HRSort[eachMember.player_id])? (@currentBat_HRSort[eachMember.player_id]):(@wildcardBat_HRSort[eachMember.player_id])
+				end
+				
+				for i in 0..(@fieldingContinuity.length - 1)
+					# 安打
+					@currentFld_ESort[eachMember.player_id] = (@ArrayFld_E[i] == 0)? (0):(@currentFld_ESort[eachMember.player_id] + 1)
+					@wildcardFld_ESort[eachMember.player_id] = (@currentFld_ESort[eachMember.player_id] >= @wildcardFld_ESort[eachMember.player_id])? (@currentFld_ESort[eachMember.player_id]):(@wildcardFld_ESort[eachMember.player_id])
+					# 無安打
+					@currentFld_NESort[eachMember.player_id] = (@ArrayFld_E[i] != 0)? (0):(@currentFld_NESort[eachMember.player_id] + 1)
+					@wildcardFld_NESort[eachMember.player_id] = (@currentFld_NESort[eachMember.player_id] >= @wildcardFld_NESort[eachMember.player_id])? (@currentFld_NESort[eachMember.player_id]):(@wildcardFld_NESort[eachMember.player_id])
+				end
+				
+			end
+			
+			@currentBat_HSort = @currentBat_HSort.sort_by {|k,v| v}.reverse.to_h
+			@currentFld_ESort = @currentFld_ESort.sort_by {|k,v| v}.reverse.to_h
+			
+			@allPitcher = Player.find_by_sql('SELECT DISTINCT PIT.player_id
+												FROM pitchings AS PIT,
+													 players AS PLY
+											   WHERE PIT.player_id = PLY.player_id AND
+													 PLY.member = 1
+											ORDER BY PIT.player_id')
+			
+			@currentPit_WSort = Hash.new{0}
+			@wildcardPit_WSort = Hash.new{0}
+			@currentPit_LSort = Hash.new{0}
+			@wildcardPit_LSort = Hash.new{0}
+			@currentPit_SOSort = Hash.new{0}
+			@wildcardPit_SOSort = Hash.new{0}
+			@currentPit_HRSort = Hash.new{0}
+			@wildcardPit_HRSort = Hash.new{0}
+			
+			@allPitcher.each do |eachPitcher|
+				
+				@pitchingContinuity = Pitching.find_by_sql('SELECT PIT.W,
+																   PIT.L,
+																   PIT.SO,
+																   PIT.HR
+															  FROM pitchings AS PIT
+															 WHERE PIT.player_id = "' + eachPitcher.player_id + '"
+														  ORDER BY PIT.game_id')
+				@ArrayPit_W = Array.new
+				@ArrayPit_L = Array.new
+				@ArrayPit_SO = Array.new
+				@ArrayPit_HR = Array.new
+				
+				@pitchingContinuity.each do |pitContinuity|
+					@ArrayPit_W.push(pitContinuity.W)
+					@ArrayPit_L.push(pitContinuity.L)
+					@ArrayPit_SO.push(pitContinuity.SO)
+					@ArrayPit_HR.push(pitContinuity.HR)
+				end
+				
+				for i in 0..(@pitchingContinuity.length - 1)
+					# 勝, 無勝負關係要跳過
+					@currentPit_WSort[eachPitcher.player_id] = (@ArrayPit_W[i] == 0)? ((@ArrayPit_L[i] == 0)? (@currentPit_WSort[eachPitcher.player_id]):(0)):(@currentPit_WSort[eachPitcher.player_id] + 1)
+					@wildcardPit_WSort[eachPitcher.player_id] = (@currentPit_WSort[eachPitcher.player_id] >= @wildcardPit_WSort[eachPitcher.player_id])? (@currentPit_WSort[eachPitcher.player_id]):(@wildcardPit_WSort[eachPitcher.player_id])
+					# 敗, 無勝負關係要跳過
+					@currentPit_LSort[eachPitcher.player_id] = (@ArrayPit_L[i] == 0)? ((@ArrayPit_W[i] == 0)? (@currentPit_LSort[eachPitcher.player_id]):(0)):(@currentPit_LSort[eachPitcher.player_id] + 1)
+					@wildcardPit_LSort[eachPitcher.player_id] = (@currentPit_LSort[eachPitcher.player_id] >= @wildcardPit_LSort[eachPitcher.player_id])? (@currentPit_LSort[eachPitcher.player_id]):(@wildcardPit_LSort[eachPitcher.player_id])
+					# 三振
+					@currentPit_SOSort[eachPitcher.player_id] = (@ArrayPit_SO[i] == 0)? (0):(@currentPit_SOSort[eachPitcher.player_id] + 1)
+					@wildcardPit_SOSort[eachPitcher.player_id] = (@currentPit_SOSort[eachPitcher.player_id] >= @wildcardPit_SOSort[eachPitcher.player_id])? (@currentPit_SOSort[eachPitcher.player_id]):(@wildcardPit_SOSort[eachPitcher.player_id])
+					# 被全壘打
+					@currentPit_HRSort[eachPitcher.player_id] = (@ArrayPit_HR[i] == 0)? (0):(@currentPit_HRSort[eachPitcher.player_id] + 1)
+					@wildcardPit_HRSort[eachPitcher.player_id] = (@currentPit_HRSort[eachPitcher.player_id] >= @wildcardPit_HRSort[eachPitcher.player_id])? (@currentPit_HRSort[eachPitcher.player_id]):(@wildcardPit_HRSort[eachPitcher.player_id])
+				end
+			
+			end
+			
+			@currentPit_WSort = @currentPit_WSort.sort_by {|k,v| v}.reverse.to_h
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
+	
+	def max
+	
+		if logged_in?
+
+			@top = 10
+			@allMember = Player.select('players.player_id, members.name').where('players.member = 1').joins('LEFT JOIN members ON members.id = players.player_id').order('players.player_id')
+			@arrayID2Name = Hash.new
+			@allMember.each do |eachMember|
+				@arrayID2Name[eachMember.player_id] = (eachMember.name == nil)? (eachMember.player_id):(eachMember.name)
+			end	
+			# Batting
+			@max_bat_H = Batting.find_by_sql('SELECT BAT.player_id,
+													 BAT.H,
+													 COUNT(*) AS G
+												FROM battings AS BAT,
+													 players AS PLY
+											   WHERE BAT.player_id = PLY.player_id AND
+													 PLY.member = 1
+											GROUP BY BAT.player_id,
+													 BAT.H
+											ORDER BY BAT.H DESC,
+													 COUNT(*) DESC
+											   LIMIT ' + @top.to_s)
+			@lowerBound_bat_H = @max_bat_H[@max_bat_H.size - 1].H
+			@max_bat_H = Batting.find_by_sql('SELECT BAT.player_id,
+													 BAT.H,
+													 COUNT(*) AS G
+												FROM battings AS BAT,
+													 players AS PLY
+											   WHERE BAT.player_id = PLY.player_id AND
+													 PLY.member = 1 AND
+													 BAT.H >= ' + @lowerBound_bat_H.to_s + '
+											GROUP BY BAT.player_id,
+													 BAT.H
+											ORDER BY BAT.H DESC,
+													 COUNT(*) DESC')
+			@max_bat_RBI = Batting.find_by_sql('SELECT BAT.player_id,
+													   BAT.RBI,
+													   COUNT(*) AS G
+												  FROM battings AS BAT,
+													   players AS PLY
+											     WHERE BAT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY BAT.player_id,
+													   BAT.RBI
+											  ORDER BY BAT.RBI DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_bat_RBI = @max_bat_RBI[@max_bat_RBI.size - 1].RBI
+			@max_bat_RBI = Batting.find_by_sql('SELECT BAT.player_id,
+													   BAT.RBI,
+													   COUNT(*) AS G
+												  FROM battings AS BAT,
+													   players AS PLY
+											     WHERE BAT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   BAT.RBI >= ' + @lowerBound_bat_RBI.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.RBI
+											  ORDER BY BAT.RBI DESC,
+													   COUNT(*) DESC')
+			@max_bat_HR = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.HR,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  BAT.HR
+											 ORDER BY BAT.HR DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_HR = @max_bat_HR[@max_bat_HR.size - 1].HR
+			@max_bat_HR = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.HR,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  BAT.HR >= ' + @lowerBound_bat_HR.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.HR
+											  ORDER BY BAT.HR DESC,
+													   COUNT(*) DESC')
+			@max_bat_R = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.R,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  BAT.R
+											 ORDER BY BAT.R DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_R = @max_bat_R[@max_bat_R.size - 1].R
+			@max_bat_R = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.R,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  BAT.R >= ' + @lowerBound_bat_R.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.R
+											  ORDER BY BAT.R DESC,
+													   COUNT(*) DESC')
+			@max_bat_SO = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.SO,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  BAT.SO
+											 ORDER BY BAT.SO DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_SO = @max_bat_SO[@max_bat_SO.size - 1].SO
+			@max_bat_SO = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.SO,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  BAT.SO >= ' + @lowerBound_bat_SO.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.SO
+											  ORDER BY BAT.SO DESC,
+													   COUNT(*) DESC')
+			@max_bat_BB = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.BB,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  BAT.BB
+											 ORDER BY BAT.BB DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_BB = @max_bat_BB[@max_bat_BB.size - 1].BB
+			@max_bat_BB = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.BB,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  BAT.BB >= ' + @lowerBound_bat_BB.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.BB
+											  ORDER BY BAT.BB DESC,
+													   COUNT(*) DESC')
+			@max_bat_TB = Batting.find_by_sql('SELECT BAT.player_id,
+													  (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) AS TB,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)
+											 ORDER BY (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_TB = @max_bat_TB[@max_bat_TB.size - 1].TB
+			@max_bat_TB = Batting.find_by_sql('SELECT BAT.player_id,
+													  (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) AS TB,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) >= ' + @lowerBound_bat_TB.to_s + '
+											  GROUP BY BAT.player_id,
+													   (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3)
+											  ORDER BY (BAT.H+BAT.B2*1+BAT.B3*2+BAT.HR*3) DESC,
+													   COUNT(*) DESC')
+			@max_bat_B2 = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.B2,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  BAT.B2
+											 ORDER BY BAT.B2 DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_B2 = @max_bat_B2[@max_bat_B2.size - 1].B2
+			@max_bat_B2 = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.B2,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  BAT.B2 >= ' + @lowerBound_bat_B2.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.B2
+											  ORDER BY BAT.B2 DESC,
+													   COUNT(*) DESC')
+			@max_bat_B3 = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.B3,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1
+											 GROUP BY BAT.player_id,
+													  BAT.B3
+											 ORDER BY BAT.B3 DESC,
+													  COUNT(*) DESC
+												LIMIT ' + @top.to_s)
+			@lowerBound_bat_B3 = @max_bat_B3[@max_bat_B3.size - 1].B3
+			@max_bat_B3 = Batting.find_by_sql('SELECT BAT.player_id,
+													  BAT.B3,
+													  COUNT(*) AS G
+												 FROM battings AS BAT,
+													  players AS PLY
+											    WHERE BAT.player_id = PLY.player_id AND
+													  PLY.member = 1 AND
+													  BAT.B3 >= ' + @lowerBound_bat_B3.to_s + '
+											  GROUP BY BAT.player_id,
+													   BAT.B3
+											  ORDER BY BAT.B3 DESC,
+													   COUNT(*) DESC')
+			# Fielding										   
+			@top = 8
+			@max_fld_TC = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.PO+FIELD.K+FIELD.A+FIELD.E AS TC,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+												 WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C"
+											  GROUP BY FIELD.player_id,
+													   FIELD.PO+FIELD.K+FIELD.A+FIELD.E
+											  ORDER BY FIELD.PO+FIELD.K+FIELD.A+FIELD.E DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_fld_TC = @max_fld_TC[@max_fld_TC.size - 1].TC
+			@max_fld_TC = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.PO+FIELD.K+FIELD.A+FIELD.E AS TC,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+											     WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C" AND
+													   FIELD.PO+FIELD.K+FIELD.A+FIELD.E >= ' + @lowerBound_fld_TC.to_s + '
+											  GROUP BY FIELD.player_id,
+													   FIELD.PO+FIELD.K+FIELD.A+FIELD.E
+											  ORDER BY FIELD.PO+FIELD.K+FIELD.A+FIELD.E DESC,
+													   COUNT(*) DESC')
+			@max_fld_PO = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.PO,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+												 WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C"
+											  GROUP BY FIELD.player_id,
+													   FIELD.PO
+											  ORDER BY FIELD.PO DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_fld_PO = @max_fld_PO[@max_fld_PO.size - 1].PO
+			@max_fld_PO = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.PO,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+											     WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C" AND
+													   FIELD.PO >= ' + @lowerBound_fld_PO.to_s + '
+											  GROUP BY FIELD.player_id,
+													   FIELD.PO
+											  ORDER BY FIELD.PO DESC,
+													   COUNT(*) DESC')
+			@max_fld_A = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.A,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+												 WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C"
+											  GROUP BY FIELD.player_id,
+													   FIELD.A
+											  ORDER BY FIELD.A DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_fld_A = @max_fld_A[@max_fld_A.size - 1].A
+			@max_fld_A = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.A,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+											     WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C" AND
+													   FIELD.A >= ' + @lowerBound_fld_A.to_s + '
+											  GROUP BY FIELD.player_id,
+													   FIELD.A
+											  ORDER BY FIELD.A DESC,
+													   COUNT(*) DESC')
+			@max_fld_E = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.E,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+												 WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C"
+											  GROUP BY FIELD.player_id,
+													   FIELD.E
+											  ORDER BY FIELD.E DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_fld_E = @max_fld_E[@max_fld_E.size - 1].E
+			@max_fld_E = Fielding.find_by_sql('SELECT FIELD.player_id,
+													   FIELD.E,
+													   COUNT(*) AS G
+												  FROM fieldings AS FIELD,
+													   players AS PLY
+											     WHERE FIELD.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   FIELD.POS <> "C" AND
+													   FIELD.E >= ' + @lowerBound_fld_E.to_s + '
+											  GROUP BY FIELD.player_id,
+													   FIELD.E
+											  ORDER BY FIELD.E DESC,
+													   COUNT(*) DESC')
+			# Pitching
+			@top = 8
+			@max_pit_SO = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.SO,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+												 WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY PIT.player_id,
+													   PIT.SO
+											  ORDER BY PIT.SO DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_pit_SO = @max_pit_SO[@max_pit_SO.size - 1].SO
+			@max_pit_SO = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.SO,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+											     WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   PIT.SO >= ' + @lowerBound_pit_SO.to_s + '
+											  GROUP BY PIT.player_id,
+													   PIT.SO
+											  ORDER BY PIT.SO DESC,
+													   COUNT(*) DESC')
+			@max_pit_BB = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.BB,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+												 WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY PIT.player_id,
+													   PIT.BB
+											  ORDER BY PIT.BB DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_pit_BB = @max_pit_BB[@max_pit_BB.size - 1].BB
+			@max_pit_BB = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.BB,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+											     WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   PIT.BB >= ' + @lowerBound_pit_BB.to_s + '
+											  GROUP BY PIT.player_id,
+													   PIT.BB
+											  ORDER BY PIT.BB DESC,
+													   COUNT(*) DESC')
+			@max_pit_ER = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.ER,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+												 WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY PIT.player_id,
+													   PIT.ER
+											  ORDER BY PIT.ER DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_pit_ER = @max_pit_ER[@max_pit_ER.size - 1].ER
+			@max_pit_ER = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.ER,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+											     WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   PIT.ER >= ' + @lowerBound_pit_ER.to_s + '
+											  GROUP BY PIT.player_id,
+													   PIT.ER
+											  ORDER BY PIT.ER DESC,
+													   COUNT(*) DESC')
+			@max_pit_R = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.R,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+												 WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY PIT.player_id,
+													   PIT.R
+											  ORDER BY PIT.R DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_pit_R = @max_pit_R[@max_pit_R.size - 1].R
+			@max_pit_R = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.R,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+											     WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   PIT.R >= ' + @lowerBound_pit_R.to_s + '
+											  GROUP BY PIT.player_id,
+													   PIT.R
+											  ORDER BY PIT.R DESC,
+													   COUNT(*) DESC')
+			@max_pit_H = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.H,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+												 WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY PIT.player_id,
+													   PIT.H
+											  ORDER BY PIT.H DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_pit_H = @max_pit_H[@max_pit_H.size - 1].H
+			@max_pit_H = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.H,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+											     WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   PIT.H >= ' + @lowerBound_pit_H.to_s + '
+											  GROUP BY PIT.player_id,
+													   PIT.H
+											  ORDER BY PIT.H DESC,
+													   COUNT(*) DESC')
+			@max_pit_HR = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.HR,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+												 WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1
+											  GROUP BY PIT.player_id,
+													   PIT.HR
+											  ORDER BY PIT.HR DESC,
+													   COUNT(*) DESC
+												 LIMIT ' + @top.to_s)
+			@lowerBound_pit_HR = @max_pit_HR[@max_pit_HR.size - 1].HR
+			@max_pit_HR = Pitching.find_by_sql('SELECT PIT.player_id,
+													   PIT.HR,
+													   COUNT(*) AS G
+												  FROM pitchings AS PIT,
+													   players AS PLY
+											     WHERE PIT.player_id = PLY.player_id AND
+													   PLY.member = 1 AND
+													   PIT.HR >= ' + @lowerBound_pit_HR.to_s + '
+											  GROUP BY PIT.player_id,
+													   PIT.HR
+											  ORDER BY PIT.HR DESC,
+													   COUNT(*) DESC')
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
+	
+	
 	
 end

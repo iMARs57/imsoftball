@@ -5,15 +5,17 @@
     <div class="row">
         <%= render :partial => "sidebar" %>
 		<div class="recordsContent col-sm-9">
-			<h3>隊員查詢</h3>
-			<hr>
 			<% if @player == nil %>
+				<h3>隊員查詢</h3>
+				<hr>
 				<%= form_tag("player" , method:"get") do %>
 					<%= select_tag(:player, options_for_select(@player_option,@player_option[0][1])) %>
 					<%= submit_tag("查詢", name: nil) %>
 				<% end %>
 			<% else %>
-				<h4><%= @playerName %> (<%= @player %>)</h4>
+				<h3><%= (@inactive == 'true')?('其他球員查詢'):('隊員查詢') %></h3>
+				<hr>
+				<h4><%= @playerName %> <%= (@playerName == @player)?(''):('(' +  @player + ')') %></h4>
 				<br/>
 				<h4>年度打擊表現</h4>
 				<br/>
@@ -502,7 +504,9 @@
 						<tfoot>
 							<% if @playerFieldingTotal.G != nil %>
 								<tr>
-									<td style="//text-align:right;">Total</td>
+									<td style="//text-align:right;">
+										<%= link_to 'Total', controller: "records", action: "fielding", player: @player, year: 'Wildcard' %>
+									</td>
 									<td><%= @playerFieldingTotal.G %></td>
 									<td><%= '%.1f' % @playerFieldingTotal.INN.round(1) %></td>
 									<td><%= @playerFieldingTotal.TC %></td>
