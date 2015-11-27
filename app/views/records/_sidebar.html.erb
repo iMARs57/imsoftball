@@ -38,9 +38,9 @@
 			<a href="#" data-toggle="collapse" data-target="#menu3"> 進階分析 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse" id="menu3">
 				<!--
-				<li><a href=""><i class="glyphicon glyphicon-circle"></i> 打擊表現分布</a></li>
-				<li><a href=""><i class="glyphicon glyphicon-circle"></i> 整體守備</a></li>
-				<li><a href=""><i class="glyphicon glyphicon-circle"></i> 近期表現</a></li>
+				<li><%#= link_to "　#{fa_icon "pie-chart 1x", class:"icon_sidebar"} 打擊表現分布".html_safe, {controller: "records", action: "battingN"} %></li>
+				<li><%#= link_to "　#{fa_icon "sliders 1x", class:"icon_sidebar"} 整體守備".html_safe, {controller: "records", action: "fieldingG"} %></li>
+				<li><%#= link_to "　#{fa_icon "history 1x", class:"icon_sidebar"} 近期表現".html_safe, {controller: "records", action: "latest"} %></li>
 				-->
 				<li><%= link_to "　<i class='glyphicon glyphicon-sort-by-order icon_sidebar'></i> 棒次表現".html_safe, {controller: "records", action: "order"} %></li>
 				<li><%= link_to "　#{fa_icon "flag 1x", class:"icon_sidebar"} 單場最佳紀錄".html_safe, {controller: "records", action: "max"} %></li>

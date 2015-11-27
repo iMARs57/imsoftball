@@ -3855,6 +3855,50 @@ class RecordsController < ApplicationController
 		end
 	end
 	
+	def battingN
 	
+		if logged_in?
+
+			@activePLAYER_rate = 1
+			@activePLAYER = 150
+
+			@year = params[:year]
+			@N = params[:N]
+			if @N != nil
+				@N = params[:N]
+			else
+				@N = 3
+			end
+			
+			# 每年有幾場比賽
+			@gameNumberInEachYear = Cup.find_by_sql('SELECT cups.year,
+															COUNT(*) AS gameNumber
+													   FROM games,
+															cups
+													  WHERE games.cup_id = cups.cup_id
+												   GROUP BY cups.year')
+			@gameNumberInYear = Hash.new(0)
+			@gameNumberInWildcard = 0
+			@gameNumberInEachYear.each do |gNIEY|
+				@gameNumberInYear[gNIEY.year.to_s] = gNIEY.gameNumber
+				@gameNumberInWildcard += gNIEY.gameNumber
+			end
+			@gameNumberInYear['Wildcard'] = @gameNumberInWildcard
+			
+			# 組出Year選項
+			@year_option = Array.new
+			@allyear = Cup.select('DISTINCT cups.year').order('cups.year')
+			@allyear.each do |eachyear|
+				@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
+			end
+			@year_option.push(["不分年度","Wildcard"])
+			
+			
+			
+		else
+			session[:previous_url] = request.fullpath
+			redirect_to :action => 'new', :controller => 'sessions'
+		end
+	end
 	
 end
