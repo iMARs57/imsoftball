@@ -5,7 +5,134 @@
     <div class="row">
         <%= render :partial => "sidebar" %>
 		<div class="recordsContent col-sm-9">
-			
+			<h3>近期表現</h3>
+			<hr>
+			<%= form_tag("latest" , method:"get") do %>
+				<%= select_tag(:top, options_for_select(@top_option,@top_option[@top - 1][1])) %>
+				<%= submit_tag("查詢", name: nil) %>
+			<% end %>
+			<br/>
+			<h4>打擊表現</h4>
+			<br/>
+			<h5 style="margin:0 0 10px; text-transform:none">打者本年度 (<%= @year %>) 近 <%= @top %> 場表現，不足 <%= @top %> 場不計。</h5>
+			<div class="table-responsive" id="div_latest_BAT">
+				<table class="table table-striped table-condensed" id="table_latest_BAT">
+					<thead>
+						<tr>
+							<th>打者</th>
+							<th>打席</th>
+							<th>打數</th>
+							<th>安打</th>
+							<th>二壘</th>
+							<th>三壘</th>
+							<th>全壘</th>
+							<th>壘打數</th>
+							<th>打點</th>
+							<th>得分</th>
+							<th>三振</th>
+							<th>四壞</th>
+							<th>故意</th>
+							<th>犧牲</th>
+							<th>失誤</th>
+							<th>打擊率</th>
+							<th>上壘率</th>
+							<th>長打率</th>
+							<th>整體攻擊指數</th>
+							<th>攻擊指數</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% counterBAT = 0 %>
+						<% if @HashPlayerBatting.size != 0 %>
+							<% @HashPlayerBatting.each do |key,value| %>
+								<% if value.AVG == 0.0 then
+									break
+								end %>
+								<%
+									counterBAT = counterBAT + 1
+									colorRed = (255 * value.AVG).round
+									colorGreen = (255 * (1-value.AVG)).round
+								%>
+								<tr>
+									<td><%= link_to @allActivePlayer[key], controller: "records", action: "batting", player: key, year: @year %></td>
+									<td><%= value.PA %></td>
+									<td><%= value.AB %></td>
+									<td><%= value.H %></td>
+									<td><%= value.B2 %></td>
+									<td><%= value.B3 %></td>
+									<td><%= value.HR %></td>
+									<td><%= value.TB %></td>
+									<td><%= value.RBI %></td>
+									<td><%= value.R %></td>
+									<td><%= value.SO %></td>
+									<td><%= value.BB %></td>
+									<td><%= value.IBB %></td>
+									<td><%= value.SF %></td>
+									<td><%= value.E %></td>
+									<td class="sorting" style="color:rgb(<%= colorRed %>,<%= colorGreen %>,0)"><%= '%.3f' % value.AVG.round(3) %></td>
+									<td><%= '%.3f' % value.OBP.round(3) %></td>
+									<td><%= '%.3f' % value.SLG.round(3) %></td>
+									<td><%= '%.3f' % value.OPS.round(3) %></td>
+									<td><%= '%.3f' % value.TA.round(3) %></td>
+								</tr>
+							<% end %>
+						<% end %>
+						<% if counterBAT == 0 %>
+							<tr>
+								<td colspan='20'>目前無符合資料</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+			<br/>
+			<h4>守備表現</h4>
+			<br/>
+			<h5 style="margin:0 0 10px; text-transform:none">野手本年度 (<%= @year %>) 近 <%= @top %> 場表現，不足 <%= @top %> 場不計，捕手三振刺殺紀錄不列入考量。</h5>
+			<div class="table-responsive" id="div_latest_FLD">
+				<table class="table table-striped table-condensed" id="table_latest_FLD">
+					<thead>
+						<tr>
+							<th>野手</th>
+							<th>局數</th>
+							<th>守備機會</th>
+							<th>刺殺</th>
+							<th>助殺</th>
+							<th>失誤</th>
+							<th>守備率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% counterFLD = 0 %>
+						<% if @HashPlayerFielding.size != 0 %>
+							<% @HashPlayerFielding.each do |key,value| %>
+								<% if value.FPCT == 0.0 then
+									break
+								end %>
+								<% 
+									counterFLD = counterFLD + 1
+									colorRed = (255 * value.FPCT).round
+									colorGreen = (255 * (1-value.FPCT)).round
+								%>
+								<tr>
+									<td><%= link_to @allActivePlayer[key], controller: "records", action: "fielding", player: key, year: @year %></td>
+									<td><%= '%.1f' % value.INN.round(1) %></td>
+									<td><%= value.TC %></td>
+									<td><%= value.PO %></td>
+									<td><%= value.A %></td>
+									<td><%= value.E %></td>
+									<td class="sorting" style="color:rgb(<%= colorRed %>,<%= colorGreen %>,0)"><%= '%.3f' % value.FPCT.round(3) %></td>
+								</tr>
+							<% end %>
+						<% end %>
+						<% if counterFLD == 0 %>
+							<tr>
+								<td colspan='7'>目前無符合資料</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
         </div>
         <!--/col-span-9-->
     </div>

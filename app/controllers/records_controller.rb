@@ -3855,45 +3855,151 @@ class RecordsController < ApplicationController
 		end
 	end
 	
-	def battingN
+	def latest
 	
 		if logged_in?
 
-			@activePLAYER_rate = 1
-			@activePLAYER = 150
-
-			@year = params[:year]
-			@N = params[:N]
-			if @N != nil
-				@N = params[:N]
-			else
-				@N = 3
+			@default_top = 5
+			@default_counter = 23
+			@top = @default_top
+			if params[:top] != nil && params[:top].to_i >= 1 && params[:top].to_i <= 10
+				@top = params[:top].to_i
 			end
 			
-			# 每年有幾場比賽
-			@gameNumberInEachYear = Cup.find_by_sql('SELECT cups.year,
-															COUNT(*) AS gameNumber
-													   FROM games,
-															cups
-													  WHERE games.cup_id = cups.cup_id
-												   GROUP BY cups.year')
-			@gameNumberInYear = Hash.new(0)
-			@gameNumberInWildcard = 0
-			@gameNumberInEachYear.each do |gNIEY|
-				@gameNumberInYear[gNIEY.year.to_s] = gNIEY.gameNumber
-				@gameNumberInWildcard += gNIEY.gameNumber
+			
+			@top_option = Array.new
+			for t in 1..10
+				@top_option.push(["近 " + t.to_s + " 場",t])
 			end
-			@gameNumberInYear['Wildcard'] = @gameNumberInWildcard
 			
-			# 組出Year選項
-			@year_option = Array.new
-			@allyear = Cup.select('DISTINCT cups.year').order('cups.year')
-			@allyear.each do |eachyear|
-				@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
+			@allActivePlayer = Hash.new
+			@allActivePlayerQuery = Player.select('players.player_id, members.name')
+										  .where('players.active = 1')
+										  .joins('LEFT JOIN members ON members.id = players.player_id')
+			
+			@allyear = Cup.select('DISTINCT cups.year').order('cups.year DESC')
+			@year = @allyear[0].year
+			
+			Struct.new("PlayerBatting", :PA, :AB, :H, :B2, :B3, :HR, :TB, :RBI, :R, :SO, :BB, :IBB, :SF, :E, :AVG, :OBP, :SLG, :OPS, :TA)
+			Struct.new("PlayerFielding", :INN, :TC, :PO, :A, :E, :FPCT)
+			@HashPlayerBatting = Hash.new
+			@HashPlayerFielding = Hash.new
+			@allActivePlayerQuery.each do |eachPlayer|
+				
+				if eachPlayer.name == nil
+					@allActivePlayer[eachPlayer.player_id] = eachPlayer.player_id
+				else
+					@allActivePlayer[eachPlayer.player_id] = eachPlayer.name
+				end
+				
+				@playerBatting = Batting.find_by_sql('SELECT SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) AS PA,
+															 SUM(BAT.AB) AS AB,
+															 SUM(BAT.H) AS H,
+															 SUM(BAT.B2) AS B2,
+															 SUM(BAT.B3) AS B3,
+															 SUM(BAT.HR) AS HR,
+															 SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3 AS TB,
+															 SUM(BAT.RBI) AS RBI,
+															 SUM(BAT.R) AS R,
+															 SUM(BAT.SO) AS SO,
+															 SUM(BAT.BB) AS BB,
+															 SUM(BAT.IBB) AS IBB,
+															 SUM(BAT.SF) AS SF,
+															 SUM(BAT.E) AS E,
+															 CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS AVG,
+															 CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS OBP,
+															 CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS SLG,
+															 (CAST(CAST(((SUM(BAT.H)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) + (CAST(CAST(((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0) AS OPS,
+															 CAST(CAST((((SUM(BAT.H)+SUM(BAT.B2)*1+SUM(BAT.B3)*2+SUM(BAT.HR)*3)+SUM(BAT.BB)+SUM(BAT.IBB))/(SUM(BAT.AB)-SUM(BAT.H)+SUM(BAT.GIDP)+0.0000000000000000000000000000000000001)*10000) AS SIGNED) AS DECIMAL)/10000.0 AS TA
+														FROM battings AS BAT
+													   WHERE BAT.player_id = "' + eachPlayer.player_id + '" AND
+															 BAT.game_id IN (SELECT * FROM
+																				(SELECT BAT.game_id
+																			       FROM battings AS BAT,
+																					    games AS G,
+																					    cups AS C
+																				  WHERE BAT.game_id = G.game_id AND
+																						G.cup_id = C.cup_id AND
+																						C.year = ' + @year.to_s + ' AND
+																						player_id = "' + eachPlayer.player_id + '"
+																			   ORDER BY BAT.game_id DESC
+																				  LIMIT ' + @top.to_s + ')
+																			 AS t) AND
+															 				(SELECT COUNT(*)
+																			   FROM battings AS BAT,
+																					games AS G,
+																					cups AS C
+																			  WHERE BAT.game_id = G.game_id AND
+																					G.cup_id = C.cup_id AND
+																					C.year = ' + @year.to_s + ' AND
+																					player_id = "' + eachPlayer.player_id + '") >= ' + @top.to_s)[0]
+				
+				if @playerBatting.PA == nil
+					@HashPlayerBatting[eachPlayer.player_id] = Struct::PlayerBatting.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+				else
+					@HashPlayerBatting[eachPlayer.player_id] = Struct::PlayerBatting.new(@playerBatting.PA,
+																						 @playerBatting.AB,
+																						 @playerBatting.H,
+																						 @playerBatting.B2,
+																						 @playerBatting.B3,
+																						 @playerBatting.HR,
+																						 @playerBatting.TB,
+																						 @playerBatting.RBI,
+																						 @playerBatting.R,
+																						 @playerBatting.SO,
+																						 @playerBatting.BB,
+																						 @playerBatting.IBB,
+																						 @playerBatting.SF,
+																						 @playerBatting.E,
+																						 @playerBatting.AVG,
+																						 @playerBatting.OBP,
+																						 @playerBatting.SLG,
+																						 @playerBatting.OPS,
+																						 @playerBatting.TA)
+				end
+				
+				@playerFielding = Fielding.find_by_sql('SELECT SUM(FIELD.InnOuts)/3 AS INN,
+															   SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E) AS TC,
+															   SUM(FIELD.PO) AS PO,
+															   SUM(FIELD.A) AS A,
+															   SUM(FIELD.E) AS E,
+															   CAST(CAST((SUM(FIELD.PO)+SUM(FIELD.A))/(SUM(FIELD.PO)+SUM(FIELD.A)+SUM(FIELD.E)+0.000000000000000000000000000000000000001)*10000 AS SIGNED) AS DECIMAL)/10000 AS FPCT
+														  FROM fieldings AS FIELD
+														 WHERE FIELD.player_id = "' + eachPlayer.player_id + '" AND
+															   FIELD.POS <> "C" AND
+															   FIELD.game_id IN (SELECT * FROM
+																					(SELECT FIELD.game_id
+																					   FROM fieldings AS FIELD,
+																							games AS G,
+																							cups AS C
+																					  WHERE FIELD.game_id = G.game_id AND
+																							G.cup_id = C.cup_id AND
+																							C.year = ' + @year.to_s + ' AND
+																							player_id = "' + eachPlayer.player_id + '"
+																				   ORDER BY FIELD.game_id DESC
+																					  LIMIT ' + @top.to_s + ') AS t)AND
+																				(SELECT COUNT(*)
+																				   FROM fieldings AS FIELD,
+																						games AS G,
+																						cups AS C
+																				  WHERE FIELD.game_id = G.game_id AND
+																						G.cup_id = C.cup_id AND
+																						C.year = ' + @year.to_s + ' AND
+																						player_id = "' + eachPlayer.player_id + '") >= ' + @top.to_s)[0]
+				if @playerFielding.TC == nil
+					@HashPlayerFielding[eachPlayer.player_id] = Struct::PlayerFielding.new(0.0, 0, 0, 0, 0, 0.0)
+				else
+					@HashPlayerFielding[eachPlayer.player_id] = Struct::PlayerFielding.new(@playerFielding.INN,
+																						   @playerFielding.TC,
+																						   @playerFielding.PO,
+																						   @playerFielding.A,
+																						   @playerFielding.E,
+																						   @playerFielding.FPCT)
+				end
 			end
-			@year_option.push(["不分年度","Wildcard"])
 			
-			
+			@HashPlayerBatting = @HashPlayerBatting.sort_by {|k,v| [v.AVG,v.H]}.reverse.to_h
+			@HashPlayerFielding = @HashPlayerFielding.sort_by {|k,v| [v.FPCT,v.TC]}.reverse.to_h
 			
 		else
 			session[:previous_url] = request.fullpath

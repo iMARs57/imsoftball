@@ -89,7 +89,8 @@
 #table_continuity_batting > thead > tr > th,
 #table_continuity_fielding > thead > tr > th,
 #table_continuity_pitching > thead > tr > th,
-table[id^='table_max_'] > thead > tr > th
+table[id^='table_max_'] > thead > tr > th,
+table[id^='table_latest_'] > thead > tr > th
 {
 	
 	background:rgba(192,192,192,0.7);
@@ -182,7 +183,8 @@ img.teamLogo{
 #table_continuity_batting > thead > tr > th, #table_continuity_batting > tbody > tr > td,
 #table_continuity_fielding > thead > tr > th, #table_continuity_fielding > tbody > tr > td,
 #table_continuity_pitching > thead > tr > th, #table_continuity_pitching > tbody > tr > td,
-table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td
+table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td,
+table[id^='table_latest_'] > thead > tr > th, table[id^='table_latest_'] > tbody > tr > td
 {
 	
 	text-align: center;
@@ -337,7 +339,8 @@ td.win{
 #table_continuity_batting > thead > tr > th, #table_continuity_batting > tbody > tr > td,
 #table_continuity_fielding > thead > tr > th, #table_continuity_fielding > tbody > tr > td,
 #table_continuity_pitching > thead > tr > th, #table_continuity_pitching > tbody > tr > td,
-table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td
+table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td,
+table[id^='table_latest_'] > thead > tr > th, table[id^='table_latest_'] > tbody > tr > td
 {	
 	white-space: nowrap;
 }
