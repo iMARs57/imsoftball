@@ -41,7 +41,7 @@ class HomeController < ApplicationController
   def index  
     
 	ntuIP = IPAddr.new("140.112.0.0/16")
-    if (remote_ip === ntuIP) || logged_in?
+    if (ntuIP === remote_ip) || logged_in?
 	
 	  # 執行秀出已授權可看的畫面內容
       if(Time.now.year < 2011)

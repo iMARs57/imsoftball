@@ -35,6 +35,63 @@
 	color: #777777;
 }
 
+.div_Btn_menu{
+	margin-bottom:20px;
+}
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 767px) {
+	
+	#records{
+		
+		overflow: hidden;
+	}
+	
+	.row-offcanvas {
+		position: relative;
+		-webkit-transition: all 0.25s ease-out;
+		-moz-transition: all 0.25s ease-out;
+		transition: all 0.25s ease-out;
+	}
+
+	.row-offcanvas-left.active {
+		//left: 0;
+		-webkit-transform: translateX(50%);
+		-moz-transform: translateX(50%);
+		transform: translateX(50%);
+		
+	}
+
+	.sidebar-offcanvas {
+		position: absolute !important;
+		width: 50%;
+		top: -25px;
+		left: -50%;
+		padding-top: 25px;
+		//margin-left: 12px;
+		padding-right:12px;
+		background-color: #333333;
+		
+	}
+	
+	.sidebar-offcanvas * {
+		color: rgba(255, 255, 255, 0.7) !important;
+	}
+	
+	.recordsContent{
+		padding-left: 25px !important;
+	}
+	
+	.sidebar-offcanvas * a:hover, .sidebar-offcanvas * a:focus{
+		background-color: #242424 !important;
+		color: white !important;
+	}
+}
+
+
 #table_game_oneyear > thead > tr > th, #table_game_oneyear > tbody > tr > td{
 	
 	text-align: center;

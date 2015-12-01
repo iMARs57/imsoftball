@@ -2,9 +2,12 @@
 <!-- Main -->
 <section id="records">
 <div class="container-fluid">
-    <div class="row">
+    <div class="row row-offcanvas row-offcanvas-left">
         <%= render :partial => "sidebar" %>
 		<div class="recordsContent col-sm-9">
+			<div class="visible-xs div_Btn_menu">
+				<button type="button" class="btn btn-primary btn-xs btn_menu" data-toggle="offcanvas"><%= fa_icon "bars 1x" %></button>
+			</div>
 			<h3>對戰成績查詢</h3>
 			<hr>
 			<% if @team == nil %>

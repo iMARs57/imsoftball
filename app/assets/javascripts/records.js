@@ -38,4 +38,20 @@ $(window).on('load resize', function(){
 	$('#table_game_fieldingAway').height(panel_game_fieldingHeight);
 	$('#table_game_fieldingHome').height(panel_game_fieldingHeight);
 	
+	if ($(window).width() < 768){
+		$('.sidebar-offcanvas').css('height', $('#records').height() + 45);
+		$('.sidebar-offcanvas').css('overflow', 'auto');
+	}
+	else{
+		$('.sidebar-offcanvas').css('height', '');
+		$('.sidebar-offcanvas').css('overflow', '');
+	}
+	
+});
+
+$(document).ready(function() {
+	$('[data-toggle=offcanvas]').click(function() {
+		$('.row-offcanvas').toggleClass('active');
+		$("i",this).toggleClass("fa-bars fa-close");
+	});
 });
