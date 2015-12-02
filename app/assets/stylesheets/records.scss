@@ -147,7 +147,8 @@
 #table_continuity_fielding > thead > tr > th,
 #table_continuity_pitching > thead > tr > th,
 table[id^='table_max_'] > thead > tr > th,
-table[id^='table_latest_'] > thead > tr > th
+table[id^='table_latest_'] > thead > tr > th,
+table[id^='table_index_'] > thead > tr > th
 {
 	
 	background:rgba(192,192,192,0.7);
@@ -241,7 +242,8 @@ img.teamLogo{
 #table_continuity_fielding > thead > tr > th, #table_continuity_fielding > tbody > tr > td,
 #table_continuity_pitching > thead > tr > th, #table_continuity_pitching > tbody > tr > td,
 table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td,
-table[id^='table_latest_'] > thead > tr > th, table[id^='table_latest_'] > tbody > tr > td
+table[id^='table_latest_'] > thead > tr > th, table[id^='table_latest_'] > tbody > tr > td,
+table[id^='table_index_'] > thead > tr > th, table[id^='table_index_'] > tbody > tr > td
 {
 	
 	text-align: center;
@@ -384,7 +386,8 @@ td.win{
 #table_cup_fielding_summary > tbody > tr > td,
 #table_player_BattingMax > tbody > tr > td,
 #table_player_PitchingMax > tbody > tr > td,
-#table_order_player_Summary > tbody > tr > td
+#table_order_player_Summary > tbody > tr > td,
+table[id^='table_index_'] > tbody > tr > td
 {	
 	background:rgba(235,235,235,0.7);
 }
@@ -397,7 +400,8 @@ td.win{
 #table_continuity_fielding > thead > tr > th, #table_continuity_fielding > tbody > tr > td,
 #table_continuity_pitching > thead > tr > th, #table_continuity_pitching > tbody > tr > td,
 table[id^='table_max_'] > thead > tr > th, table[id^='table_max_'] > tbody > tr > td,
-table[id^='table_latest_'] > thead > tr > th, table[id^='table_latest_'] > tbody > tr > td
+table[id^='table_latest_'] > thead > tr > th, table[id^='table_latest_'] > tbody > tr > td,
+table[id^='table_index_'] > thead > tr > th, table[id^='table_index_'] > tbody > tr > td
 {	
 	white-space: nowrap;
 }

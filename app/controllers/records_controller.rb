@@ -3,17 +3,170 @@ class RecordsController < ApplicationController
 	
 		if logged_in?
 
-			#member = Member.find('shilamus')
-			#member.nameEN = "HUANG, Chun-szu"
-			#member.birthday = Date.new(1993,2,16)
-			#member.birthplaceCH = "台北市"
-			#member.birthplaceEN = "Taipei  City"
-			#member.high_schoolCH = "台北市私立延平高級中學"
-			#member.high_schoolEN = "Yan Ping High School"
-			#member.position = "P"
-			#member.bats = "R"
-			#member.throws = "R"
-			#member.save
+			if(Time.now.year < 2011)
+				if Time.now.month >= 9
+					@academicYear = '0' + (Time.now.year - 1911).to_s
+					@thisyear = Time.now.year
+				else
+					@academicYear = '0' + (Time.now.year - 1912).to_s
+					@thisyear = Time.now.year - 1
+				end
+			else
+				if Time.now.month >= 9
+					@academicYear = (Time.now.year - 1911).to_s
+					@thisyear = Time.now.year
+					#@thisyear = Time.now.year - 1 # for test
+				else
+					@academicYear = (Time.now.year - 1912).to_s
+					@thisyear = Time.now.year - 1
+				end
+			end
+			
+			@panel_standings_GP = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+									     AND (games.home_team_id = "IM" OR 
+											  games.away_team_id = "IM" OR
+										     (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+										     (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+										     (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+										     (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))')
+									  .count('games.game_id')
+			@panel_standings_W = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+										AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
+											(games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+											(games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+											(games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+											(games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
+										AND ((games.home_score > games.away_score AND games.home_team_id = "IM") OR 
+											(games.home_score < games.away_score AND games.away_team_id = "IM") OR
+											(games.home_score > games.away_score AND games.home_team_id = "IM-A") OR
+											(games.home_score < games.away_score AND games.away_team_id = "IM-A") OR
+											(games.home_score > games.away_score AND games.home_team_id = "IM-B") OR 
+											(games.home_score < games.away_score AND games.away_team_id = "IM-B"))')
+									 .count('games.game_id')
+			@panel_standings_L = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+									   AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
+										   (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+										   (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+										   (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+										   (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
+									   AND ((games.home_score < games.away_score AND games.home_team_id = "IM") OR 
+											(games.home_score > games.away_score AND games.away_team_id = "IM") OR
+											(games.home_score < games.away_score AND games.home_team_id = "IM-A") OR
+											(games.home_score > games.away_score AND games.away_team_id = "IM-A") OR
+											(games.home_score < games.away_score AND games.home_team_id = "IM-B") OR 
+											(games.home_score > games.away_score AND games.away_team_id = "IM-B"))')
+									 .count('games.game_id')
+			@panel_standings_D = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+									   AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
+										   (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+										   (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+										   (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+										   (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
+									   AND ((games.home_score = games.away_score AND games.home_team_id = "IM") OR 
+											(games.home_score = games.away_score AND games.away_team_id = "IM") OR
+											(games.home_score = games.away_score AND games.home_team_id = "IM-A") OR
+											(games.home_score = games.away_score AND games.away_team_id = "IM-A") OR
+											(games.home_score = games.away_score AND games.home_team_id = "IM-B") OR 
+											(games.home_score = games.away_score AND games.away_team_id = "IM-B"))')
+									 .count('games.game_id')
+			@panel_standings_WLD = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+										  AND (games.home_team_id = "IM" OR 
+											   games.away_team_id = "IM" OR
+											  (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
+											  (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
+											  (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
+											  (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))')
+			@counter = 0;
+			@panel_standings_last10_W = 0
+			@panel_standings_last10_L = 0
+			@panel_standings_last10_D = 0
+			@panel_standings_away_W = 0;
+			@panel_standings_away_L = 0;
+			@panel_standings_away_D = 0;
+			@panel_standings_home_W = 0;
+			@panel_standings_home_L = 0;
+			@panel_standings_home_D = 0;
+
+			@panel_standings_WLD.each do |wld|
+				if wld.home_team_id == "IM" || wld.home_team_id == "IM-A" || wld.home_team_id == "IM-B"
+					if wld.home_score > wld.away_score
+						@panel_standings_home_W = @panel_standings_home_W + 1;
+						if @counter < 10
+							@panel_standings_last10_W = @panel_standings_last10_W + 1;
+						end
+					elsif wld.home_score < wld.away_score
+						@panel_standings_home_L = @panel_standings_home_L + 1;
+						if @counter < 10  
+							@panel_standings_last10_L = @panel_standings_last10_L + 1;
+						end
+					else
+						@panel_standings_home_D = @panel_standings_home_D + 1;
+						if @counter < 10
+							@panel_standings_last10_D = @panel_standings_last10_D + 1;
+						end
+					end
+				else
+					if wld.home_score < wld.away_score
+						@panel_standings_away_W = @panel_standings_away_W + 1;
+						if @counter < 10
+							@panel_standings_last10_W = @panel_standings_last10_W + 1;
+						end
+					elsif wld.home_score > wld.away_score 
+						@panel_standings_away_L = @panel_standings_away_L + 1;
+						if @counter < 10
+							@panel_standings_last10_L = @panel_standings_last10_L + 1;
+						end
+					else
+						@panel_standings_away_D = @panel_standings_away_D + 1;
+						if @counter < 10
+							@panel_standings_last10_D = @panel_standings_last10_D + 1;
+						end
+					end
+				end
+				@counter = @counter + 1;
+			end
+
+			@panel_standings_forAvgBat = Game.find_by_sql('SELECT SUM(b.AB) AS allAB, SUM(b.H) AS allH, SUM(b.HR) AS allHR
+													 FROM games AS g, battings AS b
+													 WHERE g.game_id LIKE "' + @academicYear + '__"
+													 AND (g.home_team_id = "IM" OR 
+														  g.away_team_id = "IM" OR
+														 (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
+														 (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
+														 (g.away_team_id = "IM-A" AND g.home_team_id <> "IM-B") OR
+														 (g.away_team_id = "IM-B" AND g.home_team_id <> "IM-A"))
+													 AND g.game_id = b.game_id
+													 AND (b.team_id = "IM" OR
+														  b.team_id = "IM-A" OR
+														  b.team_id = "IM-B")')[0]
+			@panel_standings_forAvgDef = Game.find_by_sql('SELECT SUM(f.PO) AS allPO, SUM(f.A) AS allA, SUM(f.E) AS allE
+													 FROM games AS g, fieldings AS f
+													 WHERE g.game_id LIKE "' + @academicYear + '__"
+													 AND (g.home_team_id = "IM" OR 
+														  g.away_team_id = "IM" OR
+														 (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
+														 (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
+														 (g.away_team_id = "IM-A" AND g.home_team_id <> "IM-B") OR
+														 (g.away_team_id = "IM-B" AND g.home_team_id <> "IM-A"))
+													 AND g.game_id = f.game_id
+													 AND (f.team_id = "IM" OR
+														  f.team_id = "IM-A" OR
+														  f.team_id = "IM-B")')[0]
+			@panel_standings_forAvgERA = Game.find_by_sql('SELECT SUM(p.IPouts) AS allIPouts, SUM(p.ER) AS allER
+													 FROM games AS g, pitchings AS p
+													 WHERE g.game_id LIKE "' + @academicYear + '__"
+													 AND (g.home_team_id = "IM" OR 
+														  g.away_team_id = "IM" OR
+														 (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
+														 (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
+														 (g.away_team_id = "IM-A" AND g.home_team_id <> "IM-B") OR
+														 (g.away_team_id = "IM-B" AND g.home_team_id <> "IM-A"))
+													 AND g.game_id = p.game_id
+													 AND (p.team_id = "IM" OR
+														  p.team_id = "IM-A" OR
+														  p.team_id = "IM-B")')[0]
+			@panel_standings_AvgERA5 = '%.2f' % (15.0 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
+			@panel_standings_AvgERA7 = '%.2f' % (21.0 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
 			
 		else
 			session[:previous_url] = request.fullpath
@@ -3880,8 +4033,8 @@ class RecordsController < ApplicationController
 			@allyear = Cup.select('DISTINCT cups.year').order('cups.year DESC')
 			@year = @allyear[0].year
 			
-			Struct.new("PlayerBatting", :PA, :AB, :H, :B2, :B3, :HR, :TB, :RBI, :R, :SO, :BB, :IBB, :SF, :E, :AVG, :OBP, :SLG, :OPS, :TA)
-			Struct.new("PlayerFielding", :INN, :TC, :PO, :A, :E, :FPCT)
+			Struct.new("PlayerBattingLatest", :PA, :AB, :H, :B2, :B3, :HR, :TB, :RBI, :R, :SO, :BB, :IBB, :SF, :E, :AVG, :OBP, :SLG, :OPS, :TA)
+			Struct.new("PlayerFieldingLatest", :INN, :TC, :PO, :A, :E, :FPCT)
 			@HashPlayerBatting = Hash.new
 			@HashPlayerFielding = Hash.new
 			@allActivePlayerQuery.each do |eachPlayer|
@@ -3935,27 +4088,27 @@ class RecordsController < ApplicationController
 																					player_id = "' + eachPlayer.player_id + '") >= ' + @top.to_s)[0]
 				
 				if @playerBatting.PA == nil
-					@HashPlayerBatting[eachPlayer.player_id] = Struct::PlayerBatting.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+					@HashPlayerBatting[eachPlayer.player_id] = Struct::PlayerBattingLatest.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 				else
-					@HashPlayerBatting[eachPlayer.player_id] = Struct::PlayerBatting.new(@playerBatting.PA,
-																						 @playerBatting.AB,
-																						 @playerBatting.H,
-																						 @playerBatting.B2,
-																						 @playerBatting.B3,
-																						 @playerBatting.HR,
-																						 @playerBatting.TB,
-																						 @playerBatting.RBI,
-																						 @playerBatting.R,
-																						 @playerBatting.SO,
-																						 @playerBatting.BB,
-																						 @playerBatting.IBB,
-																						 @playerBatting.SF,
-																						 @playerBatting.E,
-																						 @playerBatting.AVG,
-																						 @playerBatting.OBP,
-																						 @playerBatting.SLG,
-																						 @playerBatting.OPS,
-																						 @playerBatting.TA)
+					@HashPlayerBatting[eachPlayer.player_id] = Struct::PlayerBattingLatest.new(@playerBatting.PA,
+																							   @playerBatting.AB,
+																							   @playerBatting.H,
+																							   @playerBatting.B2,
+																							   @playerBatting.B3,
+																							   @playerBatting.HR,
+																							   @playerBatting.TB,
+																							   @playerBatting.RBI,
+																							   @playerBatting.R,
+																							   @playerBatting.SO,
+																							   @playerBatting.BB,
+																							   @playerBatting.IBB,
+																							   @playerBatting.SF,
+																							   @playerBatting.E,
+																							   @playerBatting.AVG,
+																							   @playerBatting.OBP,
+																							   @playerBatting.SLG,
+																							   @playerBatting.OPS,
+																							   @playerBatting.TA)
 				end
 				
 				@playerFielding = Fielding.find_by_sql('SELECT SUM(FIELD.InnOuts)/3 AS INN,
@@ -3987,14 +4140,14 @@ class RecordsController < ApplicationController
 																						C.year = ' + @year.to_s + ' AND
 																						player_id = "' + eachPlayer.player_id + '") >= ' + @top.to_s)[0]
 				if @playerFielding.TC == nil
-					@HashPlayerFielding[eachPlayer.player_id] = Struct::PlayerFielding.new(0.0, 0, 0, 0, 0, 0.0)
+					@HashPlayerFielding[eachPlayer.player_id] = Struct::PlayerFieldingLatest.new(0.0, 0, 0, 0, 0, 0.0)
 				else
-					@HashPlayerFielding[eachPlayer.player_id] = Struct::PlayerFielding.new(@playerFielding.INN,
-																						   @playerFielding.TC,
-																						   @playerFielding.PO,
-																						   @playerFielding.A,
-																						   @playerFielding.E,
-																						   @playerFielding.FPCT)
+					@HashPlayerFielding[eachPlayer.player_id] = Struct::PlayerFieldingLatest.new(@playerFielding.INN,
+																								 @playerFielding.TC,
+																								 @playerFielding.PO,
+																								 @playerFielding.A,
+																								 @playerFielding.E,
+																								 @playerFielding.FPCT)
 				end
 			end
 			
