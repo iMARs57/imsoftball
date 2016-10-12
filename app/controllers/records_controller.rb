@@ -22,13 +22,13 @@ class RecordsController < ApplicationController
 				end
 			end
 			
-			@panel_standings_GP = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+			@panel_standings_GP = Game.where(['games.game_id LIKE ? 
 									     AND (games.home_team_id = "IM" OR 
 											  games.away_team_id = "IM" OR
 										     (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
 										     (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
 										     (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
-										     (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))')
+										     (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))',@academicYear+'__'])
 									  .count('games.game_id')
 			@panel_standings_W = Game.where('games.game_id LIKE "' + @academicYear + '__" 
 										AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
@@ -188,7 +188,7 @@ class RecordsController < ApplicationController
 					@year_option.push([eachyear.year.to_s + "(" + (eachyear.year - 1911).to_s + "年度)",eachyear.year])
 				end
 			elsif @year != nil && @game_id == nil 
-				@game_oneyear = Game.find_by_sql('SELECT G.game_id,
+				@game_oneyear = Game.find_by_sql(['SELECT G.game_id,
 														 C.year,
 														 C.cup_name,
 														 teamAway.team_name AS teamAwayName,
@@ -204,8 +204,8 @@ class RecordsController < ApplicationController
 												   WHERE G.cup_id = C.cup_id AND
 														 teamHome.team_id = G.home_team_id AND
 														 teamAway.team_id = G.away_team_id AND
-														 C.year = "' + @year.to_s + '"
-												ORDER BY G.game_id')
+														 C.year = ?
+												ORDER BY G.game_id',@year.to_s])
 			else
 				
 				@winner = ""

@@ -1,0 +1,62 @@
+<%= javascript_include_tag 'rec_app' %>
+<!-- Main -->
+<section id="rec_app">
+<div class="container-fluid">
+    <div class="row row-offcanvas row-offcanvas-left">
+        <%= render :partial => "sidebar" %>
+		<div class="rec_appContent col-sm-9">
+			<div class="visible-xs div_Btn_menu">
+				<button type="button" class="btn btn-primary btn-xs btn_menu" data-toggle="offcanvas"><%= fa_icon "bars 1x" %></button>
+			</div>
+			<h3>比賽登錄</h3>
+			<hr>
+			<h4>從Google Drive匯入</h4>
+			<br/>
+			<% if @url == nil %>
+				<%= form_tag("game_import" , method:"post") do %>
+					<%= label_tag 'label_url', '請輸入Google Sheet紀錄的網址：' %>
+					<br/>
+					<%= text_field_tag 'sheetURL', nil, placeholder: ' ex. https://docs.google.com/spreadsheets/d/thisisyourkey/edit#gid=0&vpid=A1 ', size: 70 %>
+					<%= submit_tag("繼續", name: nil) %>
+				<% end %>
+			<% else %>
+				
+				<div id="div_gameForm" style="font-weight:bolder">
+					<%= render :partial => "gameform", :locals => {:sheetsKey => @key} %>
+				</div>
+				<!--
+				<div id="test" style="font-weight:bolder">
+					<table>
+						<thead>
+							<tr>
+								<th>棒次</th>
+								<th>守位</th>
+								<th>姓名</th>
+								<th>打席</th>
+								<th>打數</th>
+								<th>安打</th>
+								<th>得分</th>
+								<th>打點</th>
+								<th>犧牲</th>
+								<th>壘打數</th>
+								<th>全壘打</th>
+								<th>三振</th>
+								<th>四壞</th>
+								<th>打擊率</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+						</tbody>
+					</table>
+				</div>
+				-->
+				
+			<% end %>
+			
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>

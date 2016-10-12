@@ -13,14 +13,14 @@ class HomeController < ApplicationController
 			return remIP
 		end
 	end
-	
+
 	def memberQuery(age)
 		@query = Member.select('members.*')
                        .where('members.IM_age = ' + age.to_s)
                        .order('number')
 		return @query
 	end
-	
+
 	def memberQuery_active(age)
 		@query = Member.select('members.*')
                        .where('members.IM_age = ' + age.to_s)
@@ -28,7 +28,7 @@ class HomeController < ApplicationController
                        .order('number')
 		return @query
 	end
-	
+
 	def memberQuery_leadership(age, type)
 		@query = Member.select('members.*')
                        .where('members.IM_age = ' + age.to_s)
@@ -36,13 +36,13 @@ class HomeController < ApplicationController
                        .order('number')
 		return @query
 	end
-	
 
-  def index  
-    
+
+  def index
+
 	ntuIP = IPAddr.new("140.112.0.0/16")
     if (ntuIP === remote_ip) || logged_in?
-	
+
 	  # 執行秀出已授權可看的畫面內容
       if(Time.now.year < 2011)
         if Time.now.month >= 9
@@ -62,7 +62,7 @@ class HomeController < ApplicationController
           @thisyear = Time.now.year - 1
         end
       end
-	  
+
       # News' kaminari setup
       @informations = Information.order('date DESC').page(params[:page]).per(10)
       # SQL for Info Board
@@ -110,55 +110,55 @@ class HomeController < ApplicationController
                                  .joins('INNER JOIN teams AS teamAway ON games.away_team_id = teamAway.team_id')
                                  .joins('INNER JOIN teams AS teamHome ON games.home_team_id = teamHome.team_id')
                                  .order('game_id DESC').take(5)
-      @panel_standings_GP = Game.where('games.game_id LIKE "' + @academicYear + '__" 
-                                   AND (games.home_team_id = "IM" OR 
+      @panel_standings_GP = Game.where('games.game_id LIKE "' + @academicYear + '__"
+                                   AND (games.home_team_id = "IM" OR
                                         games.away_team_id = "IM" OR
                                        (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
                                        (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
                                        (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
                                        (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))')
                                 .count('games.game_id')
-      @panel_standings_W = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+      @panel_standings_W = Game.where('games.game_id LIKE "' + @academicYear + '__"
                                    AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
                                        (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
                                        (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
                                        (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
                                        (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
-                                   AND ((games.home_score > games.away_score AND games.home_team_id = "IM") OR 
+                                   AND ((games.home_score > games.away_score AND games.home_team_id = "IM") OR
                                         (games.home_score < games.away_score AND games.away_team_id = "IM") OR
                                         (games.home_score > games.away_score AND games.home_team_id = "IM-A") OR
                                         (games.home_score < games.away_score AND games.away_team_id = "IM-A") OR
-                                        (games.home_score > games.away_score AND games.home_team_id = "IM-B") OR 
+                                        (games.home_score > games.away_score AND games.home_team_id = "IM-B") OR
                                         (games.home_score < games.away_score AND games.away_team_id = "IM-B"))')
                                .count('games.game_id')
-      @panel_standings_L = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+      @panel_standings_L = Game.where('games.game_id LIKE "' + @academicYear + '__"
                                    AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
                                        (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
                                        (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
                                        (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
                                        (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
-                                   AND ((games.home_score < games.away_score AND games.home_team_id = "IM") OR 
+                                   AND ((games.home_score < games.away_score AND games.home_team_id = "IM") OR
                                         (games.home_score > games.away_score AND games.away_team_id = "IM") OR
                                         (games.home_score < games.away_score AND games.home_team_id = "IM-A") OR
                                         (games.home_score > games.away_score AND games.away_team_id = "IM-A") OR
-                                        (games.home_score < games.away_score AND games.home_team_id = "IM-B") OR 
+                                        (games.home_score < games.away_score AND games.home_team_id = "IM-B") OR
                                         (games.home_score > games.away_score AND games.away_team_id = "IM-B"))')
                                .count('games.game_id')
-      @panel_standings_D = Game.where('games.game_id LIKE "' + @academicYear + '__" 
+      @panel_standings_D = Game.where('games.game_id LIKE "' + @academicYear + '__"
                                    AND (games.home_team_id = "IM" OR games.away_team_id = "IM" OR
                                        (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
                                        (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
                                        (games.away_team_id = "IM-A" AND games.home_team_id <> "IM-B") OR
                                        (games.away_team_id = "IM-B" AND games.home_team_id <> "IM-A"))
-                                   AND ((games.home_score = games.away_score AND games.home_team_id = "IM") OR 
+                                   AND ((games.home_score = games.away_score AND games.home_team_id = "IM") OR
                                         (games.home_score = games.away_score AND games.away_team_id = "IM") OR
                                         (games.home_score = games.away_score AND games.home_team_id = "IM-A") OR
                                         (games.home_score = games.away_score AND games.away_team_id = "IM-A") OR
-                                        (games.home_score = games.away_score AND games.home_team_id = "IM-B") OR 
+                                        (games.home_score = games.away_score AND games.home_team_id = "IM-B") OR
                                         (games.home_score = games.away_score AND games.away_team_id = "IM-B"))')
                                .count('games.game_id')
-      @panel_standings_WLD = Game.where('games.game_id LIKE "' + @academicYear + '__" 
-                                    AND (games.home_team_id = "IM" OR 
+      @panel_standings_WLD = Game.where('games.game_id LIKE "' + @academicYear + '__"
+                                    AND (games.home_team_id = "IM" OR
                                          games.away_team_id = "IM" OR
                                         (games.home_team_id = "IM-A" AND games.away_team_id <> "IM-B") OR
                                         (games.home_team_id = "IM-B" AND games.away_team_id <> "IM-A") OR
@@ -174,7 +174,7 @@ class HomeController < ApplicationController
       @panel_standings_home_W = 0;
       @panel_standings_home_L = 0;
       @panel_standings_home_D = 0;
-      
+
       @panel_standings_WLD.each do |wld|
         if wld.home_team_id == "IM" || wld.home_team_id == "IM-A" || wld.home_team_id == "IM-B"
           if wld.home_score > wld.away_score
@@ -184,7 +184,7 @@ class HomeController < ApplicationController
             end
           elsif wld.home_score < wld.away_score
             @panel_standings_home_L = @panel_standings_home_L + 1;
-            if @counter < 10  
+            if @counter < 10
               @panel_standings_last10_L = @panel_standings_last10_L + 1;
             end
           else
@@ -199,7 +199,7 @@ class HomeController < ApplicationController
             if @counter < 10
               @panel_standings_last10_W = @panel_standings_last10_W + 1;
             end
-          elsif wld.home_score > wld.away_score 
+          elsif wld.home_score > wld.away_score
             @panel_standings_away_L = @panel_standings_away_L + 1;
             if @counter < 10
               @panel_standings_last10_L = @panel_standings_last10_L + 1;
@@ -217,7 +217,7 @@ class HomeController < ApplicationController
       @panel_standings_forAvgBat = Game.find_by_sql('SELECT SUM(b.AB) AS allAB, SUM(b.H) AS allH, SUM(b.HR) AS allHR
                                                      FROM games AS g, battings AS b
                                                      WHERE g.game_id LIKE "' + @academicYear + '__"
-                                                     AND (g.home_team_id = "IM" OR 
+                                                     AND (g.home_team_id = "IM" OR
                                                           g.away_team_id = "IM" OR
                                                          (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
                                                          (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
@@ -230,7 +230,7 @@ class HomeController < ApplicationController
       @panel_standings_forAvgDef = Game.find_by_sql('SELECT SUM(f.PO) AS allPO, SUM(f.A) AS allA, SUM(f.E) AS allE
                                                      FROM games AS g, fieldings AS f
                                                      WHERE g.game_id LIKE "' + @academicYear + '__"
-                                                     AND (g.home_team_id = "IM" OR 
+                                                     AND (g.home_team_id = "IM" OR
                                                           g.away_team_id = "IM" OR
                                                          (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
                                                          (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
@@ -243,7 +243,7 @@ class HomeController < ApplicationController
       @panel_standings_forAvgERA = Game.find_by_sql('SELECT SUM(p.IPouts) AS allIPouts, SUM(p.ER) AS allER
                                                      FROM games AS g, pitchings AS p
                                                      WHERE g.game_id LIKE "' + @academicYear + '__"
-                                                     AND (g.home_team_id = "IM" OR 
+                                                     AND (g.home_team_id = "IM" OR
                                                           g.away_team_id = "IM" OR
                                                          (g.home_team_id = "IM-A" AND g.away_team_id <> "IM-B") OR
                                                          (g.home_team_id = "IM-B" AND g.away_team_id <> "IM-A") OR
@@ -256,18 +256,18 @@ class HomeController < ApplicationController
       @panel_standings_AvgERA5 = '%.2f' % (15.0 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
       @panel_standings_AvgERA7 = '%.2f' % (21.0 * @panel_standings_forAvgERA.allER.to_f / @panel_standings_forAvgERA.allIPouts.to_f)
 
-      
+
       # Top 5 panel
 
       @activePLAYER = 150
       @gameNumber = Game.where('cups.year = ' + @thisyear.to_s).joins('INNER JOIN cups ON cups.cup_id = games.cup_id').count()
-      @bat_year = 'AND BAT.game_id IN 
-                   (SELECT G.game_id 
-                    FROM battings AS BAT, games AS G, cups AS C 
+      @bat_year = 'AND BAT.game_id IN
+                   (SELECT G.game_id
+                    FROM battings AS BAT, games AS G, cups AS C
                     WHERE BAT.game_id = G.game_id AND G.cup_id = C.cup_id AND C.year = ' + @thisyear.to_s + ' )'
-      @pitch_year = 'AND PIT.game_id IN 
-                     (SELECT G.game_id 
-                      FROM pitchings AS PIT, games AS G, cups AS C 
+      @pitch_year = 'AND PIT.game_id IN
+                     (SELECT G.game_id
+                      FROM pitchings AS PIT, games AS G, cups AS C
                       WHERE PIT.game_id = G.game_id and G.cup_id = C.cup_id and C.year = ' + @thisyear.to_s + ' )'
 
       @Top5AVG = '(SELECT BAT.player_id AS Batter,
@@ -277,18 +277,18 @@ class HomeController < ApplicationController
 						  SUM(BAT.AB) AS ABs,
 						  SUM(BAT.H) AS Hits,
 						  SUM(BAT.RBI) AS RBIs
-					 FROM battings AS BAT, 
+					 FROM battings AS BAT,
 						  players AS PLY
-				    WHERE BAT.player_id = PLY.player_id AND 
+				    WHERE BAT.player_id = PLY.player_id AND
 						  PLY.member = 1 ' +
 						  @bat_year +
 			   ' GROUP BY BAT.player_id,
 						  PLY.player_fname,
-						  PLY.player_lname 
+						  PLY.player_lname
 				   HAVING (SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @gameNumber.to_s + ' OR
-						  SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @activePLAYER.to_s + ' ) 
-				 ORDER BY AVG DESC, 
-						  Hits DESC, 
+						  SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF) >= ' + @activePLAYER.to_s + ' )
+				 ORDER BY AVG DESC,
+						  Hits DESC,
 						  RBIs DESC)'
 	  @panel_top5_AVG = Batting.find_by_sql('SELECT QueryAVG.Batter AS ID,
                                                     QueryAVG.AVG AS Data,
@@ -300,7 +300,7 @@ class HomeController < ApplicationController
                                                     ON QueryAVG.AVG < QueryAVG2.AVG
                                                     GROUP BY QueryAVG.Batter,
                                                              QueryAVG.AVG
-                                                    HAVING Rank IN 
+                                                    HAVING Rank IN
                                                         (SELECT * FROM (SELECT COUNT(QueryAVG2.AVG)+1 AS avgRank
                                                            FROM ' + @Top5AVG + ' AS QueryAVG
                                                       LEFT JOIN ' + @Top5AVG + ' AS QueryAVG2 ON QueryAVG.AVG < QueryAVG2.AVG
@@ -317,20 +317,20 @@ class HomeController < ApplicationController
 						   SUM(BAT.BB) AS BBs,
 						   SUM(BAT.IBB) AS IBBs,
 						   SUM(BAT.SF) AS SFs,
-						   CASE WHEN ((SUM(BAT.AB) + SUM(BAT.BB) + SUM(BAT.IBB) + SUM(BAT.SF)) > ' + @gameNumber.to_s + ') OR 
+						   CASE WHEN ((SUM(BAT.AB) + SUM(BAT.BB) + SUM(BAT.IBB) + SUM(BAT.SF)) > ' + @gameNumber.to_s + ') OR
 								   ((SUM(BAT.AB) + SUM(BAT.BB) + SUM(BAT.IBB) + SUM(BAT.SF)) > ' + @activePLAYER.to_s + ')
 								THEN CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+0.0000000000000000000000000000000000001)*1000) AS SIGNED) AS DECIMAL)/1000.0
 							    ELSE CAST(CAST((SUM(BAT.H)/(SUM(BAT.AB)+(' + [@gameNumber, @activePLAYER].min.to_s + ' - (SUM(BAT.AB) + SUM(BAT.BB) + SUM(BAT.IBB) + SUM(BAT.SF)))+0.0000000000000000000000000000000000001)*1000) AS SIGNED) AS DECIMAL)/1000.0
 						   END AS AVGS,
-						   SUM(BAT.RBI) AS RBIs     
-					  FROM battings AS BAT, 
+						   SUM(BAT.RBI) AS RBIs
+					  FROM battings AS BAT,
 						   players AS PLY
-				     WHERE BAT.player_id = PLY.player_id AND 
+				     WHERE BAT.player_id = PLY.player_id AND
 						   PLY.member = 1 ' +
 						   @bat_year +
 				' GROUP BY BAT.player_id
-				  ORDER BY AVGS DESC, 
-						   Hits DESC, 
+				  ORDER BY AVGS DESC,
+						   Hits DESC,
 						   RBIs DESC)'
       @panel_top5_AVGS = Batting.find_by_sql('SELECT QueryAVGS.Batter AS ID,
                                                      CONCAT("(",CAST(FORMAT(QueryAVGS.AVGS,3) AS CHAR(10)),"/",CAST(FORMAT(QueryAVGS.AVG,3) AS CHAR(10)),")") AS Data,
@@ -342,7 +342,7 @@ class HomeController < ApplicationController
                                                      ON QueryAVGS.AVGS < QueryAVGS2.AVGS
                                                      GROUP BY QueryAVGS.Batter,
                                                               QueryAVGS.AVGS
-                                                    HAVING Rank IN 
+                                                    HAVING Rank IN
                                                         (SELECT * FROM (SELECT COUNT(QueryAVGS2.AVGS)+1 AS avgsRank
                                                            FROM ' + @Top5AVGS + ' AS QueryAVGS
                                                       LEFT JOIN ' + @Top5AVGS + ' AS QueryAVGS2 ON QueryAVGS.AVGS < QueryAVGS2.AVGS
@@ -355,14 +355,14 @@ class HomeController < ApplicationController
 						PLY.player_lname AS lName,
 						SUM(BAT.H) AS Hits,
 						SUM(BAT.AB) AS ABs
-				   FROM battings AS BAT, 
+				   FROM battings AS BAT,
 					    players AS PLY
-				  WHERE BAT.player_id = PLY.player_id AND 
+				  WHERE BAT.player_id = PLY.player_id AND
 						PLY.member = 1 ' +
 						@bat_year +
-			 ' GROUP BY BAT.player_id 
-				 HAVING SUM(BAT.H) > 0 
-			   ORDER BY Hits DESC, 
+			 ' GROUP BY BAT.player_id
+				 HAVING SUM(BAT.H) > 0
+			   ORDER BY Hits DESC,
 						ABs DESC)'
 	  @panel_top5_H = Batting.find_by_sql('SELECT QueryH.Batter AS ID,
 												  QueryH.Hits AS Data,
@@ -374,7 +374,7 @@ class HomeController < ApplicationController
 												  ON QueryH.Hits < QueryH2.Hits
 												  GROUP BY QueryH.Batter,
 														   QueryH.Hits
-												  HAVING Rank IN 
+												  HAVING Rank IN
 													(SELECT * FROM (SELECT COUNT(QueryH2.Hits)+1 AS hRank
 													   FROM ' + @Top5H + ' AS QueryH
 												  LEFT JOIN ' + @Top5H + ' AS QueryH2 ON QueryH.Hits < QueryH2.Hits
@@ -387,14 +387,14 @@ class HomeController < ApplicationController
 						 PLY.player_lname AS lName,
 						 SUM(BAT.HR) AS HRs,
 						 SUM(BAT.AB) AS ABs
-				  FROM battings AS BAT, 
+				  FROM battings AS BAT,
 					   players AS PLY
-				  WHERE BAT.player_id = PLY.player_id AND 
+				  WHERE BAT.player_id = PLY.player_id AND
 						PLY.member = 1 ' +
 						@bat_year +
-				' GROUP BY BAT.player_id 
-				  HAVING SUM(BAT.HR) > 0 
-				  ORDER BY HRs DESC, 
+				' GROUP BY BAT.player_id
+				  HAVING SUM(BAT.HR) > 0
+				  ORDER BY HRs DESC,
 						   ABs,
 						   SUM(BAT.RBI) DESC)'
 	  @panel_top5_HR = Batting.find_by_sql('SELECT QueryHR.Batter AS ID,
@@ -407,7 +407,7 @@ class HomeController < ApplicationController
                                                     ON QueryHR.HRs < QueryHR2.HRs
                                                     GROUP BY QueryHR.Batter,
                                                              QueryHR.HRs
-                                                    HAVING Rank IN 
+                                                    HAVING Rank IN
                                                         (SELECT * FROM (SELECT COUNT(QueryHR2.HRs)+1 AS hrRank
                                                            FROM ' + @Top5HR + ' AS QueryHR
                                                       LEFT JOIN ' + @Top5HR + ' AS QueryHR2 ON QueryHR.HRs < QueryHR2.HRs
@@ -420,13 +420,13 @@ class HomeController < ApplicationController
 						 PLY.player_lname AS lName,
 						 SUM(BAT.RBI) AS RBIs,
 						 SUM(BAT.AB) AS ABs
-				  FROM battings AS BAT, 
+				  FROM battings AS BAT,
 					   players AS PLY
-				  WHERE BAT.player_id = PLY.player_id AND 
+				  WHERE BAT.player_id = PLY.player_id AND
 						PLY.member = 1 ' +
 						@bat_year +
-				' GROUP BY BAT.player_id 
-				  ORDER BY RBIs DESC, 
+				' GROUP BY BAT.player_id
+				  ORDER BY RBIs DESC,
 						   SUM(BAT.H)/SUM(BAT.AB+0.00000000000000000000000000000000001) DESC,
 						   ABs)'
 	  @panel_top5_RBI = Batting.find_by_sql('SELECT QueryRBI.Batter AS ID,
@@ -439,7 +439,7 @@ class HomeController < ApplicationController
                                                     ON QueryRBI.RBIs < QueryRBI2.RBIs
                                                     GROUP BY QueryRBI.Batter,
                                                              QueryRBI.RBIs
-                                                    HAVING Rank IN 
+                                                    HAVING Rank IN
                                                         (SELECT * FROM (SELECT COUNT(QueryRBI2.RBIs)+1 AS rbiRank
                                                            FROM ' + @Top5RBI + ' AS QueryRBI
                                                       LEFT JOIN ' + @Top5RBI + ' AS QueryRBI2 ON QueryRBI.RBIs < QueryRBI2.RBIs
@@ -451,13 +451,13 @@ class HomeController < ApplicationController
 						 PLY.player_fname AS fName,
 						 PLY.player_lname AS lName,
 						 SUM(BAT.R) AS Rs
-				  FROM battings AS BAT, 
+				  FROM battings AS BAT,
 					   players AS PLY
-				  WHERE BAT.player_id = PLY.player_id AND 
+				  WHERE BAT.player_id = PLY.player_id AND
 						PLY.member = 1 ' +
 						@bat_year +
-				' GROUP BY BAT.player_id 
-				  ORDER BY Rs DESC, 
+				' GROUP BY BAT.player_id
+				  ORDER BY Rs DESC,
 						   SUM(BAT.AB)+SUM(BAT.BB)+SUM(BAT.IBB)+SUM(BAT.SF))'
 	  @panel_top5_R = Batting.find_by_sql('SELECT QueryR.Batter AS ID,
                                                     QueryR.Rs AS Data,
@@ -469,7 +469,7 @@ class HomeController < ApplicationController
                                                     ON QueryR.Rs < QueryR2.Rs
                                                     GROUP BY QueryR.Batter,
                                                              QueryR.Rs
-                                                    HAVING Rank IN 
+                                                    HAVING Rank IN
                                                         (SELECT * FROM (SELECT COUNT(QueryR2.Rs)+1 AS rRank
                                                            FROM ' + @Top5R + ' AS QueryR
                                                       LEFT JOIN ' + @Top5R + ' AS QueryR2 ON QueryR.Rs < QueryR2.Rs
@@ -479,17 +479,17 @@ class HomeController < ApplicationController
                                                     ORDER BY Rank ASC')
       @Top5W = '(SELECT PIT.player_id AS Pitcher,
 						 PLY.player_fname AS fName,
-						 PLY.player_lname AS lName, 
-						 SUM(PIT.W) AS Ws, 
+						 PLY.player_lname AS lName,
+						 SUM(PIT.W) AS Ws,
 						 COUNT(*) AS G
-				  FROM pitchings AS PIT, 
+				  FROM pitchings AS PIT,
 					   players AS PLY
-				  WHERE PLY.player_id = PIT.player_id AND 
+				  WHERE PLY.player_id = PIT.player_id AND
 						PLY.member = 1 ' +
 						@pitch_year +
 				' GROUP BY PIT.player_id
-				  HAVING SUM(PIT.W) > 0 
-				  ORDER BY SUM(PIT.W) DESC, 
+				  HAVING SUM(PIT.W) > 0
+				  ORDER BY SUM(PIT.W) DESC,
 						   SUM(PIT.W)/(SUM(PIT.W)+SUM(PIT.L)) DESC)'
 	  @panel_top5_W = Pitching.find_by_sql('SELECT QueryW.Pitcher AS ID,
                                                    QueryW.Ws AS Data,
@@ -501,7 +501,7 @@ class HomeController < ApplicationController
                                                    ON QueryW.Ws < QueryW2.Ws
                                                    GROUP BY QueryW.Pitcher,
                                                             QueryW.Ws
-                                                   HAVING Rank IN 
+                                                   HAVING Rank IN
                                                        (SELECT * FROM (SELECT COUNT(QueryW2.Ws)+1 AS wRank
                                                           FROM ' + @Top5W + ' AS QueryW
                                                      LEFT JOIN ' + @Top5W + ' AS QueryW2 ON QueryW.Ws < QueryW2.Ws
@@ -511,16 +511,16 @@ class HomeController < ApplicationController
                                                    ORDER BY Rank ASC')
       @Top5SO = '(SELECT PIT.player_id AS Pitcher,
 						PLY.player_fname AS fName,
-						PLY.player_lname AS lName, 
-						SUM(PIT.SO) AS SOs, 
+						PLY.player_lname AS lName,
+						SUM(PIT.SO) AS SOs,
 						SUM(PIT.IPouts)/3 AS IPs
-				  FROM pitchings AS PIT, 
+				  FROM pitchings AS PIT,
 					   players AS PLY
-				  WHERE PLY.player_id = PIT.player_id AND 
+				  WHERE PLY.player_id = PIT.player_id AND
 						PLY.member = 1 ' +
 						@pitch_year +
 				' GROUP BY PIT.player_id
-				  HAVING SUM(PIT.SO) > 0 
+				  HAVING SUM(PIT.SO) > 0
 				  ORDER BY SUM(PIT.SO) DESC)'
 	  @panel_top5_SO = Pitching.find_by_sql('SELECT QuerySO.Pitcher AS ID,
                                                     QuerySO.SOs AS Data,
@@ -532,7 +532,7 @@ class HomeController < ApplicationController
                                                     ON QuerySO.SOs < QuerySO2.SOs
                                                     GROUP BY QuerySO.Pitcher,
                                                              QuerySO.SOs
-                                                    HAVING Rank IN 
+                                                    HAVING Rank IN
                                                         (SELECT * FROM (SELECT COUNT(QuerySO2.SOs)+1 AS soRank
                                                            FROM ' + @Top5SO + ' AS QuerySO
                                                       LEFT JOIN ' + @Top5SO + ' AS QuerySO2 ON QuerySO.SOs < QuerySO2.SOs
@@ -544,15 +544,15 @@ class HomeController < ApplicationController
 							PLY.player_fname AS fName,
 							PLY.player_lname AS lName,
 							CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*15*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA5s,
-							SUM(PIT.ER) AS ERs, 
+							SUM(PIT.ER) AS ERs,
 							SUM(PIT.IPouts)/3 AS IPs
-					   FROM pitchings AS PIT, 
+					   FROM pitchings AS PIT,
 							players AS PLY
-					  WHERE PLY.player_id = PIT.player_id AND 
+					  WHERE PLY.player_id = PIT.player_id AND
 							PLY.member = 1 ' +
 							@pitch_year +
 				 ' GROUP BY PIT.player_id
-					 HAVING (SUM(PIT.IPouts)/3 >= ' + @gameNumber.to_s + ' OR SUM(PIT.IPouts)/3 >= ' + @activePLAYER.to_s + ') 
+					 HAVING (SUM(PIT.IPouts)/3 >= ' + @gameNumber.to_s + ' OR SUM(PIT.IPouts)/3 >= ' + @activePLAYER.to_s + ')
 				   ORDER BY SUM(PIT.ER)/SUM(PIT.IPouts+0.0000000000000000000000000000000000000001))'
       @panel_top5_ERA5 = Pitching.find_by_sql('SELECT QueryERA5.Pitcher AS ID,
                                                       QueryERA5.ERA5s AS Data,
@@ -564,7 +564,7 @@ class HomeController < ApplicationController
                                                       ON QueryERA5.ERA5s > QueryERA52.ERA5s
                                                       GROUP BY QueryERA5.Pitcher,
                                                                QueryERA5.ERA5s
-                                                      HAVING Rank IN 
+                                                      HAVING Rank IN
                                                           (SELECT * FROM (SELECT COUNT(QueryERA52.ERA5s)+1 AS era5Rank
                                                              FROM ' + @Top5ERA5 + ' AS QueryERA5
                                                       LEFT JOIN ' + @Top5ERA5 + ' AS QueryERA52 ON QueryERA5.ERA5s < QueryERA52.ERA5s
@@ -576,15 +576,15 @@ class HomeController < ApplicationController
 							PLY.player_fname AS fName,
 							PLY.player_lname AS lName,
 							CAST(CAST(SUM(PIT.ER)/SUM(PIT.IPouts+0.00000000000000000000000000000000000000001)*21*100 AS SIGNED) AS DECIMAL)/100.0 AS ERA7s,
-							SUM(PIT.ER) AS ERs, 
+							SUM(PIT.ER) AS ERs,
 							SUM(PIT.IPouts)/3 AS IPs
-					   FROM pitchings AS PIT, 
+					   FROM pitchings AS PIT,
 							players AS PLY
-					  WHERE PLY.player_id = PIT.player_id AND 
+					  WHERE PLY.player_id = PIT.player_id AND
 							PLY.member = 1 ' +
 							@pitch_year +
 				 ' GROUP BY PIT.player_id
-					 HAVING (SUM(PIT.IPouts)/3 >= ' + @gameNumber.to_s + ' OR SUM(PIT.IPouts)/3 >= ' + @activePLAYER.to_s + ') 
+					 HAVING (SUM(PIT.IPouts)/3 >= ' + @gameNumber.to_s + ' OR SUM(PIT.IPouts)/3 >= ' + @activePLAYER.to_s + ')
 				   ORDER BY SUM(PIT.ER)/SUM(PIT.IPouts+0.0000000000000000000000000000000000000001))'
       @panel_top5_ERA7 = Pitching.find_by_sql('SELECT QueryERA7.Pitcher AS ID,
                                                       QueryERA7.ERA7s AS Data,
@@ -596,7 +596,7 @@ class HomeController < ApplicationController
                                                       ON QueryERA7.ERA7s > QueryERA72.ERA7s
                                                       GROUP BY QueryERA7.Pitcher,
                                                                QueryERA7.ERA7s
-                                                      HAVING Rank IN 
+                                                      HAVING Rank IN
                                                           (SELECT * FROM (SELECT COUNT(QueryERA72.ERA7s)+1 AS era7Rank
                                                              FROM ' + @Top5ERA7 + ' AS QueryERA7
                                                       LEFT JOIN ' + @Top5ERA7 + ' AS QueryERA72 ON QueryERA7.ERA7s < QueryERA72.ERA7s
@@ -607,11 +607,11 @@ class HomeController < ApplicationController
 	  @Top5WHIP = '(SELECT PIT.player_id AS Pitcher,
 							PLY.player_fname AS fName,
 							PLY.player_lname AS lName,
-							(SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/((SUM(PIT.IPouts)/3)+0.0) AS WHIPs, 
+							(SUM(PIT.H)+SUM(PIT.BB)+SUM(PIT.IBB)+0.0)/((SUM(PIT.IPouts)/3)+0.0) AS WHIPs,
 							SUM(PIT.IPouts)/3 AS IPs
-					   FROM pitchings AS PIT, 
+					   FROM pitchings AS PIT,
 							players AS PLY
-					  WHERE PLY.player_id = PIT.player_id AND 
+					  WHERE PLY.player_id = PIT.player_id AND
 							PLY.member = 1 ' +
 							@pitch_year +
 				 ' GROUP BY PIT.player_id
@@ -627,7 +627,7 @@ class HomeController < ApplicationController
                                                       ON QueryWHIP.WHIPs > QueryWHIP2.WHIPs
                                                       GROUP BY QueryWHIP.Pitcher,
                                                                QueryWHIP.WHIPs
-                                                      HAVING Rank IN 
+                                                      HAVING Rank IN
                                                           (SELECT * FROM (SELECT COUNT(QueryWHIP2.WHIPs)+1 AS whipRank
                                                              FROM ' + @Top5WHIP + ' AS QueryWHIP
                                                       LEFT JOIN ' + @Top5WHIP + ' AS QueryWHIP2 ON QueryWHIP.WHIPs < QueryWHIP2.WHIPs
@@ -654,13 +654,13 @@ class HomeController < ApplicationController
 		@GAlist[i] = memberQuery_leadership(i+1,3).length
 		@counter_GA = @counter_GA + @GAlist[i]
 	  end
-	  
-	  
+
+
 	else
       #沒台大IP又沒登入
       redirect_to :action => 'new', :controller => 'sessions'
-    end                                                     
-	
+    end
+
   end
 
 end

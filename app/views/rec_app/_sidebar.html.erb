@@ -1,0 +1,26 @@
+<div class="col-sm-3 sidebar-offcanvas" id="rec_app_sidebar" role="navigation">
+	
+	<!-- Left column -->
+	<strong><i class="glyphicon glyphicon-floppy-save"></i> 紀錄系統</strong>
+
+	<hr>
+
+	<ul class="nav nav-stacked">
+		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu">比賽登錄 <i class="glyphicon glyphicon-chevron-right"></i></a>
+			<ul class="nav nav-stacked collapse in" id="userMenu">
+				<li><%= link_to "　#{fa_icon "google 1x", class:"icon_sidebar"} GoogleDrive匯入".html_safe, {controller: "rec_app", action: "game_import"} %></li>
+				<li><%= link_to "　#{fa_icon "edit 1x", class:"icon_sidebar"} 手動新增".html_safe, {controller: "rec_app", action: "game_create"} %></li>
+				<li><%= link_to "　#{fa_icon "pencil-square 1x", class:"icon_sidebar"} 從過去紀錄修改".html_safe, {controller: "rec_app", action: "game_edit"} %></li>
+			</ul>
+		</li>
+		
+		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#menu2"> 其他資料修改 <i class="glyphicon glyphicon-chevron-right"></i></a>
+			<ul class="nav nav-stacked collapse" id="menu2">
+				
+			</ul>
+		</li>
+		
+	</ul>
+	
+</div>
+<!-- /col-3 -->

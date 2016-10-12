@@ -6,7 +6,7 @@
 	<hr>
 
 	<ul class="nav nav-stacked">
-		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu">一般查詢 <i class="glyphicon glyphicon-chevron-right"></i></a>
+		<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu"> 一般查詢 <i class="glyphicon glyphicon-chevron-right"></i></a>
 			<ul class="nav nav-stacked collapse in" id="userMenu">
 				<li><%= link_to "　#{fa_icon "newspaper-o 1x", class:"icon_sidebar"} 球賽查詢".html_safe, {controller: "records", action: "game"} %></li>
 				<li><%= link_to "　<i class='glyphicon glyphicon-fire icon_sidebar'></i> 打擊查詢".html_safe, {controller: "records", action: "batting"} %></li>

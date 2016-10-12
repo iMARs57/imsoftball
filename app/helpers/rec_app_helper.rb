@@ -1,0 +1,2 @@
+module RecAppHelper
+end

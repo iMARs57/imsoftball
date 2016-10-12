@@ -5,15 +5,17 @@
  */
 
 @font-face {
-  font-family: KaiGenGothicTW-Medium;
-  src: font-url("KaiGenGothicTW/KaiGenGothicTW-Medium.ttf") format('truetype');
+  
+  font-family: NotoSansCJK;
+  /*
+  src: font-url("KaiGenGothicTW/NotoSansCJK.ttf") format('truetype');
+  */
 }
 
 body {
     width: 100%;
     height: 100%;
-    font-family: KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: font-url("KaiGenGothicTW/KaiGenGothicTW-Medium.ttf") format('truetype');
+    font-family: NotoSansCJK, "Helvetica Neue", Helvetica, Arial, "文泉驛正黑", "WenQuanYi Zen Hei", "黑體-繁", "Heiti TC", "儷黑 Pro", "LiHei Pro", "微軟正黑體", "Microsoft Jhenghei", sans-serif;
     color: #fff;
     background-color: #000000;
 }
@@ -31,8 +33,7 @@ h5,
 h6 {
     margin: 0 0 35px;
     text-transform: uppercase;
-    font-family: Montserrat , KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: font-url("KaiGenGothicTW/KaiGenGothicTW-Medium.ttf") format('truetype');
+    font-family: Montserrat , NotoSansCJK, "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -72,8 +73,7 @@ a:focus {
     margin-bottom: 0;
     border-bottom: 1px solid rgba(255,255,255,.3);
     text-transform: uppercase;
-    font-family: Montserrat, KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: font-url("KaiGenGothicTW/KaiGenGothicTW-Medium.ttf") format('truetype');
+    font-family: Montserrat, NotoSansCJK, "Helvetica Neue",Helvetica,Arial,sans-serif;
     background-color: #000;
 }
 
@@ -312,8 +312,7 @@ a:focus {
 .btn {
     border-radius: 0;
     text-transform: uppercase;
-    font-family: Montserrat, KaiGenGothicTW-Medium, "Helvetica Neue",Helvetica,Arial,sans-serif;
-    src: font-url("KaiGenGothicTW/KaiGenGothicTW-Medium.ttf") format('truetype');
+    font-family: Montserrat, NotoSansCJK, "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-weight: 400;
     -webkit-transition: all .3s ease-in-out;
     -moz-transition: all .3s ease-in-out;
@@ -357,15 +356,15 @@ ul.banner-social-buttons {
 }
 
 ::-moz-selection {
-    text-shadow: none;
-    background: #fcfcfc;
-    background: rgba(255,255,255,.2);
+    //text-shadow: none;
+    background: #a8d1ff;
+    //background: rgba(255,255,255,.2);
 }
 
 ::selection {
-    text-shadow: none;
-    background: #fcfcfc;
-    background: rgba(255,255,255,.2);
+    //text-shadow: none;
+    background: #a8d1ff;
+    //background: rgba(255,255,255,.2);
 
 }
 

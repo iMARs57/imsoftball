@@ -1,0 +1,81 @@
+// Place all the styles related to the recApp controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#rec_app{
+
+	background: #F2F2F2;
+	padding-top: 25px;
+	padding-bottom: 20px;
+	color: black;
+}
+
+#rec_app * h1, #rec_app * h2, #rec_app * h3, #rec_app * h4{
+
+	margin: 0 0;
+	text-transform: none;
+	color: black;
+}
+
+#rec_app * div.table-responsive{
+	border-radius: 5px;
+}
+
+#rec_app_sidebar{
+
+	padding-bottom: 30px;
+}
+
+#rec_app_sidebar * {
+
+	color: #777777;
+}
+
+#rec_app_sidebar * li{
+
+	white-space: nowrap;
+}
+
+#div_null{
+
+	display:block;
+}
+
+#table_gameform_batting td{
+	vertical-align: middle;
+}
+
+.input_batting{
+
+	max-width: 40px;
+	text-align: center;
+}
+
+.input_batting_Name{
+
+	min-width: 175px;
+}
+
+.input_batting_POS{
+
+	width: 70px !important;
+}
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 767px) {
+
+	#rec_app{
+
+		overflow: hidden;
+	}
+
+	#div_null{
+
+		display:none;
+	}
+
+	/* 其餘已在records.scss定義過 */
+}

@@ -1,0 +1,376 @@
+<%= form_tag("game_input" , method:"post", class:"form-horizontal", role:"form") do %>
+	<h4>比賽基本資訊</h4>
+	<br/>
+	<div class="col-sm-6" id="div_gameID">
+		<div class="form-group">
+			<%= label_tag 'label_gameID', '場次編號：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_gameID', nil, placeholder: 'ex. 10401', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6" id="div_null">
+		<script>
+			$(window).on('load resize', function(){
+				$('#div_null').height($('#div_gameID').height());
+			});
+		</script>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_year', '年度：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_year', nil, placeholder: 'ex. 2016', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_cupName', '盃賽名稱：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_cupName', nil, placeholder: 'ex. 台大盃', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_awayName', '客隊隊名：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_awayName', nil, placeholder: 'ex. 台大資管', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_homeName', '主隊隊名：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_homeName', nil, placeholder: 'ex. 台大資管', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_awayID', '客隊ID：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_awayID', nil, placeholder: 'ex. NTUIM', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_homeID', '主隊ID：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_homeID', nil, placeholder: 'ex. NTUIM', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_awayScore', '客隊得分：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_awayScore', nil, class: 'form-control', type:"number", min:0 %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_homeScore', '主隊得分：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_homeScore', nil, class: 'form-control', type:"number", min:0 %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_pitcherWin', '勝利投手：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_pitcherWin', nil, placeholder: '若無請留白', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_pitcherLose', '敗戰投手：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_pitcherLose', nil, placeholder: '若無請留白', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_time', '比賽時間：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_time', nil, placeholder: 'yyyy/mm/dd HH:MM:SS', class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group">
+			<%= label_tag 'label_mvp', 'MVP：', class: 'col-md-4 control-label' %>
+			<div class="col-md-8">
+				<%= text_field_tag 'txt_mvp', nil, class: 'form-control' %>
+			</div>
+		</div>
+	</div>
+	<br/>
+	<h4>打擊成績</h4>
+	<br/>
+	<div class="table-responsive" id="div_gameform_batting">
+		<table class="table table-striped table-condensed" id="table_gameform_batting">
+			<thead>
+				<tr>
+					<th>棒次</th>
+					<th>守位</th>
+					<th>姓名</th>
+					<th>打席</th>
+					<th>打數</th>
+					<th>安打</th>
+					<th>得分</th>
+					<th>打點</th>
+					<th>犧牲打</th>
+					<th>壘打數</th>
+					<th>全壘打</th>
+					<th>三振</th>
+					<th>四壞</th>
+					<th>二壘</th>
+					<th>三壘</th>
+					<th>故意</th>
+					<th>因失誤上壘</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<h4>投球成績</h4>
+	<br/>
+
+	<h4>守備成績</h4>
+	<br/>
+	<%= submit_tag("下一步", name: nil) %>
+<% end %>
+
+<% if sheetsKey != nil %>
+	<!--Load the AJAX API-->
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script>
+
+		var URL_s1 = 'https://docs.google.com/spreadsheets/d/<%= sheetsKey %>/gviz/tq?sheet=比數';
+		var URL_s2 = 'https://docs.google.com/spreadsheets/d/<%= sheetsKey %>/gviz/tq?sheet=打擊';
+		var URL_s3 = 'https://docs.google.com/spreadsheets/d/<%= sheetsKey %>/gviz/tq?sheet=投打';
+		var URL_s4 = 'https://docs.google.com/spreadsheets/d/<%= sheetsKey %>/gviz/tq?sheet=守備';
+		var query_s1 = null;
+		var query_s2 = null;
+		var query_s3 = null;
+		var query_s4 = null;
+
+		var encodePLayerOption = document.createElement('textarea');
+		encodePLayerOption.innerHTML = "<%= @player_option %>";
+		var decodePLayerOption = JSON.parse(encodePLayerOption.value);
+		console.log(decodePLayerOption);
+
+		// make player option
+		var selectbox_player = $('<select id="input_batting_" name="input_batting_" class="form-control"></select>');
+		var option_null = $('<option></option>');
+		selectbox_player.append(option_null);
+		for (var key in decodePLayerOption){
+			var option_Name = $('<option></option>').text(decodePLayerOption[key]);
+			option_Name.attr("name", decodePLayerOption[key]);
+			option_Name.val(key);
+			selectbox_player.append(option_Name);
+		}
+
+		// 載入visualization　API
+		google.load('visualization', '1',
+					{'packages': ['table']});
+		google.setOnLoadCallback(runQuery);
+
+		function runQuery(){
+			// data from 比數 sheet
+			query_s1 = new google.visualization.Query(URL_s1);
+			query_s1.setQuery('select *');
+			query_s1.send(function(resp){
+				var dataTable = resp.getDataTable();
+				var jsonData = JSON.parse(dataTable.toJSON());
+				console.log(jsonData);
+
+				// get info from sheet name
+				var sheetName = '<%= @sheetName %>'.replace(/  +/g, ' ').split(" ");
+				console.log(sheetName);
+				// game ID
+				var gameID = jsonData.rows[0].c[1].v.substring(0,3) + jsonData.rows[0].c[1].v.substring(5,7);
+				$('#txt_gameID').val(gameID);
+				// year
+				var year = sheetName[6].substring(6,10);
+				$('#txt_year').val(year);
+				// cup
+				var cup = sheetName[5];
+				$('#txt_cupName').val(cup);
+				// away name
+				var awayName = jsonData.rows[1].c[1].v;
+				$('#txt_awayName').val(awayName);
+				// home name
+				var homeName = jsonData.rows[2].c[1].v;
+				$('#txt_homeName').val(homeName);
+
+				// away score
+				var awayScore = jsonData.rows[1].c[11].v;
+				$('#txt_awayScore').val(awayScore);
+				// home score
+				var homeScore = jsonData.rows[2].c[11].v;
+				$('#txt_homeScore').val(homeScore);
+
+			});
+
+			// data from 投打 sheet
+			query_s3 = new google.visualization.Query(URL_s3);
+			query_s3.setQuery('select *');
+			query_s3.send(function(resp){
+
+				var dataTable = resp.getDataTable();
+				var jsonData = JSON.parse(dataTable.toJSON());
+				var len = jsonData.rows.length;
+				//console.log(jsonData);
+
+				var rowIdx = 0;
+				for (var i = 0; i < len-1; ++i) {
+					var row = jsonData.rows[i];
+					var tr = $('<tr></tr>');
+					if(row.c[2].v == 'Total'){
+						rowIdx = i;
+						break;
+					}
+					for (var j = 0; j < 13; ++j) {
+						var td = $('<td></td>');
+						td.addClass("text-center");
+						//console.log(row.c[j].v);
+						var columnName;
+						switch(j){
+							case 0:
+								columnName = "Order";
+								var inputbox = $('<input/>');
+								inputbox.attr('id', 'input_batting_'+columnName+'_'+i);
+								inputbox.attr('name', 'input_batting_'+columnName+'_'+i);
+								inputbox.attr('class', 'input_batting');
+								inputbox.attr('type', 'number');
+								inputbox.attr('min', '1');
+								inputbox.attr('max', '99');
+								if(row.c[j] == null && i != 0){
+									inputbox.val(jsonData.rows[i-1].c[j].v);
+								}
+								else{
+									inputbox.val(row.c[j].v);
+								}
+								td.append(inputbox);
+								break;
+							case 1:
+								columnName = "POS";
+								var selectbox_POS = $('<select id="input_batting_" name="input_batting_" class="form-control"></select>');
+								selectbox_POS.attr("id", selectbox_player.attr("id")+columnName+'_'+i);
+								selectbox_POS.attr("name", selectbox_player.attr("name")+columnName+'_'+i);
+								selectbox_POS.addClass("input_batting_"+columnName);
+								var arrayPos = ['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'SF', 'EP', 'PH'];
+								for (var key in arrayPos){
+									var option_POS = $('<option></option>').text(arrayPos[key]);
+									option_POS.attr("name", arrayPos[key]);
+									option_POS.val(arrayPos[key]);
+									selectbox_POS.append(option_POS);
+								}
+								var isFindPOS = false;
+								selectbox_POS.children("option").each(function() {
+								    if($(this).attr("name").toLowerCase() == (row.c[j].v).toLowerCase()){
+										selectbox_POS.val($(this).val());
+										isFindPOS = true;
+										return false; // break
+									}
+								});
+								if(!isFindPOS){
+									selectbox_POS.val("PH");
+								}
+								td.append(selectbox_POS);
+								break;
+							case 2:
+								columnName = "Name";
+
+								var selectbox_Name = selectbox_player.clone();
+								selectbox_Name.attr("id", selectbox_player.attr("id")+columnName+'_'+i);
+								selectbox_Name.attr("name", selectbox_player.attr("name")+columnName+'_'+i);
+								selectbox_Name.addClass("input_batting_"+columnName);
+								var isFindName = false;
+								selectbox_Name.children("option").each(function() {
+								    if($(this).attr("name") != undefined && $(this).attr("name").indexOf(row.c[j].v) != -1){
+										selectbox_Name.val($(this).val());
+										isFindName = true;
+										return false; // break
+									}
+								});
+								if(!isFindName){
+									selectbox_Name.val("");
+								}
+								td.append(selectbox_Name);
+								selectbox_Name.combobox();
+
+
+
+
+								break;
+							case 3:
+								columnName = "PA";
+								break;
+							case 4:
+							columnName = "AB";
+								break;
+							case 5:
+								columnName = "H";
+								break;
+							case 6:
+								columnName = "R";
+								break;
+							case 7:
+								columnName = "RBI";
+								break;
+							case 8:
+								columnName = "SF";
+								break;
+							case 9:
+								columnName = "TB";
+								break;
+							case 10:
+								columnName = "HR";
+								break;
+							case 11:
+								columnName = "SO";
+								break;
+							case 12:
+								columnName = "BB";
+								break;
+							default:
+								break;
+						}
+						if(j >= 3){
+
+							var inputbox = $('<input/>');
+							inputbox.attr('id', 'input_batting_'+columnName+'_'+i);
+							inputbox.attr('name', 'input_batting_'+columnName+'_'+i);
+							inputbox.attr('class', 'input_batting');
+							inputbox.attr('type', 'number');
+							inputbox.attr('min', '0');
+							inputbox.attr('max', '99');
+							inputbox.val(row.c[j].v);
+
+							td.append(inputbox);
+						}
+
+						tr.append(td);
+					}
+					$('#table_gameform_batting > tbody').append(tr);
+				}
+
+			});
+		}
+
+	</script>
+<% end %>

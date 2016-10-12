@@ -58,6 +58,9 @@ gem 'bootstrap-kaminari-views'
 #gem 'devise'
 #gem 'devise-bootstrap-views'
 
+# url analysis
+gem 'mechanize'
+
 # Use thin
 gem 'thin'
 
@@ -79,4 +82,3 @@ group :development, :test do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 end
-

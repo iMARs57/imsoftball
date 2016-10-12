@@ -1,0 +1,19 @@
+<%= javascript_include_tag 'rec_app' %>
+<!-- Main -->
+<section id="rec_app">
+<div class="container-fluid">
+    <div class="row row-offcanvas row-offcanvas-left">
+        <%= render :partial => "sidebar" %>
+		<div class="rec_appContent col-sm-9">
+			<div class="visible-xs div_Btn_menu">
+				<button type="button" class="btn btn-primary btn-xs btn_menu" data-toggle="offcanvas"><%= fa_icon "bars 1x" %></button>
+			</div>
+			<h3>台大資管棒壘球隊　成績紀錄系統</h3>
+			<hr>
+			
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+</section>
