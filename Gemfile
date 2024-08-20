@@ -8,7 +8,7 @@ gem 'sprockets-rails', :require => 'sprockets/railtie'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.1'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+gem 'sqlite3', '~> 1.3.11'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 
@@ -19,6 +19,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
+gem 'execjs', '2.6.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 #gem 'therubyracer', platforms: :ruby
 
@@ -62,7 +63,7 @@ gem 'bootstrap-kaminari-views'
 gem 'thin'
 
 # Use mysql
-gem 'mysql2', "~> 0.3.11"
+gem 'mysql2', "~> 0.3.20"
 
 gem 'tzinfo-data'
 
@@ -78,5 +79,9 @@ group :development, :test do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+
+  gem 'nokogiri', '~> 1.6.6.2'
+  gem 'loofah', '~> 2.0.3'
+  gem 'rails-dom-testing', '~> 1.0.7'
 end
 

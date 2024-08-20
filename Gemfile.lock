@@ -41,7 +41,6 @@ GEM
       execjs
       json
     bcrypt (3.1.10)
-    bcrypt (3.1.10-x64-mingw32)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     bootstrap-kaminari-views (0.0.5)
@@ -94,10 +93,7 @@ GEM
     minitest (5.8.2)
     multi_json (1.11.2)
     mysql2 (0.3.20)
-    mysql2 (0.3.20-x64-mingw32)
     nokogiri (1.6.6.2)
-      mini_portile (~> 0.6.0)
-    nokogiri (1.6.6.2-x64-mingw32)
       mini_portile (~> 0.6.0)
     rack (1.6.4)
     rack-test (0.6.3)
@@ -147,7 +143,6 @@ GEM
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
     sqlite3 (1.3.11)
-    sqlite3 (1.3.11-x64-mingw32)
     thin (1.6.4)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -172,7 +167,6 @@ GEM
 
 PLATFORMS
   ruby
-  x64-mingw32
 
 DEPENDENCIES
   autoprefixer-rails
@@ -181,6 +175,7 @@ DEPENDENCIES
   bootstrap-sass
   byebug
   coffee-rails (~> 4.1.0)
+  execjs (= 2.6.0)
   font-awesome-rails
   gmaps4rails
   jbuilder (~> 2.0)
@@ -188,13 +183,16 @@ DEPENDENCIES
   jquery-easing-rails
   jquery-rails
   kaminari
-  mysql2 (~> 0.3.11)
+  loofah (~> 2.0.3)
+  mysql2 (~> 0.3.20)
+  nokogiri (~> 1.6.6.2)
   rails (= 4.2.1)
+  rails-dom-testing (~> 1.0.7)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   spring
   sprockets-rails
-  sqlite3
+  sqlite3 (~> 1.3.11)
   thin
   turbolinks
   tzinfo-data
@@ -202,4 +200,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.10.6
+   1.16.6
